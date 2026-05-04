@@ -12,9 +12,11 @@ import {
   Table,
   Tooltip,
   Modal,
+  AlertDialog,
 } from "@heroui/react";
 import {
   AlertCircle,
+  Crown,
   Mail,
   Search,
   Shield,
@@ -268,7 +270,7 @@ function DeleteMemberAction({
   };
 
   return (
-    <Modal isOpen={isOpen} onOpenChange={setIsOpen}>
+    <AlertDialog isOpen={isOpen} onOpenChange={setIsOpen}>
       <Tooltip delay={0}>
         <Tooltip.Trigger>
           <Button
@@ -277,6 +279,7 @@ function DeleteMemberAction({
             className="rounded-md text-danger hover:bg-danger/5"
             size="sm"
             variant="ghost"
+            onPress={() => setIsOpen(true)}
           >
             <Trash2 size={16} />
           </Button>
@@ -284,52 +287,53 @@ function DeleteMemberAction({
         <Tooltip.Content>Delete User</Tooltip.Content>
       </Tooltip>
 
-      <Modal.Backdrop
-        className="bg-black/35 backdrop-blur-0"
-        variant="transparent"
+      <AlertDialog.Backdrop
+        className="bg-linear-to-t from-red-950/90 via-red-950/50 to-transparent dark:from-red-950/95 dark:via-red-950/60"
+        variant="blur"
       >
-        <Modal.Container placement="center" scroll="outside" size="xs">
-          <Modal.Dialog className="w-full max-w-[420px]">
-            <Modal.CloseTrigger className="absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-lg text-default-500 transition-colors hover:bg-default-100">
+        <AlertDialog.Container>
+          <AlertDialog.Dialog className="w-full max-w-[420px]">
+            <AlertDialog.CloseTrigger className="absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-lg text-default-500 transition-colors hover:bg-default-100">
               <X size={16} />
-            </Modal.CloseTrigger>
-            <Modal.Header className="flex flex-col gap-1 p-6 pb-2">
-              <div className="flex items-center gap-2">
-                <Trash2 className="text-danger" size={18} />
-                <Modal.Heading className="text-xl font-bold">
-                  Remove Account
-                </Modal.Heading>
-              </div>
-              <p className="text-sm text-default-500">
-                Warning: This operation is permanent and cannot be reversed.
-              </p>
-            </Modal.Header>
-            <Modal.Body className="p-6 pt-2">
+            </AlertDialog.CloseTrigger>
+
+            <AlertDialog.Header className="flex flex-col items-center gap-3 p-6 pb-2 text-center">
+              <AlertDialog.Icon status="danger">
+                <AlertCircle className="size-6" />
+              </AlertDialog.Icon>
+              <AlertDialog.Heading className="text-xl font-bold">
+                Permanently delete this account?
+              </AlertDialog.Heading>
+            </AlertDialog.Header>
+
+            <AlertDialog.Body className="p-6 py-2 text-center">
               <p className="text-sm leading-relaxed text-default-500">
-                Are you sure you want to delete{" "}
-                <strong className="text-foreground">{user.name}</strong>?
+                This action cannot be undone. All data associated with{" "}
+                <strong className="text-foreground">{user.name}</strong> will be
+                permanently removed from the system registry.
               </p>
-            </Modal.Body>
-            <Modal.Footer className="flex justify-end gap-3 p-6 pt-4">
+            </AlertDialog.Body>
+
+            <AlertDialog.Footer className="flex flex-col-reverse gap-3 p-6 pt-4">
               <Button
-                className="font-semibold"
+                className="w-full font-semibold"
                 variant="tertiary"
                 onPress={() => setIsOpen(false)}
               >
-                Cancel
+                Keep Account
               </Button>
               <Button
-                className="font-semibold"
+                className="w-full font-semibold"
                 variant="danger"
                 onPress={handleDelete}
               >
-                Delete
+                Delete Forever
               </Button>
-            </Modal.Footer>
-          </Modal.Dialog>
-        </Modal.Container>
-      </Modal.Backdrop>
-    </Modal>
+            </AlertDialog.Footer>
+          </AlertDialog.Dialog>
+        </AlertDialog.Container>
+      </AlertDialog.Backdrop>
+    </AlertDialog>
   );
 }
 
@@ -346,7 +350,15 @@ export default function UserManagementPage() {
         params: { search: searchQuery },
       });
 
-      setUsers(Array.isArray(response.data) ? response.data : []);
+      const fetchedUsers = Array.isArray(response.data) ? response.data : [];
+      const sortedUsers = [...fetchedUsers].sort((a, b) => {
+        const aAdmin = a.role.toLowerCase() === "admin";
+        const bAdmin = b.role.toLowerCase() === "admin";
+        if (aAdmin && !bAdmin) return -1;
+        if (!aAdmin && bAdmin) return 1;
+        return 0;
+      });
+      setUsers(sortedUsers);
     } catch (error) {
       console.error("Failed to fetch users:", error);
     } finally {
@@ -458,8 +470,12 @@ export default function UserManagementPage() {
                                 className="bg-primary/10 text-primary"
                                 size="sm"
                               >
-                                <Avatar.Fallback className="text-[10px] font-bold">
-                                  {user.name.charAt(0)}
+                                <Avatar.Fallback>
+                                  {isAdmin ? (
+                                    <Crown className="text-warning" size={14} />
+                                  ) : (
+                                    <User size={14} />
+                                  )}
                                 </Avatar.Fallback>
                               </Avatar>
                               <div className="flex flex-col">
