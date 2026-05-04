@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
 import { Card, Button, Select, Label, ListBox, Chip } from "@heroui/react";
 import {
   Building2,
@@ -13,7 +14,6 @@ import {
   RefreshCw,
   AlertCircle,
   CheckCircle2,
-  ChevronRight,
   Settings as SettingsIcon,
 } from "lucide-react";
 
@@ -66,6 +66,7 @@ const categories: SettingCategory[] = [
 ];
 
 export default function Settings() {
+  const { setTheme } = useTheme();
   const [settings, setSettings] = useState({
     instansi_name: "",
     logo_url: "",
@@ -121,6 +122,11 @@ export default function Settings() {
       const value = (settings as any)[key];
 
       await updateSetting(key, String(value));
+
+      if (key === "default_theme") {
+        setTheme(value);
+      }
+
       setMessage({ type: "success", text: "Settings saved successfully!" });
       setTimeout(() => setMessage({ type: "", text: "" }), 3000);
     } catch (error: any) {
@@ -141,6 +147,9 @@ export default function Settings() {
       );
 
       await Promise.all(updates);
+
+      setTheme(settings.default_theme);
+
       setMessage({
         type: "success",
         text: "All settings saved successfully!",
@@ -558,47 +567,28 @@ export default function Settings() {
       {/* Main Content - Sidebar + Content */}
       <div className="flex-1 flex gap-6 min-h-0">
         {/* Sidebar Navigation */}
-        <div className="w-64 flex-shrink-0">
-          <nav className="space-y-1">
+        <Card className="w-60 flex-shrink-0 p-2 h-fit">
+          <nav className="space-y-0.5">
             {categories.map((cat) => (
               <button
                 key={cat.id}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
                   activeCategory === cat.id
-                    ? "bg-primary/10 text-primary shadow-sm"
-                    : "hover:bg-default-100 text-foreground"
+                    ? "bg-primary/10 text-primary"
+                    : "hover:bg-default-50 text-default-600"
                 }`}
                 onClick={() => setActiveCategory(cat.id)}
               >
                 <div
-                  className={`flex-shrink-0 ${activeCategory === cat.id ? "text-primary" : "text-foreground"}`}
+                  className={activeCategory === cat.id ? "text-primary" : ""}
                 >
                   {cat.icon}
                 </div>
-                <div className="flex-1 text-left">
-                  <p
-                    className={`font-medium text-sm ${activeCategory === cat.id ? "text-primary" : "text-foreground"}`}
-                  >
-                    {cat.label}
-                  </p>
-                  <p
-                    className={`text-xs mt-0.5 ${activeCategory === cat.id ? "text-primary" : "text-foreground"}`}
-                  >
-                    {cat.description}
-                  </p>
-                </div>
-                <ChevronRight
-                  className={`flex-shrink-0 transition-transform ${
-                    activeCategory === cat.id
-                      ? "rotate-90 text-primary"
-                      : "text-gray-400 dark:text-gray-500"
-                  }`}
-                  size={16}
-                />
+                <span className="font-medium text-sm">{cat.label}</span>
               </button>
             ))}
           </nav>
-        </div>
+        </Card>
 
         {/* Content Area */}
         <div className="flex-1 overflow-y-auto">

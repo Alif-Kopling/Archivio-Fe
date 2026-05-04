@@ -380,14 +380,16 @@ export default function UserManagementPage() {
   return (
     <div className="flex w-full flex-col gap-6 animate-in fade-in duration-500">
       <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
-        <div>
-          <h1 className="flex items-center gap-2 text-2xl font-bold">
-            <Shield className="text-primary" size={24} />
-            User Management Registry
-          </h1>
-          <p className="text-sm text-default-500">
-            Monitor and manage system access for all registered members.
-          </p>
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-primary/10 text-primary">
+            <Shield size={24} />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold">User Management</h1>
+            <p className="text-sm text-default-500">
+              Monitor and manage system access for all registered members.
+            </p>
+          </div>
         </div>
 
         <AddMemberAction onSuccess={fetchUsers} />

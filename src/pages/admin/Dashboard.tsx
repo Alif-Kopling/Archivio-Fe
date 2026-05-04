@@ -10,6 +10,7 @@ import {
   ArrowDownRight,
   CheckCircle2,
   XCircle,
+  LayoutDashboard,
 } from "lucide-react";
 import {
   BarChart,
@@ -117,11 +118,16 @@ const getSourceChipProps = (sourceType: Document["sourceType"]) => {
 
 const Header: FC = () => (
   <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-    <div>
-      <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-      <p className="text-default-500 text-sm">
-        Monitor and manage all documents and approval requests.
-      </p>
+    <div className="flex items-center gap-3">
+      <div className="p-2 rounded-xl bg-primary/10 text-primary">
+        <LayoutDashboard size={24} />
+      </div>
+      <div>
+        <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+        <p className="text-default-500 text-sm">
+          Monitor and manage all documents and approval requests.
+        </p>
+      </div>
     </div>
     <div className="flex items-center gap-3">
       <div className="relative">
