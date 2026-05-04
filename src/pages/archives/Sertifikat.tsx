@@ -10,8 +10,10 @@ import {
   Clock,
   CheckCircle2,
   Plus,
+  X,
 } from "lucide-react";
 import {
+  Alert,
   Card,
   Button,
   Tooltip,
@@ -530,6 +532,7 @@ export default function SertifikatPage() {
     verified: 0,
   });
   const [searchQuery, setSearchQuery] = useState("");
+  const [uploadSuccess, setUploadSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [issuer, setIssuer] = useState("");
   const [page, setPage] = useState(1);
@@ -598,11 +601,10 @@ export default function SertifikatPage() {
       await api.post("/sertifikat", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      alert(
-        "Certificate uploaded successfully. Please wait for Admin to verify your certificate.",
-      );
+      setUploadSuccess(true);
       setIssuer("");
       fetchSertifikat();
+      setTimeout(() => setUploadSuccess(false), 5000);
     } catch (error: any) {
       alert(`Upload failed: ${error.response?.data?.error ?? error.message}`);
     } finally {
@@ -690,6 +692,29 @@ export default function SertifikatPage() {
         type="file"
         onChange={handleFileChange}
       />
+      {uploadSuccess ? (
+        <div className="fixed bottom-6 right-6 z-50 max-w-md animate-in slide-in-from-bottom-4 fade-in duration-300">
+          <Alert className="shadow-lg" status="warning">
+            <Alert.Indicator />
+            <Alert.Content>
+              <Alert.Title>Certificate Uploaded Successfully</Alert.Title>
+              <Alert.Description>
+                Your certificate has been submitted and is pending administrator
+                approval.
+              </Alert.Description>
+            </Alert.Content>
+            <Button
+              isIconOnly
+              className="h-6 min-w-6 w-6"
+              size="sm"
+              variant="ghost"
+              onClick={() => setUploadSuccess(false)}
+            >
+              <X size={14} />
+            </Button>
+          </Alert>
+        </div>
+      ) : null}
       <StatsSection stats={stats} />
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch w-full flex-1 min-h-0">
         <div className="lg:col-span-3 xl:col-span-2">

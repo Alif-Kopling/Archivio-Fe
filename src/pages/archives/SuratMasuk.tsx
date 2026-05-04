@@ -14,6 +14,7 @@ import {
   Plus,
 } from "lucide-react";
 import {
+  Alert,
   Card,
   Button,
   Tooltip,
@@ -26,6 +27,7 @@ import {
   ListLayout,
   AlertDialog,
 } from "@heroui/react";
+import { X } from "lucide-react";
 
 import api from "@/lib/axios";
 import {
@@ -622,6 +624,7 @@ export default function SuratMasukPage() {
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
   const [uploadForm, setUploadForm] = useState<DocumentUploadFormState>({
     title: "",
     documentDate: "",
@@ -718,8 +721,8 @@ export default function SuratMasukPage() {
       formData.append("status", "draft");
 
       await api.post("/surat-masuk", formData);
-      alert("Document uploaded successfully. Waiting for admin approval.");
       setUploadOpen(false);
+      setUploadSuccess(true);
       setUploadForm({
         title: "",
         documentDate: "",
@@ -727,6 +730,7 @@ export default function SuratMasukPage() {
         file: null,
       });
       fetchSurat();
+      setTimeout(() => setUploadSuccess(false), 5000);
     } catch (error: any) {
       console.error(
         "Upload surat masuk failed:",
@@ -824,6 +828,29 @@ export default function SuratMasukPage() {
         onFileChange={handleUploadFileChange}
         onSubmit={handleSubmitUpload}
       />
+      {uploadSuccess ? (
+        <div className="fixed bottom-6 right-6 z-50 max-w-md animate-in slide-in-from-bottom-4 fade-in duration-300">
+          <Alert className="shadow-lg" status="warning">
+            <Alert.Indicator />
+            <Alert.Content>
+              <Alert.Title>Document Uploaded Successfully</Alert.Title>
+              <Alert.Description>
+                Your document has been submitted and is pending administrator
+                approval.
+              </Alert.Description>
+            </Alert.Content>
+            <Button
+              isIconOnly
+              className="h-6 min-w-6 w-6"
+              size="sm"
+              variant="ghost"
+              onClick={() => setUploadSuccess(false)}
+            >
+              <X size={14} />
+            </Button>
+          </Alert>
+        </div>
+      ) : null}
       <StatsSection stats={stats} />
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch w-full flex-1 min-h-0">
         <div className="lg:col-span-3 xl:col-span-2">
