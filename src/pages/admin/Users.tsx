@@ -354,10 +354,13 @@ export default function UserManagementPage() {
       const sortedUsers = [...fetchedUsers].sort((a, b) => {
         const aAdmin = a.role.toLowerCase() === "admin";
         const bAdmin = b.role.toLowerCase() === "admin";
+
         if (aAdmin && !bAdmin) return -1;
         if (!aAdmin && bAdmin) return 1;
+
         return 0;
       });
+
       setUsers(sortedUsers);
     } catch (error) {
       console.error("Failed to fetch users:", error);
