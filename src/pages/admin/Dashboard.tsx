@@ -2,9 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
 import { FC, useEffect, useState, useCallback } from "react";
-import { Card, Button, Avatar, Table, Chip, Tooltip } from "@heroui/react";
+import { Card, Button, Avatar, Table, Chip, Tooltip, SearchField } from "@heroui/react";
 import {
-  Search,
   Bell,
   ArrowUpRight,
   ArrowDownRight,
@@ -130,17 +129,14 @@ const Header: FC = () => (
       </div>
     </div>
     <div className="flex items-center gap-3">
-      <div className="relative">
-        <Search
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-default-400"
-          size={16}
-        />
-        <input
-          className="bg-default-100 border-none rounded-full py-2 pl-10 pr-4 text-sm focus:ring-1 focus:ring-primary outline-none w-48 md:w-64"
-          placeholder="Search..."
-          type="text"
-        />
-      </div>
+      <SearchField
+        className="w-48 md:w-64"
+      >
+        <SearchField.Group className="w-full">
+          <SearchField.SearchIcon />
+          <SearchField.Input placeholder="Search..." />
+        </SearchField.Group>
+      </SearchField>
       <Button
         isIconOnly
         className="bg-default-100 text-default-500 rounded-full"

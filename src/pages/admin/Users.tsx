@@ -13,12 +13,12 @@ import {
   Tooltip,
   Modal,
   AlertDialog,
+  SearchField,
 } from "@heroui/react";
 import {
   AlertCircle,
   Crown,
   Mail,
-  Search,
   Shield,
   Trash2,
   User,
@@ -397,23 +397,18 @@ export default function UserManagementPage() {
 
       <Card className="overflow-hidden border-none bg-content1 shadow-sm">
         <Card.Header className="flex flex-col gap-4 border-b border-divider p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="relative w-full sm:max-w-[320px]">
-            <Search
-              className="absolute left-3 top-1/2 z-10 -translate-y-1/2 text-default-400"
-              size={16}
-            />
-            <Input
-              className="pl-8"
-              placeholder="Search by user identity..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            {searchLoading && (
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 z-10 text-default-400">
-                <Spinner color="current" size="sm" />
-              </div>
-            )}
-          </div>
+          <SearchField
+            className="w-full sm:max-w-[320px]"
+            value={searchQuery}
+            onChange={setSearchQuery}
+          >
+            <SearchField.Group className="w-full">
+              <SearchField.SearchIcon />
+              <SearchField.Input placeholder="Search by user identity..." />
+              <SearchField.ClearButton />
+            </SearchField.Group>
+          </SearchField>
+          {searchLoading ? <Spinner size="sm" /> : null}
           <div className="flex items-center gap-2 text-xs font-medium italic text-default-400">
             <AlertCircle size={14} />
             Access privileges are strictly governed by assigned roles.

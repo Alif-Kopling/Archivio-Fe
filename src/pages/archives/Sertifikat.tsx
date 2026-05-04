@@ -5,7 +5,6 @@ import {
   Download,
   Eye,
   Trash2,
-  Search,
   Award,
   Clock,
   CheckCircle2,
@@ -18,13 +17,13 @@ import {
   Button,
   Tooltip,
   Chip,
-  Input,
   Spinner,
   Separator,
   Virtualizer,
   ListBox,
   ListLayout,
   AlertDialog,
+  SearchField,
 } from "@heroui/react";
 
 import api from "@/lib/axios";
@@ -447,23 +446,17 @@ const DocumentList: FC<{
           certificates found.
         </p>
       </div>
-      <div className="w-full sm:max-w-[280px] relative">
-        <Search
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-default-400 z-10"
-          size={14}
-        />
-        <Input
-          className="rounded-lg w-full pl-9 pr-9"
-          placeholder="Search certificates..."
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
-        />
-        {searchLoading ? (
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-default-400 z-10">
-            <Spinner color="current" />
-          </div>
-        ) : null}
-      </div>
+      <SearchField
+        className="w-full sm:max-w-[280px]"
+        value={searchQuery}
+        onChange={onSearchChange}
+      >
+        <SearchField.Group className="w-full">
+          <SearchField.SearchIcon />
+          <SearchField.Input placeholder="Search certificates..." />
+          <SearchField.ClearButton />
+        </SearchField.Group>
+      </SearchField>
     </Card.Header>
 
     <Card.Content className="px-1 pb-1 flex-1 overflow-hidden relative">
