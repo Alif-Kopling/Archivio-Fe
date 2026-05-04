@@ -1,5 +1,4 @@
-/* eslint-disable no-console */
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Avatar,
   Button,
@@ -264,9 +263,7 @@ function DeleteMemberAction({
       setIsOpen(false);
       onSuccess();
     } catch (error: any) {
-      alert(
-        `Deletion Failed: ${error.response?.data?.error || error.message}`,
-      );
+      alert(`Deletion Failed: ${error.response?.data?.error || error.message}`);
     }
   };
 
@@ -339,36 +336,31 @@ function DeleteMemberAction({
 export default function UserManagementPage() {
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await api.get("/users");
+      const response = await api.get("/users", {
+        params: { search: searchQuery },
+      });
 
       setUsers(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Failed to fetch users:", error);
     } finally {
       setLoading(false);
+      setSearchLoading(false);
     }
-  }, []);
+  }, [searchQuery]);
 
   useEffect(() => {
-    fetchUsers();
+    setSearchLoading(true);
+    const timer = setTimeout(fetchUsers, 500);
+
+    return () => clearTimeout(timer);
   }, [fetchUsers]);
-
-  const filteredUsers = useMemo(() => {
-    const query = searchQuery.toLowerCase().trim();
-
-    if (!query) return users;
-
-    return users.filter(
-      (user) =>
-        user.name.toLowerCase().includes(query) ||
-        user.email.toLowerCase().includes(query),
-    );
-  }, [searchQuery, users]);
 
   return (
     <div className="flex w-full flex-col gap-6 animate-in fade-in duration-500">
@@ -399,6 +391,11 @@ export default function UserManagementPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
+            {searchLoading && (
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 z-10 text-default-400">
+                <Spinner color="current" size="sm" />
+              </div>
+            )}
           </div>
           <div className="flex items-center gap-2 text-xs font-medium italic text-default-400">
             <AlertCircle size={14} />
@@ -437,7 +434,7 @@ export default function UserManagementPage() {
                         </div>
                       </Table.Cell>
                     </Table.Row>
-                  ) : filteredUsers.length === 0 ? (
+                  ) : users.length === 0 ? (
                     <Table.Row>
                       <Table.Cell
                         className="py-10 text-center italic text-default-400"
@@ -447,7 +444,7 @@ export default function UserManagementPage() {
                       </Table.Cell>
                     </Table.Row>
                   ) : (
-                    filteredUsers.map((user) => {
+                    users.map((user) => {
                       const isAdmin = user.role.toLowerCase() === "admin";
 
                       return (
