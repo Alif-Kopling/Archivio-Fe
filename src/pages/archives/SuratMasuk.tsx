@@ -271,7 +271,7 @@ const DocumentRow: FC<{
             className={`w-9 h-9 flex-shrink-0 rounded-xl flex items-center justify-center border shadow-sm ${
               isPdf
                 ? "bg-danger/10 text-danger border-danger/10"
-                : "bg-primary/10 text-primary border-primary/10"
+                : "bg-accent/10 text-accent border-accent/10"
             }`}
           >
             <FileText size={18} />
