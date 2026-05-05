@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-sort-props */
 import { useNavigate } from "react-router-dom";
 import {
   Button,
@@ -8,8 +9,10 @@ import {
   Link,
   Popover,
   TextField,
+  Tooltip,
 } from "@heroui/react";
 import React, { useState } from "react";
+import { ArrowLeft } from "lucide-react";
 
 import api from "@/lib/axios";
 import DefaultLayout from "@/layouts/default";
@@ -53,7 +56,24 @@ export default function LoginPage() {
 
   return (
     <DefaultLayout>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-center min-h-[calc(100vh-180px)] p-6 lg:p-10">
+      <div className="relative grid grid-cols-1 lg:grid-cols-3 gap-12 items-center min-h-[calc(100vh-180px)] p-6 lg:p-10">
+        {/* Back to Home Button */}
+        <div className="fixed bottom-6 left-6 z-50">
+          <Tooltip delay={0}>
+            <Tooltip.Trigger>
+              <Button
+                isIconOnly
+                className="bg-content1/50 backdrop-blur-md border border-divider hover:bg-default-100 rounded-full shadow-lg"
+                variant="ghost"
+                onPress={() => navigate("/")}
+              >
+                <ArrowLeft size={18} className="text-default-500" />
+              </Button>
+            </Tooltip.Trigger>
+            <Tooltip.Content>Back to Home</Tooltip.Content>
+          </Tooltip>
+        </div>
+
         <div className="hidden lg:flex flex-col lg:col-span-2 space-y-8 animate-in fade-in duration-1000">
           <div className="space-y-4">
             <h1 className="text-7xl font-extrabold tracking-tighter leading-none">
