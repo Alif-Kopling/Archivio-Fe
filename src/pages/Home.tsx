@@ -95,8 +95,8 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               transition={{ delay: 1, duration: 1 }}
             >
-              <Button
-                className="bg-white text-black font-bold tracking-widest px-12 py-6 text-sm hover:bg-white/90 hover:scale-105 transition-all rounded-none shadow-[0_0_20px_rgba(255,255,255,0.1)]"
+              <button
+                className="valorant-btn group relative px-10 py-4 bg-transparent border-none cursor-pointer outline-none overflow-hidden"
                 onMouseEnter={() =>
                   logoControls.start({
                     opacity: 0.2,
@@ -111,10 +111,29 @@ export default function Home() {
                     transition: { duration: 0.5 },
                   })
                 }
-                onPress={() => navigate("/login")}
+                onClick={() => navigate("/login")}
               >
-                EXPLORE NOW
-              </Button>
+                {/* Button Background Layers */}
+                <div className="absolute inset-0 bg-white/5 transition-colors duration-300 group-hover:bg-blue-600/10" />
+                <div className="absolute inset-0 border-[1px] border-white/20 transition-colors duration-300 group-hover:border-blue-600/50" />
+                
+                {/* Valorant Diagonal Cut Shapes */}
+                <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-white/40 group-hover:border-blue-500 group-hover:scale-125 transition-all duration-300" />
+                <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-white/40 group-hover:border-blue-500 group-hover:scale-125 transition-all duration-300" />
+
+                {/* Animated Fill */}
+                <div className="absolute inset-0 w-0 bg-blue-600 transition-all duration-500 ease-out group-hover:w-full opacity-10" />
+
+                {/* The Text */}
+                <span className="relative z-10 text-white font-bold tracking-[0.2em] text-xs flex items-center gap-3 transition-all duration-300 group-hover:tracking-[0.3em] group-hover:text-blue-500">
+                  <span className="w-1 h-1 bg-blue-600 rotate-45 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  EXPLORE NOW
+                  <span className="w-1 h-1 bg-blue-600 rotate-45 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                </span>
+
+                {/* Bottom Glowing Line */}
+                <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-600 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500 shadow-[0_0_15px_rgba(37,99,235,0.8)]" />
+              </button>
             </motion.div>
           </div>
         </main>
@@ -177,6 +196,27 @@ export default function Home() {
         }
         .animate-slow-zoom {
           animation: slow-zoom 20s infinite alternate ease-in-out;
+        }
+        
+        .valorant-btn {
+          clip-path: polygon(
+            0 0,
+            calc(100% - 10px) 0,
+            100% 10px,
+            100% 100%,
+            10px 100%,
+            0 calc(100% - 10px)
+          );
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .valorant-btn:hover {
+          filter: drop-shadow(0 0 8px rgba(37, 99, 235, 0.4));
+          transform: translateY(-2px);
+        }
+
+        .valorant-btn:active {
+          transform: translateY(1px) scale(0.98);
         }
       `}</style>
     </div>
