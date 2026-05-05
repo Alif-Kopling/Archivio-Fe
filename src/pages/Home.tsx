@@ -72,7 +72,7 @@ export default function Home() {
           <motion.div
             animate={logoControls}
             className="absolute text-white"
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.8, color: "#ffffff", filter: "drop-shadow(0 0 0px rgba(37, 99, 235, 0))" }}
             transition={{ duration: 2, ease: "easeOut" }}
           >
             <Logo size={550} />
@@ -89,6 +89,15 @@ export default function Home() {
               ARCHIVIO
             </motion.h1>
 
+            <motion.p
+              animate={{ opacity: 1 }}
+              className="text-white/30 text-[10px] md:text-xs tracking-[0.3em] uppercase font-light mt-4 text-center ml-[0.3em]"
+              initial={{ opacity: 0 }}
+              transition={{ delay: 0.5, duration: 1.5 }}
+            >
+              Manage Documents Smarter, Not Harder
+            </motion.p>
+
             <motion.div
               animate={{ opacity: 1, y: 0 }}
               className="mt-12"
@@ -99,40 +108,50 @@ export default function Home() {
                 className="valorant-btn group relative px-10 py-4 bg-transparent border-none cursor-pointer outline-none overflow-hidden"
                 onMouseEnter={() =>
                   logoControls.start({
-                    opacity: 0.2,
-                    scale: 1.05,
-                    transition: { duration: 0.5 },
+                    opacity: 0.8,
+                    scale: 1.1,
+                    color: "#2563eb",
+                    filter: [
+                      "drop-shadow(0 0 10px #3b82f6) drop-shadow(0 0 20px #2563eb) drop-shadow(0 0 40px #1e40af)",
+                      "drop-shadow(0 0 15px #3b82f6) drop-shadow(0 0 30px #2563eb) drop-shadow(0 0 70px #1e40af)"
+                    ],
+                    transition: { 
+                      duration: 0.5,
+                      filter: { repeat: Infinity, repeatType: "mirror", duration: 1.5 }
+                    },
                   })
                 }
                 onMouseLeave={() =>
                   logoControls.start({
                     opacity: 0.08,
                     scale: 1,
+                    color: "#ffffff",
+                    filter: "drop-shadow(0 0 0px rgba(37, 99, 235, 0))",
                     transition: { duration: 0.5 },
                   })
                 }
                 onClick={() => navigate("/login")}
               >
                 {/* Button Background Layers */}
-                <div className="absolute inset-0 bg-white/5 transition-colors duration-300 group-hover:bg-blue-600/10" />
-                <div className="absolute inset-0 border-[1px] border-white/20 transition-colors duration-300 group-hover:border-blue-600/50" />
+                <div className="absolute inset-0 bg-white/5 transition-colors duration-300 group-hover:bg-white/10" />
+                <div className="absolute inset-0 border-[1px] border-white/20 transition-colors duration-300 group-hover:border-white/50" />
                 
                 {/* Valorant Diagonal Cut Shapes */}
-                <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-white/40 group-hover:border-blue-500 group-hover:scale-125 transition-all duration-300" />
-                <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-white/40 group-hover:border-blue-500 group-hover:scale-125 transition-all duration-300" />
+                <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-white/40 group-hover:border-white group-hover:scale-125 transition-all duration-300" />
+                <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-white/40 group-hover:border-white group-hover:scale-125 transition-all duration-300" />
 
                 {/* Animated Fill */}
-                <div className="absolute inset-0 w-0 bg-blue-600 transition-all duration-500 ease-out group-hover:w-full opacity-10" />
+                <div className="absolute inset-0 w-0 bg-white transition-all duration-500 ease-out group-hover:w-full opacity-10" />
 
                 {/* The Text */}
-                <span className="relative z-10 text-white font-bold tracking-[0.2em] text-xs flex items-center gap-3 transition-all duration-300 group-hover:tracking-[0.3em] group-hover:text-blue-500">
-                  <span className="w-1 h-1 bg-blue-600 rotate-45 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <span className="relative z-10 text-white font-bold tracking-[0.2em] text-xs flex items-center gap-3 transition-all duration-300 group-hover:tracking-[0.3em] group-hover:text-white">
+                  <span className="w-1 h-1 bg-white rotate-45 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   EXPLORE NOW
-                  <span className="w-1 h-1 bg-blue-600 rotate-45 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <span className="w-1 h-1 bg-white rotate-45 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </span>
 
                 {/* Bottom Glowing Line */}
-                <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-600 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500 shadow-[0_0_15px_rgba(37,99,235,0.8)]" />
+                <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-white to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500 shadow-[0_0_15px_rgba(255,255,255,0.6)]" />
               </button>
             </motion.div>
           </div>
@@ -211,7 +230,7 @@ export default function Home() {
         }
         
         .valorant-btn:hover {
-          filter: drop-shadow(0 0 8px rgba(37, 99, 235, 0.4));
+          filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
           transform: translateY(-2px);
         }
 
