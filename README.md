@@ -1,5 +1,7 @@
 # Archivio — Enterprise Digital Archive System
 
+![Archivio Main Interface](./src/docs/Main%20menu.png)
+
 > **"Manage Documents Smarter, Not Harder"**  
 > Sistem manajemen arsip digital terintegrasi yang menggabungkan keamanan data tingkat tinggi dengan arsitektur antarmuka modern. Dirancang untuk mengoptimalkan efisiensi operasional, aksesibilitas instan, dan integritas dokumen dalam ekosistem digital.
 
@@ -62,6 +64,22 @@ Frontend/
 │   ├── types/               # Definisi kontrak data & interface global
 │   └── App.tsx              # Konfigurasi routing & manajemen state utama
 ```
+
+---
+
+## System Interface Gallery
+
+Di bawah ini adalah representasi visual dari modul-modul utama dalam sistem Archivio:
+
+| Dashboard Utama | Manajemen Pengguna |
+|:---:|:---:|
+| ![Admin Dashboard](./src/docs/Admin%20Dashboard.png) | ![Master User](./src/docs/Master%20User.png) |
+| *Statistik & Monitoring Arsip* | *Kontrol Otoritas & Akun* |
+
+| Sistem Verifikasi | Menu Arsip |
+|:---:|:---:|
+| ![Approval System](./src/docs/Aproval%20system.png) | ![Archive Menu](./src/docs/Arcive%20menu.png) |
+| *Pipeline Approval Dokumen* | *Manajemen Folder & Dokumen* |
 
 ---
 
