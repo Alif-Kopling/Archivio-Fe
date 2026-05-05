@@ -22,11 +22,15 @@ export default function Home() {
       id: "01",
       label: "Frontend Repo",
       url: "https://github.com/Alif-Kopling/Archivio-fe",
+      color: "group-hover:text-blue-400 group-hover:drop-shadow-[0_0_8px_rgba(96,165,250,0.8)]",
+      lineColor: "bg-blue-400 shadow-[0_0_10px_rgba(96,165,250,0.8)]",
     },
     {
       id: "02",
       label: "Backend Repo",
       url: "https://github.com/Alif-Kopling/Archivio-be",
+      color: "group-hover:text-yellow-400 group-hover:drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]",
+      lineColor: "bg-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.8)]",
     },
   ];
 
@@ -196,11 +200,11 @@ export default function Home() {
                 <span className="text-[10px] tracking-widest text-white/20 font-mono italic">
                   {item.id}
                 </span>
-                <span className="text-[11px] tracking-[0.3em] font-extralight uppercase group-hover:translate-x-2 transition-transform duration-300">
+                <span className={`text-[11px] tracking-[0.3em] font-extralight uppercase transition-all duration-300 ${item.color} group-hover:translate-x-2`}>
                   {item.label}
                 </span>
                 <div className="h-[1px] w-full bg-white/5 relative overflow-hidden">
-                  <div className="absolute inset-0 bg-white/40 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+                  <div className={`absolute inset-0 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left ${item.lineColor}`} />
                 </div>
               </motion.div>
             ))}
