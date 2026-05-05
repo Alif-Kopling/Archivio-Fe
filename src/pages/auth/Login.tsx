@@ -7,7 +7,7 @@ import {
   Label,
   Link,
   Popover,
-  PopoverTrigger,
+  TextField,
 } from "@heroui/react";
 import React, { useState } from "react";
 
@@ -58,7 +58,7 @@ export default function LoginPage() {
           <div className="space-y-4">
             <h1 className="text-7xl font-extrabold tracking-tighter leading-none">
               Archivio <br />
-              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent brightness-125 saturate-150 drop-shadow-sm">
+              <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent brightness-125 saturate-150 drop-shadow-sm">
                 Digital Modern
               </span>
             </h1>
@@ -89,40 +89,31 @@ export default function LoginPage() {
         <div className="lg:col-span-1 w-full flex justify-center lg:justify-end animate-in fade-in slide-in-from-right duration-700">
           <Card className="h-auto w-full max-w-[380px] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border-none bg-content1/80 backdrop-blur-2xl p-2 rounded-[32px]">
             <Card.Header className="flex flex-col items-center justify-center pt-8 pb-1 gap-1">
-              <h2 className="text-3xl font-bold tracking-tight text-center">
+              <Card.Title className="text-3xl font-bold tracking-tight text-center">
                 Sign In
-              </h2>
+              </Card.Title>
             </Card.Header>
             <Card.Content className="px-6 py-4">
               <Form className="flex flex-col gap-4" onSubmit={onSubmit}>
-                <div className="flex flex-col gap-1.5">
-                  <Label className="text-xs font-bold ml-1" htmlFor="email">
-                    Email
-                  </Label>
+                <TextField isRequired name="email" type="email">
+                  <Label className="text-xs font-bold ml-1">Email</Label>
                   <Input
-                    required
                     className="h-10"
-                    id="email"
                     placeholder="name@email.com"
-                    type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
-                </div>
-                <div className="flex flex-col gap-1.5 mt-2">
-                  <Label className="text-xs font-bold ml-1" htmlFor="password">
-                    Password
-                  </Label>
+                </TextField>
+
+                <TextField isRequired name="password" type="password">
+                  <Label className="text-xs font-bold ml-1">Password</Label>
                   <Input
-                    required
                     className="h-10"
-                    id="password"
                     placeholder="••••••••"
-                    type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
-                </div>
+                </TextField>
 
                 {error && (
                   <p className="text-danger text-[11px] font-bold text-center bg-danger/10 p-2 rounded-lg">
@@ -139,8 +130,9 @@ export default function LoginPage() {
                   </Link>
                 </div>
                 <Button
-                  className="w-full font-bold h-11 mt-2 text-base shadow-lg shadow-primary/20 rounded-xl bg-primary text-primary-foreground"
+                  className="w-full font-bold h-11 mt-2 text-base shadow-lg shadow-blue-500/20 rounded-xl"
                   type="submit"
+                  variant="primary"
                 >
                   {loading ? "Connecting..." : "Sign In Now"}
                 </Button>
@@ -150,11 +142,11 @@ export default function LoginPage() {
               <div className="text-xs text-default-500">
                 Don&apos;t have an account?{" "}
                 <Popover>
-                  <PopoverTrigger>
+                  <Popover.Trigger>
                     <Link className="font-bold text-primary hover:underline ml-1 cursor-pointer">
                       Contact Admin
                     </Link>
-                  </PopoverTrigger>
+                  </Popover.Trigger>
                   <Popover.Content className="max-w-64">
                     <Popover.Dialog className="p-4 outline-none">
                       <Popover.Heading className="text-sm align-center font-bold mb-2">

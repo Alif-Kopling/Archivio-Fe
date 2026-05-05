@@ -499,7 +499,7 @@ export default function Settings() {
             handleSave("default_theme");
           }}
         >
-          {savingCategory === "display" ? "Menyimpan..." : "Simpan Perubahan"}
+          {savingCategory === "display" ? "Saving ..." : "Save Changes"}
         </Button>
       </div>
     </div>

@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import type { DateValue } from "@internationalized/date";
 
-import { FC, ReactNode, ChangeEvent, useId, useRef } from "react";
+import { FC, ReactNode, ChangeEvent, useRef } from "react";
 import { Upload, X } from "lucide-react";
 import { parseDate } from "@internationalized/date";
 import {
@@ -12,6 +12,7 @@ import {
   DatePicker,
   Input,
   Label,
+  TextField,
 } from "@heroui/react";
 
 export interface DocumentUploadFormState {
@@ -78,7 +79,6 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
   onFileChange,
   onSubmit,
 }) => {
-  const inputId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!open) {
@@ -128,8 +128,12 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
               {badgeIcon}
             </div>
             <div>
-              <h3 className="text-lg font-bold text-foreground">{title}</h3>
-              <p className="mt-1 text-xs text-default-500">{description}</p>
+              <Card.Title className="text-lg font-bold text-foreground">
+                {title}
+              </Card.Title>
+              <Card.Description className="mt-1 text-xs text-default-500">
+                {description}
+              </Card.Description>
             </div>
           </div>
           <Button
@@ -145,20 +149,16 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
 
         <Card.Content className="space-y-4 px-6 pb-6 pt-3">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="space-y-1.5 md:col-span-2">
-              <label
-                className="text-xs font-bold text-foreground"
-                htmlFor={`${inputId}-title`}
-              >
+            <TextField className="md:col-span-2" name="title">
+              <Label className="text-xs font-bold text-foreground">
                 Nama Surat
-              </label>
+              </Label>
               <Input
-                id={`${inputId}-title`}
                 placeholder="Contoh: Surat Undangan Rapat"
                 value={form.title}
                 onChange={(event) => onFieldChange("title", event.target.value)}
               />
-            </div>
+            </TextField>
 
             <div className="space-y-1.5">
               <DatePicker
@@ -212,36 +212,28 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
               </DatePicker>
             </div>
 
-            <div className="space-y-1.5">
-              <label
-                className="text-xs font-bold text-foreground"
-                htmlFor={`${inputId}-sender`}
-              >
+            <TextField name="sender">
+              <Label className="text-xs font-bold text-foreground">
                 Pengirim
-              </label>
+              </Label>
               <Input
-                id={`${inputId}-sender`}
                 placeholder="Contoh: PT Maju Bersama"
                 value={form.sender}
                 onChange={(event) =>
                   onFieldChange("sender", event.target.value)
                 }
               />
-            </div>
+            </TextField>
           </div>
 
           <div className="space-y-1.5">
-            <label
-              className="text-xs font-bold text-foreground"
-              htmlFor={`${inputId}-file`}
-            >
+            <Label className="text-xs font-bold text-foreground">
               Upload File
-            </label>
+            </Label>
             <input
               ref={fileInputRef}
               accept={ACCEPTED_FORMATS}
               className="hidden"
-              id={`${inputId}-file`}
               type="file"
               onChange={handleFileSelection}
             />
