@@ -59,7 +59,7 @@ export default function LoginPage() {
             <h1 className="text-7xl font-extrabold tracking-tighter leading-none">
               Archivio <br />
               <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent brightness-125 saturate-150 drop-shadow-sm">
-                Digital Modern
+                Digital Archive
               </span>
             </h1>
             <p className="text-sm text-default-500 max-w-xl leading-relaxed">
