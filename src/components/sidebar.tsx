@@ -1,12 +1,17 @@
 import { FC } from "react";
-import { LayoutDashboard, FileText, Settings, Users } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { LayoutDashboard, FileText, Settings, Users, LogOut, Crown, User } from "lucide-react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { Button, Avatar, Tooltip } from "@heroui/react";
 
 import { Logo } from "@/components/icons";
-import { getRole } from "@/lib/auth";
+import { getRole, getUserFromToken } from "@/lib/auth";
 
 export const Sidebar: FC = () => {
   const role = getRole();
+  const navigate = useNavigate();
+  const user = getUserFromToken();
+
+  const isAdmin = role === "ADMIN";
 
   const menuItems = [
     {
@@ -39,6 +44,13 @@ export const Sidebar: FC = () => {
     (item) => !role || item.roles.includes(role),
   );
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("role");
+    navigate("/login");
+  };
+
   return (
     <aside className="w-64 border-r border-divider p-6 hidden md:flex flex-col gap-8 bg-content1/50 backdrop-blur-sm h-screen sticky top-0">
       <div className="flex items-center gap-3 px-2">
@@ -49,7 +61,7 @@ export const Sidebar: FC = () => {
         </div>
       </div>
 
-      <nav className="flex flex-col gap-2">
+      <nav className="flex flex-col gap-2 flex-grow">
         <p className="text-[10px] font-semibold text-default-400 uppercase px-2 mb-2">
           Main Menu
         </p>
@@ -85,6 +97,42 @@ export const Sidebar: FC = () => {
           );
         })}
       </nav>
+
+      {/* Footer Section with User Info & Logout */}
+      <div className="mt-auto pt-6 border-t border-divider flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 overflow-hidden">
+          <Avatar 
+            className={`${isAdmin ? "bg-amber-500/10 text-amber-600" : "bg-primary/10 text-primary"} font-bold text-xs shrink-0`}
+            size="sm"
+          >
+            <Avatar.Fallback>
+              {isAdmin ? <Crown size={16} strokeWidth={2.5} /> : <User size={16} strokeWidth={2.5} />}
+            </Avatar.Fallback>
+          </Avatar>
+          <div className="flex flex-col min-w-0">
+            <p className="text-xs font-bold text-foreground truncate">
+              {user?.name || "User"}
+            </p>
+            <p className="text-[10px] text-default-400 font-medium truncate">
+              {role}
+            </p>
+          </div>
+        </div>
+        
+        <Tooltip delay={0}>
+          <Tooltip.Trigger>
+            <Button
+              isIconOnly
+              variant="ghost"
+              className="text-default-400 hover:text-danger hover:bg-danger/10 rounded-xl"
+              onPress={handleLogout}
+            >
+              <LogOut size={18} />
+            </Button>
+          </Tooltip.Trigger>
+          <Tooltip.Content>Sign Out</Tooltip.Content>
+        </Tooltip>
+      </div>
     </aside>
   );
 };
