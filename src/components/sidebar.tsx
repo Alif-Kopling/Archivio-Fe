@@ -31,7 +31,7 @@ export const Sidebar: FC = () => {
       icon: Settings,
       label: "Settings",
       href: "/admin/settings",
-      roles: ["ADMIN", "STAFF"],
+      roles: ["ADMIN"],
     },
   ];
 

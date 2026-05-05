@@ -1,4 +1,3 @@
-import { Button } from "@heroui/react";
 import { useNavigate } from "react-router-dom";
 import { motion, useAnimation } from "framer-motion";
 import { useState, useEffect } from "react";
@@ -22,14 +21,16 @@ export default function Home() {
       id: "01",
       label: "Frontend Repo",
       url: "https://github.com/Alif-Kopling/Archivio-fe",
-      color: "group-hover:text-blue-400 group-hover:drop-shadow-[0_0_8px_rgba(96,165,250,0.8)]",
+      color:
+        "group-hover:text-blue-400 group-hover:drop-shadow-[0_0_8px_rgba(96,165,250,0.8)]",
       lineColor: "bg-blue-400 shadow-[0_0_10px_rgba(96,165,250,0.8)]",
     },
     {
       id: "02",
       label: "Backend Repo",
       url: "https://github.com/Alif-Kopling/Archivio-be",
-      color: "group-hover:text-yellow-400 group-hover:drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]",
+      color:
+        "group-hover:text-yellow-400 group-hover:drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]",
       lineColor: "bg-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.8)]",
     },
   ];
@@ -76,7 +77,12 @@ export default function Home() {
           <motion.div
             animate={logoControls}
             className="absolute text-white"
-            initial={{ opacity: 0, scale: 0.8, color: "#ffffff", filter: "drop-shadow(0 0 0px rgba(37, 99, 235, 0))" }}
+            initial={{
+              opacity: 0,
+              scale: 0.8,
+              color: "#ffffff",
+              filter: "drop-shadow(0 0 0px rgba(37, 99, 235, 0))",
+            }}
             transition={{ duration: 2, ease: "easeOut" }}
           >
             <Logo size={550} />
@@ -110,6 +116,7 @@ export default function Home() {
             >
               <button
                 className="valorant-btn group relative px-10 py-4 bg-transparent border-none cursor-pointer outline-none overflow-hidden"
+                onClick={() => navigate("/login")}
                 onMouseEnter={() =>
                   logoControls.start({
                     opacity: 0.8,
@@ -117,11 +124,15 @@ export default function Home() {
                     color: "#00a2ffff",
                     filter: [
                       "drop-shadow(0 0 10px #3b82f6) drop-shadow(0 0 20px #2563eb) drop-shadow(0 0 40px #1e40af)",
-                      "drop-shadow(0 0 15px #3b82f6) drop-shadow(0 0 30px #2563eb) drop-shadow(0 0 70px #1e40af)"
+                      "drop-shadow(0 0 15px #3b82f6) drop-shadow(0 0 30px #2563eb) drop-shadow(0 0 70px #1e40af)",
                     ],
-                    transition: { 
+                    transition: {
                       duration: 0.5,
-                      filter: { repeat: Infinity, repeatType: "mirror", duration: 1.5 }
+                      filter: {
+                        repeat: Infinity,
+                        repeatType: "mirror",
+                        duration: 1.5,
+                      },
                     },
                   })
                 }
@@ -134,12 +145,11 @@ export default function Home() {
                     transition: { duration: 0.5 },
                   })
                 }
-                onClick={() => navigate("/login")}
               >
                 {/* Button Background Layers */}
                 <div className="absolute inset-0 bg-white/5 transition-colors duration-300 group-hover:bg-white/10" />
                 <div className="absolute inset-0 border-[1px] border-white/20 transition-colors duration-300 group-hover:border-white/50" />
-                
+
                 {/* Valorant Diagonal Cut Shapes */}
                 <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-white/40 group-hover:border-white group-hover:scale-125 transition-all duration-300" />
                 <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-white/40 group-hover:border-white group-hover:scale-125 transition-all duration-300" />
@@ -200,11 +210,15 @@ export default function Home() {
                 <span className="text-[10px] tracking-widest text-white/20 font-mono italic">
                   {item.id}
                 </span>
-                <span className={`text-[11px] tracking-[0.3em] font-extralight uppercase transition-all duration-300 ${item.color} group-hover:translate-x-2`}>
+                <span
+                  className={`text-[11px] tracking-[0.3em] font-extralight uppercase transition-all duration-300 ${item.color} group-hover:translate-x-2`}
+                >
                   {item.label}
                 </span>
                 <div className="h-[1px] w-full bg-white/5 relative overflow-hidden">
-                  <div className={`absolute inset-0 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left ${item.lineColor}`} />
+                  <div
+                    className={`absolute inset-0 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left ${item.lineColor}`}
+                  />
                 </div>
               </motion.div>
             ))}
