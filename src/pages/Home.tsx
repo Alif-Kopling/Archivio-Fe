@@ -114,7 +114,7 @@ export default function Home() {
                   logoControls.start({
                     opacity: 0.8,
                     scale: 1.1,
-                    color: "#2563eb",
+                    color: "#00a2ffff",
                     filter: [
                       "drop-shadow(0 0 10px #3b82f6) drop-shadow(0 0 20px #2563eb) drop-shadow(0 0 40px #1e40af)",
                       "drop-shadow(0 0 15px #3b82f6) drop-shadow(0 0 30px #2563eb) drop-shadow(0 0 70px #1e40af)"
