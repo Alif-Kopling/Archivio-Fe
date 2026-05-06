@@ -1,5 +1,13 @@
 import { FC } from "react";
-import { LayoutDashboard, FileText, Settings, Users, LogOut, Crown, User } from "lucide-react";
+import {
+  LayoutDashboard,
+  FileText,
+  Settings,
+  Users,
+  LogOut,
+  Crown,
+  User,
+} from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Button, Avatar, Tooltip } from "@heroui/react";
 
@@ -101,12 +109,16 @@ export const Sidebar: FC = () => {
       {/* Footer Section with User Info & Logout */}
       <div className="mt-auto pt-6 border-t border-divider flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 overflow-hidden">
-          <Avatar 
+          <Avatar
             className={`${isAdmin ? "bg-amber-500/10 text-amber-600" : "bg-primary/10 text-primary"} font-bold text-xs shrink-0`}
             size="sm"
           >
             <Avatar.Fallback>
-              {isAdmin ? <Crown size={16} strokeWidth={2.5} /> : <User size={16} strokeWidth={2.5} />}
+              {isAdmin ? (
+                <Crown size={16} strokeWidth={2.5} />
+              ) : (
+                <User size={16} strokeWidth={2.5} />
+              )}
             </Avatar.Fallback>
           </Avatar>
           <div className="flex flex-col min-w-0">
@@ -118,13 +130,13 @@ export const Sidebar: FC = () => {
             </p>
           </div>
         </div>
-        
+
         <Tooltip delay={0}>
           <Tooltip.Trigger>
             <Button
               isIconOnly
-              variant="ghost"
               className="text-default-400 hover:text-danger hover:bg-danger/10 rounded-xl"
+              variant="ghost"
               onPress={handleLogout}
             >
               <LogOut size={18} />

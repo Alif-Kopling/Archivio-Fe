@@ -44,7 +44,9 @@ export default function LoginPage() {
     audioRef.current = audio;
 
     const playAudio = () => {
-      audio.play().catch((e) => console.log("Background music autoplay blocked:", e));
+      audio
+        .play()
+        .catch((e) => console.log("Background music autoplay blocked:", e));
     };
 
     playAudio();
@@ -70,6 +72,7 @@ export default function LoginPage() {
 
     // Play button click sound
     const audio = new Audio(loginButtonSound);
+
     audio.volume = 0.5;
     audio.play().catch((e) => console.log("Button sound failed:", e));
 
@@ -164,7 +167,7 @@ export default function LoginPage() {
                 variant="ghost"
                 onPress={() => navigate("/")}
               >
-                <ArrowLeft size={18} className="text-default-500" />
+                <ArrowLeft className="text-default-500" size={18} />
               </Button>
             </Tooltip.Trigger>
             <Tooltip.Content>Back to Home</Tooltip.Content>
@@ -231,7 +234,7 @@ export default function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </TextField>
-                
+
                 <Button
                   className="w-full font-bold h-11 mt-2 text-base shadow-lg shadow-blue-500/20 rounded-xl"
                   type="submit"

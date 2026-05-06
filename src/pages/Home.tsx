@@ -15,6 +15,7 @@ export default function Home() {
 
   const handleStart = () => {
     const audio = new Audio(introSound);
+
     audio.volume = 0.6;
     audio.play().catch((e) => console.log("Intro sound failed:", e));
     setShowSplash(false);
@@ -22,6 +23,7 @@ export default function Home() {
 
   const handleExplore = () => {
     const audio = new Audio(exploreSound);
+
     audio.volume = 0.5;
     audio.play().catch((e) => console.log("Audio play failed:", e));
     navigate("/login");
@@ -102,11 +104,11 @@ export default function Home() {
           </div>
 
           {/* Main Frame Wrapper */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
+          <motion.div
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1.2, ease: "easeOut" }}
             className="relative z-10 h-full w-full p-6 md:p-10 flex flex-col border-[1px] border-white/10 m-auto max-w-[1600px] max-h-[900px] lg:my-8 rounded-xl shadow-2xl overflow-hidden backdrop-blur-[1px]"
+            initial={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
           >
             {/* Header */}
             <header className="flex justify-between items-center w-full">
@@ -240,7 +242,8 @@ export default function Home() {
               <div className="flex flex-col gap-2 font-mono text-[10px] tracking-widest text-white/30 uppercase items-start">
                 <div className="flex gap-4">
                   <span>
-                    Status: <span className="text-emerald-500/60">Operational</span>
+                    Status:{" "}
+                    <span className="text-emerald-500/60">Operational</span>
                   </span>
                   <span>Loc: 0.0000° N, 0.0000° E</span>
                 </div>
