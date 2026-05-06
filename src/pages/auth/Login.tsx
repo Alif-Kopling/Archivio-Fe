@@ -231,15 +231,7 @@ export default function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </TextField>
-
-                <div className="flex justify-between items-center px-1">
-                  <Link
-                    className="text-[11px] font-bold text-primary underline"
-                    href="#"
-                  >
-                    Forgot Password?
-                  </Link>
-                </div>
+                
                 <Button
                   className="w-full font-bold h-11 mt-2 text-base shadow-lg shadow-blue-500/20 rounded-xl"
                   type="submit"
