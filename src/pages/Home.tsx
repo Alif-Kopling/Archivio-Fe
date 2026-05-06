@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, useAnimation } from "framer-motion";
 import { useState, useEffect } from "react";
 
+import exploreSound from "@/assets/sound-succes-login.mp3";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { Logo } from "@/components/icons";
 
@@ -9,6 +10,13 @@ export default function Home() {
   const navigate = useNavigate();
   const [time, setTime] = useState(new Date());
   const logoControls = useAnimation();
+
+  const handleExplore = () => {
+    const audio = new Audio(exploreSound);
+    audio.volume = 0.5;
+    audio.play().catch((e) => console.log("Audio play failed:", e));
+    navigate("/login");
+  };
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -116,7 +124,7 @@ export default function Home() {
             >
               <button
                 className="valorant-btn group relative px-10 py-4 bg-transparent border-none cursor-pointer outline-none overflow-hidden"
-                onClick={() => navigate("/login")}
+                onClick={handleExplore}
                 onMouseEnter={() =>
                   logoControls.start({
                     opacity: 0.8,

@@ -1,6 +1,6 @@
-/* eslint-disable react/jsx-sort-props */
 import { useNavigate } from "react-router-dom";
 import {
+  Alert,
   Button,
   Card,
   Form,
@@ -11,9 +11,18 @@ import {
   TextField,
   Tooltip,
 } from "@heroui/react";
-import React, { useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import React, { useState, useRef } from "react";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  AlertCircle,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
+import loginMusic from "@/assets/login-menu-music.mp3";
+import loginButtonSound from "@/assets/button-login.mp3";
 import api from "@/lib/axios";
 import DefaultLayout from "@/layouts/default";
 
@@ -21,12 +30,51 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isMuted, setIsMuted] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  React.useEffect(() => {
+    const audio = new Audio(loginMusic);
+
+    audio.loop = true;
+    audio.volume = 0.3;
+    audioRef.current = audio;
+
+    const playAudio = () => {
+      audio.play().catch((e) => console.log("Background music autoplay blocked:", e));
+    };
+
+    playAudio();
+
+    return () => {
+      audio.pause();
+      audio.src = "";
+      audioRef.current = null;
+    };
+  }, []);
+
+  const toggleMute = () => {
+    if (audioRef.current) {
+      const newMutedState = !isMuted;
+
+      setIsMuted(newMutedState);
+      audioRef.current.volume = newMutedState ? 0 : 0.3;
+    }
+  };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    // Play button click sound
+    const audio = new Audio(loginButtonSound);
+    audio.volume = 0.5;
+    audio.play().catch((e) => console.log("Button sound failed:", e));
+
     setError("");
+    setSuccess("");
     setLoading(true);
 
     try {
@@ -38,17 +86,22 @@ export default function LoginPage() {
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("role", user.role.toUpperCase());
 
-      alert(`Welcome back, ${user.name}!`);
+      setSuccess(`Welcome back, ${user.name}!`);
 
       const userRole = user.role.toUpperCase();
 
-      if (userRole === "ADMIN") {
-        navigate("/admin");
-      } else {
-        navigate("/archives");
-      }
+      // Give a little time for the user to see the success alert before redirecting
+      setTimeout(() => {
+        if (userRole === "ADMIN") {
+          navigate("/admin");
+        } else {
+          navigate("/archives");
+        }
+      }, 2000);
     } catch (err: any) {
       setError(err.response?.data?.message || "Invalid email or password.");
+      // Auto hide error after 5 seconds
+      setTimeout(() => setError(""), 5000);
     } finally {
       setLoading(false);
     }
@@ -56,6 +109,50 @@ export default function LoginPage() {
 
   return (
     <DefaultLayout>
+      {/* Floating Alerts Container */}
+      <div className="fixed top-8 left-0 right-0 z-[100] flex justify-center pointer-events-none px-4">
+        <AnimatePresence mode="wait">
+          {error && (
+            <motion.div
+              key="error-alert"
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              className="pointer-events-auto w-full max-w-sm shadow-2xl"
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              initial={{ opacity: 0, y: -20, scale: 0.95 }}
+              transition={{ type: "spring", damping: 20, stiffness: 300 }}
+            >
+              <Alert status="danger">
+                <Alert.Indicator>
+                  <AlertCircle size={20} />
+                </Alert.Indicator>
+                <Alert.Content>
+                  <Alert.Title>{error}</Alert.Title>
+                </Alert.Content>
+              </Alert>
+            </motion.div>
+          )}
+          {success && (
+            <motion.div
+              key="success-alert"
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              className="pointer-events-auto w-full max-w-sm shadow-2xl"
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              initial={{ opacity: 0, y: -20, scale: 0.95 }}
+              transition={{ type: "spring", damping: 20, stiffness: 300 }}
+            >
+              <Alert status="success">
+                <Alert.Indicator>
+                  <CheckCircle2 size={20} />
+                </Alert.Indicator>
+                <Alert.Content>
+                  <Alert.Title>{success}</Alert.Title>
+                </Alert.Content>
+              </Alert>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
       <div className="relative grid grid-cols-1 lg:grid-cols-3 gap-12 items-center min-h-[calc(100vh-180px)] p-6 lg:p-10">
         {/* Back to Home Button */}
         <div className="fixed bottom-6 left-6 z-50">
@@ -135,12 +232,6 @@ export default function LoginPage() {
                   />
                 </TextField>
 
-                {error && (
-                  <p className="text-danger text-[11px] font-bold text-center bg-danger/10 p-2 rounded-lg">
-                    {error}
-                  </p>
-                )}
-
                 <div className="flex justify-between items-center px-1">
                   <Link
                     className="text-[11px] font-bold text-primary underline"
@@ -191,6 +282,29 @@ export default function LoginPage() {
             </Card.Footer>
           </Card>
         </div>
+      </div>
+
+      {/* Music Toggle Button */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <Tooltip delay={0}>
+          <Tooltip.Trigger>
+            <Button
+              isIconOnly
+              className="bg-content1/50 backdrop-blur-md border border-divider hover:bg-default-100 rounded-full shadow-lg"
+              variant="ghost"
+              onPress={toggleMute}
+            >
+              {isMuted ? (
+                <VolumeX className="text-danger" size={18} />
+              ) : (
+                <Volume2 className="text-primary" size={18} />
+              )}
+            </Button>
+          </Tooltip.Trigger>
+          <Tooltip.Content>
+            {isMuted ? "Unmute Music" : "Mute Music"}
+          </Tooltip.Content>
+        </Tooltip>
       </div>
     </DefaultLayout>
   );
