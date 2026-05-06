@@ -83,15 +83,15 @@ const STAT_CONFIG = [
     key: "total" as keyof Stats,
     label: "Total Certificates",
     Icon: Award,
-    color: "text-blue-500",
-    bg: "bg-blue-500/10",
+    color: "text-amber-500",
+    bg: "bg-amber-900/10",
   },
   {
     key: "pending" as keyof Stats,
     label: "Pending / Draft",
     Icon: Clock,
-    color: "text-warning",
-    bg: "bg-warning/10",
+    color: "text-amber-500",
+    bg: "bg-amber-900/10",
   },
   {
     key: "verified" as keyof Stats,
@@ -209,7 +209,7 @@ const UploadPanel: FC<{
 }> = ({ loading, issuer, onUploadClick, onIssuerChange }) => (
   <Card className="border-none bg-content1 shadow-sm h-fit">
     <Card.Header className="flex flex-col items-start px-4 pt-4 pb-1 gap-2">
-      <div className="p-2.5 bg-primary/10 rounded-xl text-primary">
+      <div className="p-2.5 bg-amber-900/10 rounded-xl text-amber-500">
         <Award size={22} />
       </div>
       <div className="space-y-0.5">
@@ -222,21 +222,20 @@ const UploadPanel: FC<{
       </div>
     </Card.Header>
     <Card.Content className="px-4 pb-4 pt-1 flex flex-col gap-3">
-      <Separator className="opacity-30" />
       <p className="text-[11px] text-default-600 leading-snug bg-default-50/50 p-3 rounded-lg border border-default-100 italic">
         Accepted: <span className="font-bold text-foreground">PDF</span>,{" "}
         <span className="font-bold text-foreground">JPG</span>, or{" "}
         <span className="font-bold text-foreground">PNG</span>.
       </p>
       <input
-        className="w-full h-10 px-4 rounded-lg border border-divider bg-default-100 focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+        className="w-full h-10 px-4 rounded-lg border border-divider bg-default-100 focus:outline-none focus:ring-2 focus:ring-warning text-sm"
         placeholder="Certificate issuer (optional)"
         type="text"
         value={issuer}
         onChange={(e) => onIssuerChange(e.target.value)}
       />
       <Button
-        className="w-full font-bold shadow-md shadow-primary/20 h-9 text-[11px] bg-primary text-primary-foreground rounded-lg flex items-center justify-center gap-2"
+        className="w-full font-bold shadow-md shadow-warning/20 h-9 text-[11px] bg-[#d97706] text-white rounded-lg flex items-center justify-center gap-2 hover:bg-[#b45309]"
         onClick={onUploadClick}
       >
         {!loading && <Plus size={16} strokeWidth={3} />}
@@ -720,7 +719,14 @@ export default function SertifikatPage() {
           />
           <Card className="border-none bg-content1 shadow-sm">
             <Card.Content className="px-4 py-3">
-              <StorageIndicator count={stats.total} label="Storage Usage" showGb={true} total={100} />
+              <StorageIndicator 
+                count={stats.total} 
+                label="Storage Usage" 
+                showGb={true} 
+                total={100} 
+                // @ts-ignore (prop custom untuk warna)
+                className="[&_.bg-primary]:bg-warning"
+              />
             </Card.Content>
           </Card>
         </div>
