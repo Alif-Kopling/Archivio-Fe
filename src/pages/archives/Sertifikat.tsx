@@ -720,7 +720,7 @@ export default function SertifikatPage() {
           />
           <Card className="border-none bg-content1 shadow-sm">
             <Card.Content className="px-4 py-3">
-              <StorageIndicator count={stats.total} label="Storage Usage" total={100} />
+              <StorageIndicator count={stats.total} label="Storage Usage" showGb={true} total={100} />
             </Card.Content>
           </Card>
         </div>
