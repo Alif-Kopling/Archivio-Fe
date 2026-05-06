@@ -27,6 +27,7 @@ import {
 } from "@heroui/react";
 
 import api from "@/lib/axios";
+import { StorageIndicator } from "@/components/StorageIndicator";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -710,13 +711,18 @@ export default function SertifikatPage() {
       ) : null}
       <StatsSection stats={stats} />
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch w-full flex-1 min-h-0">
-        <div className="lg:col-span-3 xl:col-span-2">
+        <div className="lg:col-span-3 xl:col-span-2 flex flex-col gap-4">
           <UploadPanel
             issuer={issuer}
             loading={loading}
             onIssuerChange={setIssuer}
             onUploadClick={handleUploadClick}
           />
+          <Card className="border-none bg-content1 shadow-sm">
+            <Card.Content className="px-4 py-3">
+              <StorageIndicator count={stats.total} label="Storage Usage" total={100} />
+            </Card.Content>
+          </Card>
         </div>
         <div className="lg:col-span-9 xl:col-span-10 w-full h-full">
           <DocumentList

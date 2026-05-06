@@ -29,10 +29,8 @@ import {
 import { X } from "lucide-react";
 
 import api from "@/lib/axios";
-import {
-  DocumentUploadDialog,
-  type DocumentUploadFormState,
-} from "@/components/DocumentUploadDialog";
+import { DocumentUploadDialog, type DocumentUploadFormState } from "@/components/DocumentUploadDialog";
+import { StorageIndicator } from "@/components/StorageIndicator";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -226,7 +224,6 @@ const UploadPanel: FC<{ loading: boolean; onUploadClick: () => void }> = ({
       </div>
     </Card.Header>
     <Card.Content className="px-4 pb-4 pt-1 flex flex-col gap-3">
-      <Separator className="opacity-30" />
       <p className="text-[11px] text-default-600 leading-snug bg-default-50/50 p-3 rounded-lg border border-default-100 italic">
         Accepted formats: <span className="font-bold text-foreground">PDF</span>{" "}
         or <span className="font-bold text-foreground">DOCX</span>.
@@ -846,8 +843,13 @@ export default function SuratMasukPage() {
       ) : null}
       <StatsSection stats={stats} />
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch w-full flex-1 min-h-0">
-        <div className="lg:col-span-3 xl:col-span-2">
+        <div className="lg:col-span-3 xl:col-span-2 flex flex-col gap-4">
           <UploadPanel loading={loading} onUploadClick={openUploadDialog} />
+          <Card className="border-none bg-content1 shadow-sm">
+            <Card.Content className="px-4 py-3">
+              <StorageIndicator count={stats.total} label="Storage Usage" total={100} />
+            </Card.Content>
+          </Card>
         </div>
         <div className="lg:col-span-9 xl:col-span-10 w-full h-full">
           <DocumentList
