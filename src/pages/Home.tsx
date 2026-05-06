@@ -19,6 +19,24 @@ export default function Home() {
     audio.volume = 0.6;
     audio.play().catch((e) => console.log("Intro sound failed:", e));
     setShowSplash(false);
+
+    // Trigger animation once after audio finishes (assuming 13.5s)
+    setTimeout(async () => {
+      await logoControls.start({
+        opacity: 0.8,
+        scale: 1.1,
+        color: "#00a2ffff",
+        filter: "drop-shadow(0 0 20px #3b82f6) drop-shadow(0 0 40px #2563eb)",
+        transition: { duration: 1 },
+      });
+      await logoControls.start({
+        opacity: 0.08,
+        scale: 1,
+        color: "#ffffff",
+        filter: "drop-shadow(0 0 0px rgba(37, 99, 235, 0))",
+        transition: { duration: 1 },
+      });
+    }, 13500); // 13.5 seconds
   };
 
   const handleExplore = () => {
