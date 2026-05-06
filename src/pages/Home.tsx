@@ -1,7 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import { motion, useAnimation } from "framer-motion";
+import { motion, useAnimation, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 
+import introSound from "@/assets/sound-awal-masuk-ke-page-home.mp3";
 import exploreSound from "@/assets/sound-succes-login.mp3";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { Logo } from "@/components/icons";
@@ -9,7 +10,15 @@ import { Logo } from "@/components/icons";
 export default function Home() {
   const navigate = useNavigate();
   const [time, setTime] = useState(new Date());
+  const [showSplash, setShowSplash] = useState(true);
   const logoControls = useAnimation();
+
+  const handleStart = () => {
+    const audio = new Audio(introSound);
+    audio.volume = 0.6;
+    audio.play().catch((e) => console.log("Intro sound failed:", e));
+    setShowSplash(false);
+  };
 
   const handleExplore = () => {
     const audio = new Audio(exploreSound);
@@ -45,6 +54,45 @@ export default function Home() {
 
   return (
     <div className="relative h-screen w-screen bg-[#0a0c10] overflow-hidden font-sans selection:bg-white/20 transition-colors duration-500">
+      <AnimatePresence mode="wait">
+        {showSplash && (
+          <motion.div
+            key="splash"
+            className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center cursor-pointer overflow-hidden"
+            exit={{ opacity: 0, scale: 1.1 }}
+            initial={{ opacity: 1 }}
+            transition={{ duration: 1, ease: "easeInOut" }}
+            onClick={handleStart}
+          >
+            {/* Ambient Background for Splash */}
+            <div className="absolute inset-0 z-0">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-blue-500/10 blur-[120px] animate-pulse" />
+            </div>
+
+            <motion.div
+              animate={{ opacity: 1, scale: 1 }}
+              className="relative z-10 flex flex-col items-center"
+              initial={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 2, ease: "easeOut" }}
+            >
+              <Logo className="text-white opacity-20" size={200} />
+              <div className="mt-8 flex flex-col items-center gap-2">
+                <h2 className="text-white font-extralight tracking-[1em] text-2xl ml-[1em]">
+                  ARCHIVIO
+                </h2>
+                <motion.p
+                  animate={{ opacity: [0.2, 0.6, 0.2] }}
+                  className="text-white/40 text-[10px] tracking-[0.4em] uppercase mt-4"
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  Click to Synchronize
+                </motion.p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Elegant Ambient Glow */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-[-10%] left-[-10%] h-[500px] w-[500px] rounded-full bg-blue-500/5 blur-[120px]" />
