@@ -8,11 +8,11 @@ interface StorageIndicatorProps {
   showGb?: boolean;
 }
 
-export const StorageIndicator: FC<StorageIndicatorProps> = ({ 
-  label, 
-  count, 
+export const StorageIndicator: FC<StorageIndicatorProps> = ({
+  label,
+  count,
   total,
-  showGb = false, 
+  showGb = false,
 }) => {
   const maxGb = 10;
   const estimatedGb = (count * 10) / 1024;
@@ -20,25 +20,20 @@ export const StorageIndicator: FC<StorageIndicatorProps> = ({
 
   return (
     <div className="w-full">
-      <ProgressBar 
-        aria-label={label} 
-        className="w-full" 
-        value={percentage}
-      >
+      <ProgressBar aria-label={label} className="w-full" value={percentage}>
         <div className="flex justify-between items-end mb-2">
           <Label className="text-[10px] font-bold text-default-500 uppercase tracking-wider">
             Storage
           </Label>
           <ProgressBar.Output className="text-[11px] font-semibold text-foreground tabular-nums">
-            {showGb 
-              ? `${estimatedGb.toFixed(2)}GB/${maxGb}GB` 
-              : `${count}/${total}`
-            }
+            {showGb
+              ? `${estimatedGb.toFixed(2)}GB/${maxGb}GB`
+              : `${count}/${total}`}
           </ProgressBar.Output>
         </div>
         <ProgressBar.Track className="h-2.5 w-full bg-default-100 rounded-full shadow-inner overflow-hidden">
-          <ProgressBar.Fill 
-            className={`h-full rounded-full transition-all duration-500 ${percentage > 80 ? "bg-danger" : "bg-primary"}`} 
+          <ProgressBar.Fill
+            className={`h-full rounded-full transition-all duration-500 ${percentage > 80 ? "bg-danger" : "bg-primary"}`}
           />
         </ProgressBar.Track>
       </ProgressBar>

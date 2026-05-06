@@ -19,7 +19,6 @@ import {
   Tooltip,
   Chip,
   Spinner,
-  Separator,
   Virtualizer,
   ListBox,
   ListLayout,
@@ -29,7 +28,10 @@ import {
 import { X } from "lucide-react";
 
 import api from "@/lib/axios";
-import { DocumentUploadDialog, type DocumentUploadFormState } from "@/components/DocumentUploadDialog";
+import {
+  DocumentUploadDialog,
+  type DocumentUploadFormState,
+} from "@/components/DocumentUploadDialog";
 import { StorageIndicator } from "@/components/StorageIndicator";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -847,7 +849,12 @@ export default function SuratMasukPage() {
           <UploadPanel loading={loading} onUploadClick={openUploadDialog} />
           <Card className="border-none bg-content1 shadow-sm">
             <Card.Content className="px-4 py-3">
-              <StorageIndicator count={stats.total} label="Storage Usage" showGb={true} total={100} />
+              <StorageIndicator
+                count={stats.total}
+                label="Storage Usage"
+                showGb={true}
+                total={100}
+              />
             </Card.Content>
           </Card>
         </div>
