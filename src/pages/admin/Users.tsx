@@ -409,7 +409,6 @@ export default function UserManagementPage() {
               <SearchField.ClearButton />
             </SearchField.Group>
           </SearchField>
-          {searchLoading ? <Spinner size="sm" /> : null}
           <div className="flex items-center gap-2 text-xs font-medium italic text-default-400">
             <AlertCircle size={14} />
             Access privileges are strictly governed by assigned roles.
