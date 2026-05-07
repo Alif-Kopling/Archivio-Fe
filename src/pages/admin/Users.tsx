@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Avatar,
   Button,
@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 
 import api from "@/lib/axios";
+import alarmDanger from "@/assets/alarm-danger-danger.mp3";
 
 interface UserData {
   id: number;
@@ -259,8 +260,61 @@ function DeleteMemberAction({
   onSuccess: () => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const sourceRef = useRef<AudioBufferSourceNode | null>(null);
+  const bufferRef = useRef<AudioBuffer | null>(null);
+
+  const isAdmin = user.role.toLowerCase() === "admin";
+
+  useEffect(() => {
+    if (isOpen && isAdmin) {
+      const playSeamlessLoop = async () => {
+        if (!audioContextRef.current) {
+          audioContextRef.current = new (window.AudioContext ||
+            window.webkitAudioContext)();
+        }
+
+        if (!bufferRef.current) {
+          try {
+            const response = await fetch(alarmDanger);
+            const arrayBuffer = await response.arrayBuffer();
+
+            bufferRef.current =
+              await audioContextRef.current.decodeAudioData(arrayBuffer);
+          } catch (error) {
+            console.error("Failed to load alarm sound:", error);
+
+            return;
+          }
+        }
+
+        const source = audioContextRef.current.createBufferSource();
+
+        source.buffer = bufferRef.current;
+        source.loop = true;
+        source.connect(audioContextRef.current.destination);
+        source.start(0);
+        sourceRef.current = source;
+      };
+
+      playSeamlessLoop();
+    }
+
+    return () => {
+      if (sourceRef.current) {
+        sourceRef.current.stop();
+        sourceRef.current.disconnect();
+        sourceRef.current = null;
+      }
+    };
+  }, [isOpen, isAdmin]);
 
   const handleDelete = async () => {
+    if (sourceRef.current) {
+      sourceRef.current.stop();
+      sourceRef.current.disconnect();
+      sourceRef.current = null;
+    }
     try {
       await api.delete(`/users/${user.id}`);
       alert(`User Removed: ${user.name} has been successfully deleted.`);
@@ -320,7 +374,14 @@ function DeleteMemberAction({
               <Button
                 className="w-full font-semibold"
                 variant="tertiary"
-                onPress={() => setIsOpen(false)}
+                onPress={() => {
+                  if (sourceRef.current) {
+                    sourceRef.current.stop();
+                    sourceRef.current.disconnect();
+                    sourceRef.current = null;
+                  }
+                  setIsOpen(false);
+                }}
               >
                 Keep Account
               </Button>
