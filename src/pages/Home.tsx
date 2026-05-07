@@ -16,18 +16,27 @@ export default function Home() {
   const [isLocked, setIsLocked] = useState(true);
   const logoControls = useAnimation();
 
+  /**
+   * Triggers auditory feedback for hover interactions
+   */
   const playHoverSound = () => {
     const audio = new Audio(hoverSound);
     audio.volume = 0.4;
     audio.play().catch((e) => console.log("Hover sound failed:", e));
   };
 
+  /**
+   * Triggers auditory feedback for primary click interactions
+   */
   const playClickSound = () => {
     const audio = new Audio(clickSound);
     audio.volume = 0.5;
     audio.play().catch((e) => console.log("Click sound failed:", e));
   };
 
+  /**
+   * Initiates the system startup sequence and synchronizes audio-visual states
+   */
   const handleStart = () => {
     const audio = new Audio(introSound);
 
@@ -35,7 +44,7 @@ export default function Home() {
     audio.play().catch((e) => console.log("Intro sound failed:", e));
     setShowSplash(false);
 
-    // Trigger animation once after audio finishes (assuming 13.5s)
+    // Sequence logo animation to synchronize with intro audio completion (approx. 13.5s)
     setTimeout(async () => {
       setIsLocked(false);
       await logoControls.start({
@@ -52,31 +61,41 @@ export default function Home() {
         filter: "drop-shadow(0 0 0px rgba(37, 99, 235, 0))",
         transition: { duration: 1 },
       });
-    }, 13500); // 13.5 seconds
+    }, 13500);
   };
 
+  /**
+   * Manages transition to the authenticated application area with synchronized audio effects
+   */
   const handleExplore = () => {
     playClickSound();
 
+    // 500ms delay to prevent audio overlapping between click and success events
     setTimeout(() => {
       const audio = new Audio(exploreSound);
 
       audio.volume = 0.5;
       audio.play().catch((e) => console.log("Audio play failed:", e));
 
-      // Kasih jeda dikit lagi baru pindah halaman biar dapet feel suaranya ya adikk!
+      // Post-success audio buffer before navigation to ensure completion of auditory feedback
       setTimeout(() => {
         navigate("/login");
       }, 300);
-    }, 500); // Jeda 0.5 detik - Balik ke awal sesuai mau adikk
+    }, 500);
   };
 
+  /**
+   * System clock synchronization
+   */
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
 
     return () => clearInterval(timer);
   }, []);
 
+  /**
+   * Repository metadata for footer navigation
+   */
   const navItems = [
     {
       id: "01",
@@ -108,7 +127,7 @@ export default function Home() {
             transition={{ duration: 1, ease: "easeInOut" }}
             onClick={handleStart}
           >
-            {/* Ambient Background for Splash */}
+            {/* Visual backdrop for initial synchronization stage */}
             <div className="absolute inset-0 z-0">
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-blue-500/10 blur-[120px] animate-pulse" />
             </div>
@@ -139,20 +158,20 @@ export default function Home() {
 
       {!showSplash && (
         <>
-          {/* Elegant Ambient Glow */}
+          {/* Global background lighting effects */}
           <div className="absolute inset-0 z-0">
             <div className="absolute top-[-10%] left-[-10%] h-[500px] w-[500px] rounded-full bg-blue-500/5 blur-[120px]" />
             <div className="absolute bottom-[-10%] right-[-10%] h-[500px] w-[500px] rounded-full bg-purple-500/5 blur-[120px]" />
           </div>
 
-          {/* Main Frame Wrapper */}
+          {/* Primary UI container with structural framing and motion scaling */}
           <motion.div
             animate={{ opacity: 1, scale: 1 }}
             className="relative z-10 h-full w-full p-6 md:p-10 flex flex-col border-[1px] border-white/10 m-auto max-w-[1600px] max-h-[900px] lg:my-8 rounded-xl shadow-2xl overflow-hidden backdrop-blur-[1px]"
             initial={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 1.2, ease: "easeOut" }}
           >
-            {/* Header */}
+            {/* Application header with brand identity and global controls */}
             <header className="flex justify-between items-center w-full">
               <motion.div
                 animate={{ opacity: 1, x: 0 }}
@@ -178,9 +197,9 @@ export default function Home() {
               </div>
             </header>
 
-            {/* Center Content */}
+            {/* Main interactive viewport */}
             <main className="flex-grow flex flex-col items-center justify-center relative">
-              {/* Central Logo Decoration */}
+              {/* Center-aligned brand identity with dynamic animation states */}
               <motion.div
                 animate={logoControls}
                 className="absolute text-white"
@@ -195,7 +214,7 @@ export default function Home() {
                 <Logo size={550} />
               </motion.div>
 
-              {/* Main Title */}
+              {/* Primary brand heading and tagline */}
               <div className="relative z-20 flex flex-col items-center">
                 <motion.h1
                   animate={{ opacity: 1, letterSpacing: "0.8em" }}
@@ -257,18 +276,18 @@ export default function Home() {
                       })
                     }
                   >
-                    {/* Button Background Layers */}
+                    {/* Multi-layered visual button architecture */}
                     <div className={`absolute inset-0 transition-colors duration-300 ${isLocked ? "bg-transparent" : "bg-white/5 group-hover:bg-white/10"}`} />
                     <div className={`absolute inset-0 border-[1px] transition-colors duration-300 ${isLocked ? "border-transparent" : "border-white/20 group-hover:border-white/50"}`} />
 
-                    {/* Valorant Diagonal Cut Shapes */}
+                    {/* Geometric corner accents for stylized UI */}
                     <div className={`absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 transition-all duration-300 ${isLocked ? "border-transparent" : "border-white/40 group-hover:border-white group-hover:scale-125"}`} />
                     <div className={`absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 transition-all duration-300 ${isLocked ? "border-transparent" : "border-white/40 group-hover:border-white group-hover:scale-125"}`} />
 
-                    {/* Animated Fill */}
+                    {/* Motion-based button interaction feedback */}
                     {!isLocked && <div className="absolute inset-0 w-0 bg-white transition-all duration-500 ease-out group-hover:w-full opacity-10" />}
 
-                    {/* The Text Container */}
+                    {/* State-dependent content renderer for primary CTA */}
                     <div className="relative z-10 w-full flex items-center justify-center gap-3">
                       <span className={`w-1 h-1 bg-white rotate-45 transition-opacity duration-300 ${isLocked ? "opacity-0" : "opacity-0 group-hover:opacity-100"}`} />
                       
@@ -297,16 +316,16 @@ export default function Home() {
                       <span className={`w-1 h-1 bg-white rotate-45 transition-opacity duration-300 ${isLocked ? "opacity-0" : "opacity-0 group-hover:opacity-100"}`} />
                     </div>
 
-                    {/* Bottom Glowing Line */}
+                    {/* High-intensity focus indicator */}
                     {!isLocked && <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-white to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500 shadow-[0_0_15px_rgba(255,255,255,0.6)]" />}
                   </button>
                 </motion.div>
               </div>
             </main>
 
-            {/* Footer Info */}
+            {/* System telemetry and metadata footer */}
             <footer className="flex flex-col md:flex-row justify-between items-end gap-8">
-              {/* Left: Technical Info */}
+              {/* Real-time system status and localization data */}
               <div className="flex flex-col gap-2 font-mono text-[10px] tracking-widest text-white/30 uppercase items-start">
                 <div className="flex gap-4">
                   <span>
@@ -319,7 +338,7 @@ export default function Home() {
                   <span>{time.toLocaleTimeString()}</span>
                   <span>{time.toLocaleDateString()}</span>
                 </div>
-                {/* Pagination Dots */}
+                {/* Decorative session progression indicators */}
                 <div className="flex gap-3 mt-2">
                   {[1, 2, 3, 4, 5].map((i) => (
                     <span
@@ -330,7 +349,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Right: Nav Items */}
+              {/* External repository navigation interfaces */}
               <div className="flex flex-wrap gap-12 text-white">
                 {navItems.map((item, idx) => (
                   <motion.div
