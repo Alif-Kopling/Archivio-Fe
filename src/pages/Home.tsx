@@ -11,6 +11,7 @@ export default function Home() {
   const navigate = useNavigate();
   const [time, setTime] = useState(new Date());
   const [showSplash, setShowSplash] = useState(true);
+  const [isLocked, setIsLocked] = useState(true);
   const logoControls = useAnimation();
 
   const handleStart = () => {
@@ -22,6 +23,7 @@ export default function Home() {
 
     // Trigger animation once after audio finishes (assuming 13.5s)
     setTimeout(async () => {
+      setIsLocked(false);
       await logoControls.start({
         opacity: 0.8,
         scale: 1.1,
@@ -198,10 +200,11 @@ export default function Home() {
                   transition={{ delay: 1.8, duration: 1 }}
                 >
                   <button
-                    className="valorant-btn group relative px-10 py-4 bg-transparent border-none cursor-pointer outline-none overflow-hidden"
+                    disabled={isLocked}
+                    className={`valorant-btn group relative min-w-[200px] py-3 bg-transparent border-none cursor-pointer outline-none overflow-hidden transition-all duration-500 ${isLocked ? "opacity-60 grayscale-[0.5] cursor-wait scale-95" : "opacity-100 grayscale-0"}`}
                     onClick={handleExplore}
                     onMouseEnter={() =>
-                      logoControls.start({
+                      !isLocked && logoControls.start({
                         opacity: 0.8,
                         scale: 1.1,
                         color: "#00a2ffff",
@@ -220,7 +223,7 @@ export default function Home() {
                       })
                     }
                     onMouseLeave={() =>
-                      logoControls.start({
+                      !isLocked && logoControls.start({
                         opacity: 0.08,
                         scale: 1,
                         color: "#ffffff",
@@ -230,25 +233,47 @@ export default function Home() {
                     }
                   >
                     {/* Button Background Layers */}
-                    <div className="absolute inset-0 bg-white/5 transition-colors duration-300 group-hover:bg-white/10" />
-                    <div className="absolute inset-0 border-[1px] border-white/20 transition-colors duration-300 group-hover:border-white/50" />
+                    <div className={`absolute inset-0 transition-colors duration-300 ${isLocked ? "bg-transparent" : "bg-white/5 group-hover:bg-white/10"}`} />
+                    <div className={`absolute inset-0 border-[1px] transition-colors duration-300 ${isLocked ? "border-transparent" : "border-white/20 group-hover:border-white/50"}`} />
 
                     {/* Valorant Diagonal Cut Shapes */}
-                    <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-white/40 group-hover:border-white group-hover:scale-125 transition-all duration-300" />
-                    <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-white/40 group-hover:border-white group-hover:scale-125 transition-all duration-300" />
+                    <div className={`absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 transition-all duration-300 ${isLocked ? "border-transparent" : "border-white/40 group-hover:border-white group-hover:scale-125"}`} />
+                    <div className={`absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 transition-all duration-300 ${isLocked ? "border-transparent" : "border-white/40 group-hover:border-white group-hover:scale-125"}`} />
 
                     {/* Animated Fill */}
-                    <div className="absolute inset-0 w-0 bg-white transition-all duration-500 ease-out group-hover:w-full opacity-10" />
+                    {!isLocked && <div className="absolute inset-0 w-0 bg-white transition-all duration-500 ease-out group-hover:w-full opacity-10" />}
 
-                    {/* The Text */}
-                    <span className="relative z-10 text-white font-bold tracking-[0.2em] text-xs flex items-center gap-3 transition-all duration-300 group-hover:tracking-[0.3em] group-hover:text-white">
-                      <span className="w-1 h-1 bg-white rotate-45 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      EXPLORE NOW
-                      <span className="w-1 h-1 bg-white rotate-45 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    </span>
+                    {/* The Text Container */}
+                    <div className="relative z-10 w-full flex items-center justify-center gap-3">
+                      <span className={`w-1 h-1 bg-white rotate-45 transition-opacity duration-300 ${isLocked ? "opacity-0" : "opacity-0 group-hover:opacity-100"}`} />
+                      
+                      <div className="flex flex-col items-center justify-center min-h-[40px]">
+                        {isLocked ? (
+                          <div className="flex flex-col items-center gap-1.5">
+                            <span className="flex items-center gap-2 animate-pulse font-mono text-[12px] font-bold text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.8)] tracking-[0.15em] uppercase">
+                              <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-ping" />
+                              Loading System
+                            </span>
+                            <div className="w-28 h-[1px] bg-blue-500/20 relative overflow-hidden">
+                              <motion.div 
+                                animate={{ x: ["-100%", "100%"] }}
+                                className="absolute inset-0 w-1/2 bg-blue-400 shadow-[0_0_10px_#60a5fa]"
+                                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                              />
+                            </div>
+                          </div>
+                        ) : (
+                          <span className="text-white font-bold tracking-[0.25em] text-xs transition-all duration-300 group-hover:tracking-[0.35em] group-hover:text-white uppercase">
+                            EXPLORE NOW
+                          </span>
+                        )}
+                      </div>
+
+                      <span className={`w-1 h-1 bg-white rotate-45 transition-opacity duration-300 ${isLocked ? "opacity-0" : "opacity-0 group-hover:opacity-100"}`} />
+                    </div>
 
                     {/* Bottom Glowing Line */}
-                    <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-white to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500 shadow-[0_0_15px_rgba(255,255,255,0.6)]" />
+                    {!isLocked && <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-white to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500 shadow-[0_0_15px_rgba(255,255,255,0.6)]" />}
                   </button>
                 </motion.div>
               </div>
