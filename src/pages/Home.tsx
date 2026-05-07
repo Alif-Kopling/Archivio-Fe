@@ -1,9 +1,11 @@
+/* eslint-disable no-console */
 import { useNavigate } from "react-router-dom";
 import { motion, useAnimation, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 
 import introSound from "@/assets/sound-awal-masuk-ke-page-home.mp3";
 import exploreSound from "@/assets/sound-succes-login.mp3";
+import hoverSound from "@/assets/select-button.mp3";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { Logo } from "@/components/icons";
 
@@ -13,6 +15,13 @@ export default function Home() {
   const [showSplash, setShowSplash] = useState(true);
   const [isLocked, setIsLocked] = useState(true);
   const logoControls = useAnimation();
+
+  const playHoverSound = () => {
+    const audio = new Audio(hoverSound);
+
+    audio.volume = 0.4;
+    audio.play().catch((e) => console.log("Hover sound failed:", e));
+  };
 
   const handleStart = () => {
     const audio = new Audio(introSound);
@@ -200,30 +209,34 @@ export default function Home() {
                   transition={{ delay: 1.8, duration: 1 }}
                 >
                   <button
-                    disabled={isLocked}
                     className={`valorant-btn group relative min-w-[200px] py-3 bg-transparent border-none cursor-pointer outline-none overflow-hidden transition-all duration-500 ${isLocked ? "opacity-60 grayscale-[0.5] cursor-wait scale-95" : "opacity-100 grayscale-0"}`}
+                    disabled={isLocked}
                     onClick={handleExplore}
-                    onMouseEnter={() =>
-                      !isLocked && logoControls.start({
-                        opacity: 0.8,
-                        scale: 1.1,
-                        color: "#00a2ffff",
-                        filter: [
-                          "drop-shadow(0 0 10px #3b82f6) drop-shadow(0 0 20px #2563eb) drop-shadow(0 0 40px #1e40af)",
-                          "drop-shadow(0 0 15px #3b82f6) drop-shadow(0 0 30px #2563eb) drop-shadow(0 0 70px #1e40af)",
-                        ],
-                        transition: {
-                          duration: 0.5,
-                          filter: {
-                            repeat: Infinity,
-                            repeatType: "mirror",
-                            duration: 1.5,
+                    onMouseEnter={() => {
+                      if (!isLocked) {
+                        playHoverSound();
+                        logoControls.start({
+                          opacity: 0.8,
+                          scale: 1.1,
+                          color: "#00a2ffff",
+                          filter: [
+                            "drop-shadow(0 0 10px #3b82f6) drop-shadow(0 0 20px #2563eb) drop-shadow(0 0 40px #1e40af)",
+                            "drop-shadow(0 0 15px #3b82f6) drop-shadow(0 0 30px #2563eb) drop-shadow(0 0 70px #1e40af)",
+                          ],
+                          transition: {
+                            duration: 0.5,
+                            filter: {
+                              repeat: Infinity,
+                              repeatType: "mirror",
+                              duration: 1.5,
+                            },
                           },
-                        },
-                      })
-                    }
+                        });
+                      }
+                    }}
                     onMouseLeave={() =>
-                      !isLocked && logoControls.start({
+                      !isLocked &&
+                      logoControls.start({
                         opacity: 0.08,
                         scale: 1,
                         color: "#ffffff",
@@ -233,20 +246,32 @@ export default function Home() {
                     }
                   >
                     {/* Button Background Layers */}
-                    <div className={`absolute inset-0 transition-colors duration-300 ${isLocked ? "bg-transparent" : "bg-white/5 group-hover:bg-white/10"}`} />
-                    <div className={`absolute inset-0 border-[1px] transition-colors duration-300 ${isLocked ? "border-transparent" : "border-white/20 group-hover:border-white/50"}`} />
+                    <div
+                      className={`absolute inset-0 transition-colors duration-300 ${isLocked ? "bg-transparent" : "bg-white/5 group-hover:bg-white/10"}`}
+                    />
+                    <div
+                      className={`absolute inset-0 border-[1px] transition-colors duration-300 ${isLocked ? "border-transparent" : "border-white/20 group-hover:border-white/50"}`}
+                    />
 
                     {/* Valorant Diagonal Cut Shapes */}
-                    <div className={`absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 transition-all duration-300 ${isLocked ? "border-transparent" : "border-white/40 group-hover:border-white group-hover:scale-125"}`} />
-                    <div className={`absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 transition-all duration-300 ${isLocked ? "border-transparent" : "border-white/40 group-hover:border-white group-hover:scale-125"}`} />
+                    <div
+                      className={`absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 transition-all duration-300 ${isLocked ? "border-transparent" : "border-white/40 group-hover:border-white group-hover:scale-125"}`}
+                    />
+                    <div
+                      className={`absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 transition-all duration-300 ${isLocked ? "border-transparent" : "border-white/40 group-hover:border-white group-hover:scale-125"}`}
+                    />
 
                     {/* Animated Fill */}
-                    {!isLocked && <div className="absolute inset-0 w-0 bg-white transition-all duration-500 ease-out group-hover:w-full opacity-10" />}
+                    {!isLocked && (
+                      <div className="absolute inset-0 w-0 bg-white transition-all duration-500 ease-out group-hover:w-full opacity-10" />
+                    )}
 
                     {/* The Text Container */}
                     <div className="relative z-10 w-full flex items-center justify-center gap-3">
-                      <span className={`w-1 h-1 bg-white rotate-45 transition-opacity duration-300 ${isLocked ? "opacity-0" : "opacity-0 group-hover:opacity-100"}`} />
-                      
+                      <span
+                        className={`w-1 h-1 bg-white rotate-45 transition-opacity duration-300 ${isLocked ? "opacity-0" : "opacity-0 group-hover:opacity-100"}`}
+                      />
+
                       <div className="flex flex-col items-center justify-center min-h-[40px]">
                         {isLocked ? (
                           <div className="flex flex-col items-center gap-1.5">
@@ -255,10 +280,14 @@ export default function Home() {
                               Loading System
                             </span>
                             <div className="w-28 h-[1px] bg-blue-500/20 relative overflow-hidden">
-                              <motion.div 
+                              <motion.div
                                 animate={{ x: ["-100%", "100%"] }}
                                 className="absolute inset-0 w-1/2 bg-blue-400 shadow-[0_0_10px_#60a5fa]"
-                                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                                transition={{
+                                  duration: 1.5,
+                                  repeat: Infinity,
+                                  ease: "linear",
+                                }}
                               />
                             </div>
                           </div>
@@ -269,11 +298,15 @@ export default function Home() {
                         )}
                       </div>
 
-                      <span className={`w-1 h-1 bg-white rotate-45 transition-opacity duration-300 ${isLocked ? "opacity-0" : "opacity-0 group-hover:opacity-100"}`} />
+                      <span
+                        className={`w-1 h-1 bg-white rotate-45 transition-opacity duration-300 ${isLocked ? "opacity-0" : "opacity-0 group-hover:opacity-100"}`}
+                      />
                     </div>
 
                     {/* Bottom Glowing Line */}
-                    {!isLocked && <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-white to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500 shadow-[0_0_15px_rgba(255,255,255,0.6)]" />}
+                    {!isLocked && (
+                      <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-white to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500 shadow-[0_0_15px_rgba(255,255,255,0.6)]" />
+                    )}
                   </button>
                 </motion.div>
               </div>
@@ -315,6 +348,7 @@ export default function Home() {
                     initial={{ opacity: 0, y: 20 }}
                     transition={{ delay: 2 + idx * 0.2, duration: 0.8 }}
                     onClick={() => window.open(item.url, "_blank")}
+                    onMouseEnter={playHoverSound}
                   >
                     <span className="text-[10px] tracking-widest text-white/20 font-mono italic">
                       {item.id}
