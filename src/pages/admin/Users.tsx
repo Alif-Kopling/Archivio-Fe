@@ -281,70 +281,82 @@ function DeleteMemberAction({
   const [isOpen, setIsOpen] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
   const sourceRef = useRef<AudioBufferSourceNode | null>(null);
+  const gainRef = useRef<GainNode | null>(null);
   const bufferRef = useRef<AudioBuffer | null>(null);
   const notify = useNotify();
 
   const isAdmin = user.role.toLowerCase() === "admin";
 
   useEffect(() => {
-    if (isOpen && isAdmin) {
-      const playSeamlessLoop = async () => {
-        if (!audioContextRef.current) {
-          const AudioContextCtor =
-            window.AudioContext ??
-            (window as Window & { webkitAudioContext?: typeof AudioContext })
-              .webkitAudioContext;
+    if (!isOpen || !isAdmin) return;
 
-          if (!AudioContextCtor) {
-            console.warn("Web Audio API is not supported in this browser.");
+    const AudioContextCtor =
+      window.AudioContext ??
+      (window as Window & { webkitAudioContext?: typeof AudioContext })
+        .webkitAudioContext;
 
-            return;
-          }
+    if (!AudioContextCtor) return;
 
-          audioContextRef.current = new AudioContextCtor();
+    const ctx = audioContextRef.current ?? new AudioContextCtor();
+
+    audioContextRef.current = ctx;
+
+    const startLoop = async () => {
+      if (ctx.state === "suspended") await ctx.resume();
+
+      if (!bufferRef.current) {
+        try {
+          const res = await fetch(alarmDanger);
+
+          bufferRef.current = await ctx.decodeAudioData(
+            await res.arrayBuffer(),
+          );
+        } catch {
+          return;
         }
+      }
 
-        if (!bufferRef.current) {
-          try {
-            const response = await fetch(alarmDanger);
-            const arrayBuffer = await response.arrayBuffer();
+      const gain = ctx.createGain();
 
-            bufferRef.current =
-              await audioContextRef.current.decodeAudioData(arrayBuffer);
-          } catch (error) {
-            console.error("Failed to load alarm sound:", error);
+      gain.connect(ctx.destination);
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.15);
 
-            return;
-          }
-        }
+      const source = ctx.createBufferSource();
 
-        const source = audioContextRef.current.createBufferSource();
+      source.buffer = bufferRef.current;
+      source.loop = true;
+      source.connect(gain);
+      source.start(0);
+      sourceRef.current = source;
+      gainRef.current = gain;
+    };
 
-        source.buffer = bufferRef.current;
-        source.loop = true;
-        source.connect(audioContextRef.current.destination);
-        source.start(0);
-        sourceRef.current = source;
-      };
-
-      playSeamlessLoop();
-    }
+    startLoop();
 
     return () => {
-      if (sourceRef.current) {
-        sourceRef.current.stop();
-        sourceRef.current.disconnect();
-        sourceRef.current = null;
+      const { current: gain } = gainRef;
+      const { current: source } = sourceRef;
+
+      if (gain && source) {
+        const now = ctx.currentTime;
+
+        gain.gain.cancelScheduledValues(now);
+        gain.gain.setValueAtTime(gain.gain.value, now);
+        gain.gain.linearRampToValueAtTime(0, now + 0.3);
+        source.stop(now + 0.35);
+      } else {
+        source?.stop();
       }
+
+      source?.disconnect();
+      gain?.disconnect();
+      sourceRef.current = null;
+      gainRef.current = null;
     };
   }, [isOpen, isAdmin]);
 
   const handleDelete = async () => {
-    if (sourceRef.current) {
-      sourceRef.current.stop();
-      sourceRef.current.disconnect();
-      sourceRef.current = null;
-    }
     try {
       await api.delete(`/users/${user.id}`);
       notify({
@@ -412,14 +424,7 @@ function DeleteMemberAction({
               <Button
                 className="w-full font-semibold"
                 variant="tertiary"
-                onPress={() => {
-                  if (sourceRef.current) {
-                    sourceRef.current.stop();
-                    sourceRef.current.disconnect();
-                    sourceRef.current = null;
-                  }
-                  setIsOpen(false);
-                }}
+                onPress={() => setIsOpen(false)}
               >
                 Keep Account
               </Button>

@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { useEffect, useRef, useState } from "react";
@@ -93,6 +92,7 @@ export default function Settings() {
   const { setTheme } = useTheme();
   const audioContextRef = useRef<AudioContext | null>(null);
   const sourceRef = useRef<AudioBufferSourceNode | null>(null);
+  const gainRef = useRef<GainNode | null>(null);
   const bufferRef = useRef<AudioBuffer | null>(null);
   const [settings, setSettings] = useState({
     instansi_name: "",
@@ -148,57 +148,71 @@ export default function Settings() {
   };
 
   useEffect(() => {
-    if (!trashDialogOpen) {
-      return;
-    }
+    if (!trashDialogOpen) return;
 
-    const playSeamlessLoop = async () => {
-      if (!audioContextRef.current) {
-        const AudioContextCtor =
-          window.AudioContext ??
-          (window as Window & { webkitAudioContext?: typeof AudioContext })
-            .webkitAudioContext;
+    const AudioContextCtor =
+      window.AudioContext ??
+      (window as Window & { webkitAudioContext?: typeof AudioContext })
+        .webkitAudioContext;
 
-        if (!AudioContextCtor) {
-          console.warn("Web Audio API is not supported in this browser.");
+    if (!AudioContextCtor) return;
 
-          return;
-        }
+    const ctx = audioContextRef.current ?? new AudioContextCtor();
 
-        audioContextRef.current = new AudioContextCtor();
-      }
+    audioContextRef.current = ctx;
+
+    const startLoop = async () => {
+      if (ctx.state === "suspended") await ctx.resume();
 
       if (!bufferRef.current) {
         try {
-          const response = await fetch(alarmDanger);
-          const arrayBuffer = await response.arrayBuffer();
+          const res = await fetch(alarmDanger);
 
-          bufferRef.current =
-            await audioContextRef.current.decodeAudioData(arrayBuffer);
-        } catch (error) {
-          console.error("Failed to load alarm sound:", error);
-
+          bufferRef.current = await ctx.decodeAudioData(
+            await res.arrayBuffer(),
+          );
+        } catch {
           return;
         }
       }
 
-      const source = audioContextRef.current.createBufferSource();
+      const gain = ctx.createGain();
+
+      gain.connect(ctx.destination);
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.15);
+
+      const source = ctx.createBufferSource();
 
       source.buffer = bufferRef.current;
       source.loop = true;
-      source.connect(audioContextRef.current.destination);
+      source.connect(gain);
       source.start(0);
       sourceRef.current = source;
+      gainRef.current = gain;
     };
 
-    playSeamlessLoop();
+    startLoop();
 
     return () => {
-      if (sourceRef.current) {
-        sourceRef.current.stop();
-        sourceRef.current.disconnect();
-        sourceRef.current = null;
+      const { current: gain } = gainRef;
+      const { current: source } = sourceRef;
+
+      if (gain && source) {
+        const now = ctx.currentTime;
+
+        gain.gain.cancelScheduledValues(now);
+        gain.gain.setValueAtTime(gain.gain.value, now);
+        gain.gain.linearRampToValueAtTime(0, now + 0.3);
+        source.stop(now + 0.35);
+      } else {
+        source?.stop();
       }
+
+      source?.disconnect();
+      gain?.disconnect();
+      sourceRef.current = null;
+      gainRef.current = null;
     };
   }, [trashDialogOpen]);
 
