@@ -452,22 +452,22 @@ const ApprovalBody: FC<{
             <Spinner />
           </div>
         ) : null}
-        <Table 
-          aria-label="Approval table" 
+        <Table
+          aria-label="Approval table"
           className="bg-transparent"
-          selectionMode="multiple"
-          selectedKeys={selectedKeys}
-          onSelectionChange={(keys) => {
-            if (keys === "all") {
-              onSelectionChange(new Set(documents.map(d => d.id)));
-            } else {
-              onSelectionChange(keys as Set<string | number>);
-            }
-          }}
         >
           <Table.ScrollContainer>
-            <Table.Content>
-              <Table.Header>
+            <Table.Content
+              selectionMode="multiple"
+              selectedKeys={selectedKeys}
+              onSelectionChange={(keys: string | Set<string | number>) => {
+                if (keys === "all") {
+                  onSelectionChange(new Set(documents.map(d => d.id)));
+                } else {
+                  onSelectionChange(keys as Set<string | number>);
+                }
+              }}
+            >              <Table.Header>
                 <Table.Column isRowHeader className="bg-transparent border-b border-divider text-default-500 font-semibold uppercase text-xs">
                   DOCUMENT NAME
                 </Table.Column>
