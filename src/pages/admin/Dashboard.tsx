@@ -448,7 +448,7 @@ const ApprovalBody: FC<{
   onBulkApprove: () => void;
   onBulkReject: () => void;
 }> = memo(
-  ({ documents, loading, page, totalPages, total, onPageChange, onApprove, onReject, onSelectionChange, selectedKeys, onBulkReject }) => (
+  ({ documents, loading, page, totalPages, total, onPageChange, onApprove, onReject, onSelectionChange, selectedKeys }) => (
     <Card className="bg-content1 border-divider shadow-none">
       <div className="relative">
         {loading ? (
