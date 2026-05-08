@@ -1,15 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable jsx-a11y/label-has-associated-control */
+
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "next-themes";
 import {
+  Alert,
   AlertDialog,
   Button,
   Card,
   Chip,
+  Input,
   Label,
   ListBox,
   Select,
+  Switch,
+  TextField,
 } from "@heroui/react";
 import {
   Building2,
@@ -296,31 +300,33 @@ export default function Settings() {
   const renderGeneralSettings = () => (
     <div className="space-y-6">
       <div>
-        <Label className="block text-sm font-semibold mb-2 text-foreground">
-          Agency Name
-        </Label>
-        <input
-          className="w-full h-12 px-4 rounded-lg border border-divider bg-default-100 focus:outline-none focus:ring-2 focus:ring-primary text-base"
-          placeholder="Enter agency name"
-          type="text"
-          value={settings.instansi_name}
-          onChange={(e) => handleChange("instansi_name", e.target.value)}
-        />
+        <TextField name="instansi_name">
+          <Label className="block text-sm font-semibold mb-2 text-foreground">
+            Agency Name
+          </Label>
+          <Input
+            className="w-full h-12"
+            placeholder="Enter agency name"
+            value={settings.instansi_name}
+            onChange={(e) => handleChange("instansi_name", e.target.value)}
+          />
+        </TextField>
         <p className="text-xs text-foreground mt-1.5">
           Agency name will be displayed in headers and reports
         </p>
       </div>
       <div>
-        <Label className="block text-sm font-semibold mb-2 text-foreground">
-          Logo URL
-        </Label>
-        <input
-          className="w-full h-12 px-4 rounded-lg border border-divider bg-default-100 focus:outline-none focus:ring-2 focus:ring-primary text-base"
-          placeholder="https://example.com/logo.png"
-          type="text"
-          value={settings.logo_url}
-          onChange={(e) => handleChange("logo_url", e.target.value)}
-        />
+        <TextField name="logo_url">
+          <Label className="block text-sm font-semibold mb-2 text-foreground">
+            Logo URL
+          </Label>
+          <Input
+            className="w-full h-12"
+            placeholder="https://example.com/logo.png"
+            value={settings.logo_url}
+            onChange={(e) => handleChange("logo_url", e.target.value)}
+          />
+        </TextField>
         <p className="text-xs text-foreground mt-1.5">
           Logo will be displayed in sidebar and header
         </p>
@@ -403,16 +409,17 @@ export default function Settings() {
         </Select>
       </div>
       <div>
-        <Label className="block text-sm font-semibold mb-2 text-foreground">
-          Retention Period (Years)
-        </Label>
-        <input
-          className="w-full h-12 px-4 rounded-lg border border-divider bg-default-100 focus:outline-none focus:ring-2 focus:ring-primary text-base"
-          placeholder="5"
-          type="number"
-          value={settings.retention_period}
-          onChange={(e) => handleChange("retention_period", e.target.value)}
-        />
+        <TextField name="retention_period" type="number">
+          <Label className="block text-sm font-semibold mb-2 text-foreground">
+            Retention Period (Years)
+          </Label>
+          <Input
+            className="w-full h-12"
+            placeholder="5"
+            value={settings.retention_period}
+            onChange={(e) => handleChange("retention_period", e.target.value)}
+          />
+        </TextField>
         <p className="text-xs text-foreground mt-1.5">
           Documents will be archived after the retention period ends
         </p>
@@ -437,31 +444,33 @@ export default function Settings() {
   const renderStorageSettings = () => (
     <div className="space-y-6">
       <div>
-        <Label className="block text-sm font-semibold mb-2 text-foreground">
-          Max File Size (MB)
-        </Label>
-        <input
-          className="w-full h-12 px-4 rounded-lg border border-divider bg-default-100 focus:outline-none focus:ring-2 focus:ring-primary text-base"
-          placeholder="10"
-          type="number"
-          value={settings.max_file_size}
-          onChange={(e) => handleChange("max_file_size", e.target.value)}
-        />
+        <TextField name="max_file_size" type="number">
+          <Label className="block text-sm font-semibold mb-2 text-foreground">
+            Max File Size (MB)
+          </Label>
+          <Input
+            className="w-full h-12"
+            placeholder="10"
+            value={settings.max_file_size}
+            onChange={(e) => handleChange("max_file_size", e.target.value)}
+          />
+        </TextField>
         <p className="text-xs text-foreground mt-1.5">
           Maximum file size that can be uploaded
         </p>
       </div>
       <div>
-        <Label className="block text-sm font-semibold mb-2 text-foreground">
-          Allowed File Types
-        </Label>
-        <input
-          className="w-full h-12 px-4 rounded-lg border border-divider bg-default-100 focus:outline-none focus:ring-2 focus:ring-primary text-base"
-          placeholder="pdf,doc,docx,jpg,png"
-          type="text"
-          value={settings.allowed_file_types}
-          onChange={(e) => handleChange("allowed_file_types", e.target.value)}
-        />
+        <TextField name="allowed_file_types">
+          <Label className="block text-sm font-semibold mb-2 text-foreground">
+            Allowed File Types
+          </Label>
+          <Input
+            className="w-full h-12"
+            placeholder="pdf,doc,docx,jpg,png"
+            value={settings.allowed_file_types}
+            onChange={(e) => handleChange("allowed_file_types", e.target.value)}
+          />
+        </TextField>
         <p className="text-xs text-foreground mt-1.5">
           Separate with commas (e.g.: pdf,doc,docx)
         </p>
@@ -491,18 +500,17 @@ export default function Settings() {
             Send email for documents that need verification
           </p>
         </div>
-        <label className="relative inline-flex items-center cursor-pointer">
-          <input
-            checked={settings.email_notification}
-            className="sr-only peer"
-            type="checkbox"
-            onChange={(e) => {
-              handleChange("email_notification", e.target.checked);
-              handleSave("email_notification");
-            }}
-          />
-          <div className="w-12 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary" />
-        </label>
+        <Switch
+          isSelected={settings.email_notification}
+          onChange={(checked) => {
+            handleChange("email_notification", checked);
+            handleSave("email_notification");
+          }}
+        >
+          <Switch.Control>
+            <Switch.Thumb />
+          </Switch.Control>
+        </Switch>
       </div>
       <div className="flex items-center justify-between p-4 rounded-lg bg-default-50 hover:bg-default-100 transition-colors">
         <div className="flex-1">
@@ -511,18 +519,17 @@ export default function Settings() {
             Automatically archive documents after retention period
           </p>
         </div>
-        <label className="relative inline-flex items-center cursor-pointer">
-          <input
-            checked={settings.auto_archive}
-            className="sr-only peer"
-            type="checkbox"
-            onChange={(e) => {
-              handleChange("auto_archive", e.target.checked);
-              handleSave("auto_archive");
-            }}
-          />
-          <div className="w-12 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary" />
-        </label>
+        <Switch
+          isSelected={settings.auto_archive}
+          onChange={(checked) => {
+            handleChange("auto_archive", checked);
+            handleSave("auto_archive");
+          }}
+        >
+          <Switch.Control>
+            <Switch.Thumb />
+          </Switch.Control>
+        </Switch>
       </div>
     </div>
   );
@@ -530,16 +537,17 @@ export default function Settings() {
   const renderSecuritySettings = () => (
     <div className="space-y-6">
       <div>
-        <Label className="block text-sm font-semibold mb-2 text-foreground">
-          Session Timeout (Minutes)
-        </Label>
-        <input
-          className="w-full h-12 px-4 rounded-lg border border-divider bg-default-100 focus:outline-none focus:ring-2 focus:ring-primary text-base"
-          placeholder="30"
-          type="number"
-          value={settings.session_timeout}
-          onChange={(e) => handleChange("session_timeout", e.target.value)}
-        />
+        <TextField name="session_timeout" type="number">
+          <Label className="block text-sm font-semibold mb-2 text-foreground">
+            Session Timeout (Minutes)
+          </Label>
+          <Input
+            className="w-full h-12"
+            placeholder="30"
+            value={settings.session_timeout}
+            onChange={(e) => handleChange("session_timeout", e.target.value)}
+          />
+        </TextField>
         <p className="text-xs text-foreground mt-1.5">
           Session will end after a period of inactivity
         </p>
@@ -744,14 +752,15 @@ export default function Settings() {
         <Card className="w-60 flex-shrink-0 p-2 h-fit">
           <nav className="space-y-0.5">
             {categories.map((cat) => (
-              <button
+              <Button
                 key={cat.id}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
+                className={`w-full flex items-center gap-3 px-3 py-2.5 justify-start text-left ${
                   activeCategory === cat.id
                     ? "bg-primary/10 text-primary"
                     : "hover:bg-default-50 text-default-600"
                 }`}
-                onClick={() => setActiveCategory(cat.id)}
+                variant="ghost"
+                onPress={() => setActiveCategory(cat.id)}
               >
                 <div
                   className={activeCategory === cat.id ? "text-primary" : ""}
@@ -759,7 +768,7 @@ export default function Settings() {
                   {cat.icon}
                 </div>
                 <span className="font-medium text-sm">{cat.label}</span>
-              </button>
+              </Button>
             ))}
           </nav>
         </Card>
@@ -782,19 +791,19 @@ export default function Settings() {
 
       {/* Message Toast */}
       {message.text && (
-        <div
-          className={`fixed bottom-6 right-6 p-4 rounded-xl shadow-lg flex items-center gap-3 z-50 ${
-            message.type === "error"
-              ? "bg-danger text-white"
-              : "bg-success text-white"
-          }`}
-        >
-          {message.type === "error" ? (
-            <AlertCircle size={20} />
-          ) : (
-            <CheckCircle2 size={20} />
-          )}
-          <span className="text-sm font-medium">{message.text}</span>
+        <div className="fixed bottom-6 right-6 z-50 w-full max-w-sm">
+          <Alert status={message.type === "error" ? "danger" : "success"}>
+            <Alert.Indicator>
+              {message.type === "error" ? (
+                <AlertCircle size={20} />
+              ) : (
+                <CheckCircle2 size={20} />
+              )}
+            </Alert.Indicator>
+            <Alert.Content>
+              <Alert.Title>{message.text}</Alert.Title>
+            </Alert.Content>
+          </Alert>
         </div>
       )}
 
