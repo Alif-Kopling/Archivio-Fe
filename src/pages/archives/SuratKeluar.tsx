@@ -613,8 +613,8 @@ const DocumentList: FC<{
         </p>
       </div>
       <SearchField
-        className="w-full sm:max-w-[280px]"
         aria-label="Search documents"
+        className="w-full sm:max-w-[280px]"
         value={searchQuery}
         onChange={onSearchChange}
       >
@@ -787,7 +787,11 @@ export default function SuratKeluarPage() {
 
   const handleSubmitUpload = async () => {
     if (!uploadForm.file) {
-      notify({ title: "No File Selected", description: "Please choose a file first.", status: "warning" });
+      notify({
+        title: "No File Selected",
+        description: "Please choose a file first.",
+        status: "warning",
+      });
 
       return;
     }
@@ -804,7 +808,12 @@ export default function SuratKeluarPage() {
 
       await api.post("/surat-keluar", formData);
       setUploadOpen(false);
-      notify({ title: "Document Uploaded", description: "Your document has been submitted and is pending administrator approval.", status: "success" });
+      notify({
+        title: "Document Uploaded",
+        description:
+          "Your document has been submitted and is pending administrator approval.",
+        status: "success",
+      });
       setUploadForm({
         title: "",
         documentDate: todayDate,
@@ -817,7 +826,11 @@ export default function SuratKeluarPage() {
         "Upload surat keluar failed:",
         error?.response?.data || error,
       );
-      notify({ title: "Upload Failed", description: error.response?.data?.error ?? error.message, status: "danger" });
+      notify({
+        title: "Upload Failed",
+        description: error.response?.data?.error ?? error.message,
+        status: "danger",
+      });
     } finally {
       setLoading(false);
     }
@@ -828,7 +841,11 @@ export default function SuratKeluarPage() {
       await api.delete(`/surat-keluar/${id}`);
       fetchSurat();
     } catch (error: any) {
-      notify({ title: "Delete Failed", description: error.response?.data?.error ?? error.message, status: "danger" });
+      notify({
+        title: "Delete Failed",
+        description: error.response?.data?.error ?? error.message,
+        status: "danger",
+      });
     }
   };
 
@@ -846,7 +863,11 @@ export default function SuratKeluarPage() {
       link.click();
       link.remove();
     } catch (error) {
-      notify({ title: "Download Failed", description: "Failed to download document.", status: "danger" });
+      notify({
+        title: "Download Failed",
+        description: "Failed to download document.",
+        status: "danger",
+      });
     }
   };
 
@@ -884,7 +905,11 @@ export default function SuratKeluarPage() {
         return url;
       });
     } catch (error) {
-      notify({ title: "Preview Failed", description: "Failed to preview document.", status: "danger" });
+      notify({
+        title: "Preview Failed",
+        description: "Failed to preview document.",
+        status: "danger",
+      });
       handleClosePreview();
     } finally {
       setPreviewLoading(false);
@@ -912,6 +937,7 @@ export default function SuratKeluarPage() {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       const title = stripFileExtension(file.name);
+
       newFiles.push({
         id: `${Date.now()}-${i}`,
         file,
@@ -931,7 +957,9 @@ export default function SuratKeluarPage() {
         if (item.id !== id) return item;
 
         const updated = { ...item, [field]: value };
-        updated.isValid = Boolean(updated.sender.trim()) && Boolean(updated.documentDate);
+
+        updated.isValid =
+          Boolean(updated.sender.trim()) && Boolean(updated.documentDate);
 
         return updated;
       }),
@@ -955,7 +983,10 @@ export default function SuratKeluarPage() {
         formData.append("files", item.file);
         formData.append(`title_${item.file.name}_${index}`, item.title);
         formData.append(`sender_${item.file.name}_${index}`, item.sender);
-        formData.append(`documentDate_${item.file.name}_${index}`, item.documentDate);
+        formData.append(
+          `documentDate_${item.file.name}_${index}`,
+          item.documentDate,
+        );
       });
 
       await api.post("/surat-keluar/bulk", formData);
@@ -969,7 +1000,11 @@ export default function SuratKeluarPage() {
       fetchSurat();
     } catch (error: any) {
       console.error("Bulk upload failed:", error?.response?.data || error);
-      notify({ title: "Bulk Upload Failed", description: error.response?.data?.error ?? error.message, status: "danger" });
+      notify({
+        title: "Bulk Upload Failed",
+        description: error.response?.data?.error ?? error.message,
+        status: "danger",
+      });
     } finally {
       setLoading(false);
     }
@@ -991,10 +1026,18 @@ export default function SuratKeluarPage() {
         `/surat-keluar/${selectedDocument.id}/send-email`,
         emailForm,
       );
-      notify({ title: "Email Sent", description: "Email sent successfully.", status: "success" });
+      notify({
+        title: "Email Sent",
+        description: "Email sent successfully.",
+        status: "success",
+      });
       setSelectedDocument(null);
     } catch (error: any) {
-      notify({ title: "Email Failed", description: error.response?.data?.error ?? error.message, status: "danger" });
+      notify({
+        title: "Email Failed",
+        description: error.response?.data?.error ?? error.message,
+        status: "danger",
+      });
     } finally {
       setSendingEmail(false);
     }

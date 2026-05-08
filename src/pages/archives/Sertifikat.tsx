@@ -593,11 +593,20 @@ export default function SertifikatPage() {
       await api.post("/sertifikat", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      notify({ title: "Certificate Uploaded", description: "Your document has been submitted and is pending administrator approval.", status: "success" });
+      notify({
+        title: "Certificate Uploaded",
+        description:
+          "Your document has been submitted and is pending administrator approval.",
+        status: "success",
+      });
       setIssuer("");
       fetchSertifikat();
     } catch (error: any) {
-      notify({ title: "Upload Failed", description: error.response?.data?.error ?? error.message, status: "danger" });
+      notify({
+        title: "Upload Failed",
+        description: error.response?.data?.error ?? error.message,
+        status: "danger",
+      });
     } finally {
       setLoading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -609,7 +618,11 @@ export default function SertifikatPage() {
       await api.delete(`/sertifikat/${id}`);
       fetchSertifikat();
     } catch (error: any) {
-      notify({ title: "Delete Failed", description: error.response?.data?.error ?? error.message, status: "danger" });
+      notify({
+        title: "Delete Failed",
+        description: error.response?.data?.error ?? error.message,
+        status: "danger",
+      });
     }
   };
 
@@ -627,7 +640,11 @@ export default function SertifikatPage() {
       link.click();
       link.remove();
     } catch (error) {
-      notify({ title: "Download Failed", description: "Failed to download certificate.", status: "danger" });
+      notify({
+        title: "Download Failed",
+        description: "Failed to download certificate.",
+        status: "danger",
+      });
     }
   };
 
@@ -665,7 +682,11 @@ export default function SertifikatPage() {
         return url;
       });
     } catch (error) {
-      notify({ title: "Preview Failed", description: "Failed to preview certificate.", status: "danger" });
+      notify({
+        title: "Preview Failed",
+        description: "Failed to preview certificate.",
+        status: "danger",
+      });
       handleClosePreview();
     } finally {
       setPreviewLoading(false);

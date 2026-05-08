@@ -198,6 +198,7 @@ const StatsGrid: FC<{ stats: Stats }> = memo(({ stats }) => {
     </div>
   );
 });
+
 StatsGrid.displayName = "StatsGrid";
 
 const ChartsSection: FC<{ stats: Stats }> = memo(({ stats }) => {
@@ -320,6 +321,7 @@ const ChartsSection: FC<{ stats: Stats }> = memo(({ stats }) => {
     </div>
   );
 });
+
 ChartsSection.displayName = "ChartsSection";
 
 const ApprovalSearchBar: FC<{
@@ -359,6 +361,7 @@ const ApprovalSearchBar: FC<{
     </div>
   </div>
 ));
+
 ApprovalSearchBar.displayName = "ApprovalSearchBar";
 
 const ApprovalRow: FC<{
@@ -367,8 +370,8 @@ const ApprovalRow: FC<{
   onReject: (doc: Document) => void;
 }> = memo(({ doc, onApprove, onReject }) => (
   <Table.Row
-    className="border-b border-divider/50 hover:bg-default-100/50 transition-colors"
     key={`${doc.sourceType}-${doc.id}`}
+    className="border-b border-divider/50 hover:bg-default-100/50 transition-colors"
   >
     <Table.Cell>
       <div className="flex items-center gap-3 py-1">
@@ -428,6 +431,7 @@ const ApprovalRow: FC<{
     </Table.Cell>
   </Table.Row>
 ));
+
 ApprovalRow.displayName = "ApprovalRow";
 
 const ApprovalBody: FC<{
@@ -458,8 +462,8 @@ const ApprovalBody: FC<{
         >
           <Table.ScrollContainer>
             <Table.Content
-              selectionMode="multiple"
               selectedKeys={selectedKeys}
+              selectionMode="multiple"
               onSelectionChange={(keys: string | Set<string | number>) => {
                 if (keys === "all") {
                   onSelectionChange(new Set(documents.map(d => d.id)));
@@ -542,6 +546,7 @@ const ApprovalBody: FC<{
     </Card>
   ),
 );
+
 ApprovalBody.displayName = "ApprovalBody";
 
 const ApprovalTable: FC<{
@@ -584,15 +589,15 @@ const ApprovalTable: FC<{
       documents={documents}
       loading={loading}
       page={page}
+      selectedKeys={selectedKeys}
       total={total}
       totalPages={totalPages}
       onApprove={onApprove}
+      onBulkApprove={onBulkApprove}
+      onBulkReject={onBulkReject}
       onPageChange={onPageChange}
       onReject={onReject}
       onSelectionChange={onSelectionChange}
-      selectedKeys={selectedKeys}
-      onBulkApprove={onBulkApprove}
-      onBulkReject={onBulkReject}
     />
   </div>
 );

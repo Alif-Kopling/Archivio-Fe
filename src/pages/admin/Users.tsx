@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -82,19 +81,31 @@ function AddMemberAction({ onSuccess }: { onSuccess: () => void }) {
       !formData.email.trim() ||
       !formData.password.trim()
     ) {
-      notify({ title: "Missing Information", description: "Please fill in all required fields.", status: "warning" });
+      notify({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        status: "warning",
+      });
 
       return;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailRegex.test(formData.email)) {
-      notify({ title: "Invalid Entry", description: "Please provide a valid email address.", status: "warning" });
+      notify({
+        title: "Invalid Entry",
+        description: "Please provide a valid email address.",
+        status: "warning",
+      });
 
       return;
     }
     if (formData.password.length < 6) {
-      notify({ title: "Security Requirement", description: "Password must be at least 6 characters.", status: "warning" });
+      notify({
+        title: "Security Requirement",
+        description: "Password must be at least 6 characters.",
+        status: "warning",
+      });
 
       return;
     }
@@ -102,12 +113,20 @@ function AddMemberAction({ onSuccess }: { onSuccess: () => void }) {
     try {
       setSubmitting(true);
       await api.post("/users", formData);
-      notify({ title: "Success", description: "The new user has been successfully registered.", status: "success" });
+      notify({
+        title: "Success",
+        description: "The new user has been successfully registered.",
+        status: "success",
+      });
       setIsOpen(false);
       resetForm();
       onSuccess();
     } catch (error: any) {
-      notify({ title: "Registration Failed", description: error.response?.data?.error || error.message, status: "danger" });
+      notify({
+        title: "Registration Failed",
+        description: error.response?.data?.error || error.message,
+        status: "danger",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -278,6 +297,7 @@ function DeleteMemberAction({
 
           if (!AudioContextCtor) {
             console.warn("Web Audio API is not supported in this browser.");
+
             return;
           }
 
@@ -327,11 +347,19 @@ function DeleteMemberAction({
     }
     try {
       await api.delete(`/users/${user.id}`);
-      notify({ title: "User Removed", description: `${user.name} has been successfully deleted.`, status: "success" });
+      notify({
+        title: "User Removed",
+        description: `${user.name} has been successfully deleted.`,
+        status: "success",
+      });
       setIsOpen(false);
       onSuccess();
     } catch (error: any) {
-      notify({ title: "Deletion Failed", description: error.response?.data?.error || error.message, status: "danger" });
+      notify({
+        title: "Deletion Failed",
+        description: error.response?.data?.error || error.message,
+        status: "danger",
+      });
     }
   };
 

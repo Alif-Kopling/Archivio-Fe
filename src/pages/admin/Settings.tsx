@@ -27,13 +27,14 @@ import {
   AlertTriangle,
 } from "lucide-react";
 
-import alarmDanger from "@/assets/alarm-danger-danger.mp3";
 import {
   emptyRejectedTrash,
   getSettings,
   getTrashStats,
   updateSetting,
 } from "../../services/setting.service";
+
+import alarmDanger from "@/assets/alarm-danger-danger.mp3";
 
 interface SettingCategory {
   id: string;
@@ -159,6 +160,7 @@ export default function Settings() {
 
         if (!AudioContextCtor) {
           console.warn("Web Audio API is not supported in this browser.");
+
           return;
         }
 
@@ -170,7 +172,8 @@ export default function Settings() {
           const response = await fetch(alarmDanger);
           const arrayBuffer = await response.arrayBuffer();
 
-          bufferRef.current = await audioContextRef.current.decodeAudioData(arrayBuffer);
+          bufferRef.current =
+            await audioContextRef.current.decodeAudioData(arrayBuffer);
         } catch (error) {
           console.error("Failed to load alarm sound:", error);
 
@@ -556,8 +559,8 @@ export default function Settings() {
               Trash bin for rejected files
             </h3>
             <p className="text-sm text-foreground/80 max-w-2xl">
-              Rejected documents are kept here until you permanently remove them.
-              Deleting them will also remove the stored file from disk.
+              Rejected documents are kept here until you permanently remove
+              them. Deleting them will also remove the stored file from disk.
             </p>
           </div>
 
@@ -789,15 +792,16 @@ export default function Settings() {
                 <AlertDialog.Icon status="danger">
                   <AlertCircle className="size-6" />
                 </AlertDialog.Icon>
-                <AlertDialog.Heading>
-                  Empty rejected trash?
-                </AlertDialog.Heading>
+                <AlertDialog.Heading>Empty rejected trash?</AlertDialog.Heading>
               </AlertDialog.Header>
               <AlertDialog.Body>
                 <p className="text-sm text-default-500">
                   You are about to permanently delete{" "}
-                  <strong className="text-foreground">{trashRejectedCount}</strong>{" "}
-                  rejected documents. Their files will also be removed from storage.
+                  <strong className="text-foreground">
+                    {trashRejectedCount}
+                  </strong>{" "}
+                  rejected documents. Their files will also be removed from
+                  storage.
                 </p>
               </AlertDialog.Body>
               <AlertDialog.Footer>

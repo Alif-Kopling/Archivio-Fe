@@ -114,7 +114,8 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
     Boolean(form.file) &&
     !loading;
 
-  const canSubmitBulk = bulkFiles.length > 0 && bulkFiles.every((f) => f.isValid);
+  const canSubmitBulk =
+    bulkFiles.length > 0 && bulkFiles.every((f) => f.isValid);
 
   const handlePickFile = () => {
     fileInputRef.current?.click();
@@ -134,7 +135,9 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
     onFileChange(selectedFile);
   };
 
-  const handleBulkFileSelection = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBulkFileSelection = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     onBulkFileChange(event.target.files);
   };
 
@@ -203,18 +206,18 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
           >
             <Tabs.ListContainer className="w-full lg:w-44 shrink-0">
               <Tabs.List aria-label="Upload mode" className="w-full">
-                <Tabs.Tab id="single" className="justify-between">
+                <Tabs.Tab className="justify-between" id="single">
                   Single Upload
                   <Tabs.Indicator />
                 </Tabs.Tab>
-                <Tabs.Tab id="bulk" className="justify-between">
+                <Tabs.Tab className="justify-between" id="bulk">
                   Bulk Upload
                   <Tabs.Indicator />
                 </Tabs.Tab>
               </Tabs.List>
             </Tabs.ListContainer>
 
-            <Tabs.Panel id="single" className="flex-1 space-y-4">
+            <Tabs.Panel className="flex-1 space-y-4" id="single">
               <div className="space-y-4">
                 <TextField className="md:col-span-2" name="title">
                   <Label className="text-xs font-bold text-foreground">
@@ -223,7 +226,9 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                   <Input
                     placeholder="Contoh: Surat Undangan Rapat"
                     value={form.title}
-                    onChange={(event) => onFieldChange("title", event.target.value)}
+                    onChange={(event) =>
+                      onFieldChange("title", event.target.value)
+                    }
                   />
                 </TextField>
 
@@ -234,7 +239,10 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                       className="w-full"
                       value={toDateValue(form.documentDate)}
                       onChange={(date) =>
-                        onFieldChange("documentDate", date ? date.toString() : "")
+                        onFieldChange(
+                          "documentDate",
+                          date ? date.toString() : "",
+                        )
                       }
                     >
                       <Label className="text-xs font-bold text-foreground">
@@ -272,7 +280,9 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                           </Calendar.Grid>
                           <Calendar.YearPickerGrid>
                             <Calendar.YearPickerGridBody>
-                              {({ year }) => <Calendar.YearPickerCell year={year} />}
+                              {({ year }) => (
+                                <Calendar.YearPickerCell year={year} />
+                              )}
                             </Calendar.YearPickerGridBody>
                           </Calendar.YearPickerGrid>
                         </Calendar>
@@ -330,16 +340,16 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
               </div>
             </Tabs.Panel>
 
-            <Tabs.Panel id="bulk" className="flex-1 space-y-4">
+            <Tabs.Panel className="flex-1 space-y-4" id="bulk">
               <div className="space-y-1.5">
                 <Label className="text-xs font-bold text-foreground">
                   Upload Multiple Files
                 </Label>
                 <input
                   ref={bulkFileInputRef}
+                  multiple
                   accept={ACCEPTED_FORMATS}
                   className="hidden"
-                  multiple
                   type="file"
                   onChange={handleBulkFileSelection}
                 />
@@ -362,11 +372,15 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                     className="flex-1"
                     placeholder="Apply one sender to all files"
                     value={bulkSenderTemplate}
-                    onChange={(event) => setBulkSenderTemplate(event.target.value)}
+                    onChange={(event) =>
+                      setBulkSenderTemplate(event.target.value)
+                    }
                   />
                   <Button
                     className="shrink-0 font-semibold"
-                    isDisabled={!bulkSenderTemplate.trim() || bulkFiles.length === 0}
+                    isDisabled={
+                      !bulkSenderTemplate.trim() || bulkFiles.length === 0
+                    }
                     variant="secondary"
                     onClick={handleApplySenderToAll}
                   >
@@ -374,7 +388,8 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                   </Button>
                 </div>
                 <p className="text-xs text-default-500">
-                  Use this when most files share the same sender. You can still edit each file afterward.
+                  Use this when most files share the same sender. You can still
+                  edit each file afterward.
                 </p>
               </div>
 
@@ -388,7 +403,10 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                       key={item.id}
                       className="flex items-start gap-3 rounded-xl border border-divider bg-content1 p-3"
                     >
-                      <FileText size={18} className="mt-1 shrink-0 text-primary" />
+                      <FileText
+                        className="mt-1 shrink-0 text-primary"
+                        size={18}
+                      />
                       <div className="min-w-0 flex-1 space-y-2">
                         <p className="truncate text-xs font-semibold">
                           {item.file.name}
@@ -405,7 +423,11 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                             placeholder="Sender"
                             value={item.sender}
                             onChange={(e) =>
-                              onBulkItemChange(item.id, "sender", e.target.value)
+                              onBulkItemChange(
+                                item.id,
+                                "sender",
+                                e.target.value,
+                              )
                             }
                           />
                           <DatePicker
@@ -450,9 +472,9 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                       </div>
                       <Button
                         isIconOnly
+                        className="text-danger"
                         size="sm"
                         variant="ghost"
-                        className="text-danger"
                         onClick={() => onBulkItemRemove(item.id)}
                       >
                         <Trash2 size={14} />
@@ -484,7 +506,7 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                 variant="primary"
                 onClick={onBulkSubmit}
               >
-                Upload All ({bulkFiles.filter(f => f.isValid).length})
+                Upload All ({bulkFiles.filter((f) => f.isValid).length})
               </Button>
             )}
           </div>

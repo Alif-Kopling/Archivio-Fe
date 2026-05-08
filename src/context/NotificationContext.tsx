@@ -47,6 +47,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       status?: NotificationStatus;
     }) => {
       const id = Date.now();
+
       setNotifications((prev) => [...prev, { id, title, description, status }]);
       setTimeout(() => {
         setNotifications((prev) => prev.filter((n) => n.id !== id));
@@ -71,7 +72,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       {children}
       <div className="fixed top-4 right-4 z-[9999] flex flex-col gap-2 w-full max-w-sm">
         {notifications.map((n) => (
-          <Alert key={n.id} status={n.status} className="shadow-lg">
+          <Alert key={n.id} className="shadow-lg" status={n.status}>
             <Alert.Indicator>{iconMap[n.status]}</Alert.Indicator>
             <Alert.Content>
               <Alert.Title>{n.title}</Alert.Title>
@@ -89,6 +90,8 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
 export function useNotify() {
   const ctx = useContext(NotificationContext);
+
   if (!ctx) throw new Error("useNotify must be used within NotificationProvider");
+
   return ctx.notify;
 }
