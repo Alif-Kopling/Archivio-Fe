@@ -13,10 +13,8 @@ import {
   Clock,
   CheckCircle2,
   Plus,
-  X,
 } from "lucide-react";
 import {
-  Alert,
   Card,
   Button,
   Tooltip,
@@ -35,8 +33,10 @@ import api from "@/lib/axios";
 import {
   DocumentUploadDialog,
   type DocumentUploadFormState,
+  type BulkFileItem,
 } from "@/components/DocumentUploadDialog";
 import { StorageIndicator } from "@/components/StorageIndicator";
+import { useNotify } from "@/context/NotificationContext";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -173,6 +173,26 @@ function getDownloadFileName(file: Surat): string {
   }
 
   return file.title || "document.pdf";
+}
+
+function getTodayDateString(): string {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+function stripFileExtension(fileName: string): string {
+  const baseName = fileName.split(/[\\/]/).pop() || fileName;
+  const lastDotIndex = baseName.lastIndexOf(".");
+
+  if (lastDotIndex <= 0) {
+    return baseName;
+  }
+
+  return baseName.slice(0, lastDotIndex);
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -594,6 +614,7 @@ const DocumentList: FC<{
       </div>
       <SearchField
         className="w-full sm:max-w-[280px]"
+        aria-label="Search documents"
         value={searchQuery}
         onChange={onSearchChange}
       >
@@ -677,13 +698,14 @@ export default function SuratKeluarPage() {
   const [selectedDocument, setSelectedDocument] = useState<Surat | null>(null);
   const [sendingEmail, setSendingEmail] = useState(false);
   const [uploadOpen, setUploadOpen] = useState(false);
-  const [uploadSuccess, setUploadSuccess] = useState(false);
   const [uploadForm, setUploadForm] = useState<DocumentUploadFormState>({
     title: "",
     documentDate: "",
     sender: "",
     file: null,
   });
+  const [bulkFiles, setBulkFiles] = useState<BulkFileItem[]>([]);
+  const [uploadMode, setUploadMode] = useState<"single" | "bulk">("single");
   const [emailForm, setEmailForm] = useState<EmailFormState>({
     to: "",
     subject: "",
@@ -693,6 +715,8 @@ export default function SuratKeluarPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const limit = 10;
+  const notify = useNotify();
+  const todayDate = getTodayDateString();
 
   const fetchSurat = useCallback(async () => {
     try {
@@ -738,7 +762,7 @@ export default function SuratKeluarPage() {
   const openUploadDialog = () => {
     setUploadForm({
       title: "",
-      documentDate: "",
+      documentDate: todayDate,
       sender: "",
       file: null,
     });
@@ -763,7 +787,7 @@ export default function SuratKeluarPage() {
 
   const handleSubmitUpload = async () => {
     if (!uploadForm.file) {
-      alert("Please choose a file first.");
+      notify({ title: "No File Selected", description: "Please choose a file first.", status: "warning" });
 
       return;
     }
@@ -780,21 +804,20 @@ export default function SuratKeluarPage() {
 
       await api.post("/surat-keluar", formData);
       setUploadOpen(false);
-      setUploadSuccess(true);
+      notify({ title: "Document Uploaded", description: "Your document has been submitted and is pending administrator approval.", status: "success" });
       setUploadForm({
         title: "",
-        documentDate: "",
+        documentDate: todayDate,
         sender: "",
         file: null,
       });
       fetchSurat();
-      setTimeout(() => setUploadSuccess(false), 5000);
     } catch (error: any) {
       console.error(
         "Upload surat keluar failed:",
         error?.response?.data || error,
       );
-      alert(`Upload failed: ${error.response?.data?.error ?? error.message}`);
+      notify({ title: "Upload Failed", description: error.response?.data?.error ?? error.message, status: "danger" });
     } finally {
       setLoading(false);
     }
@@ -805,9 +828,7 @@ export default function SuratKeluarPage() {
       await api.delete(`/surat-keluar/${id}`);
       fetchSurat();
     } catch (error: any) {
-      alert(
-        `Failed to delete: ${error.response?.data?.error ?? error.message}`,
-      );
+      notify({ title: "Delete Failed", description: error.response?.data?.error ?? error.message, status: "danger" });
     }
   };
 
@@ -825,7 +846,7 @@ export default function SuratKeluarPage() {
       link.click();
       link.remove();
     } catch (error) {
-      alert("Failed to download document.");
+      notify({ title: "Download Failed", description: "Failed to download document.", status: "danger" });
     }
   };
 
@@ -863,7 +884,7 @@ export default function SuratKeluarPage() {
         return url;
       });
     } catch (error) {
-      alert("Failed to preview document.");
+      notify({ title: "Preview Failed", description: "Failed to preview document.", status: "danger" });
       handleClosePreview();
     } finally {
       setPreviewLoading(false);
@@ -884,6 +905,76 @@ export default function SuratKeluarPage() {
     setSelectedDocument(null);
   };
 
+  const handleBulkFileChange = (files: FileList | null) => {
+    if (!files) return;
+    const newFiles: BulkFileItem[] = [];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const title = stripFileExtension(file.name);
+      newFiles.push({
+        id: `${Date.now()}-${i}`,
+        file,
+        title,
+        sender: "",
+        documentDate: todayDate,
+        isValid: false,
+      });
+    }
+
+    setBulkFiles(newFiles);
+  };
+
+  const handleBulkItemChange = (id: string, field: string, value: string) => {
+    setBulkFiles((current) =>
+      current.map((item) => {
+        if (item.id !== id) return item;
+
+        const updated = { ...item, [field]: value };
+        updated.isValid = Boolean(updated.sender.trim()) && Boolean(updated.documentDate);
+
+        return updated;
+      }),
+    );
+  };
+
+  const handleBulkItemRemove = (id: string) => {
+    setBulkFiles((current) => current.filter((item) => item.id !== id));
+  };
+
+  const handleModeChange = (mode: "single" | "bulk") => {
+    setUploadMode(mode);
+  };
+
+  const handleBulkSubmit = async () => {
+    try {
+      setLoading(true);
+      const formData = new FormData();
+
+      bulkFiles.forEach((item, index) => {
+        formData.append("files", item.file);
+        formData.append(`title_${item.file.name}_${index}`, item.title);
+        formData.append(`sender_${item.file.name}_${index}`, item.sender);
+        formData.append(`documentDate_${item.file.name}_${index}`, item.documentDate);
+      });
+
+      await api.post("/surat-keluar/bulk", formData);
+      notify({
+        title: "Bulk Upload Success",
+        description: `${bulkFiles.length} documents have been submitted and are pending administrator approval.`,
+        status: "success",
+      });
+      setBulkFiles([]);
+      setUploadOpen(false);
+      fetchSurat();
+    } catch (error: any) {
+      console.error("Bulk upload failed:", error?.response?.data || error);
+      notify({ title: "Bulk Upload Failed", description: error.response?.data?.error ?? error.message, status: "danger" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleEmailFieldChange = (
     field: keyof EmailFormState,
     value: string,
@@ -900,12 +991,10 @@ export default function SuratKeluarPage() {
         `/surat-keluar/${selectedDocument.id}/send-email`,
         emailForm,
       );
-      alert("Email sent successfully.");
+      notify({ title: "Email Sent", description: "Email sent successfully.", status: "success" });
       setSelectedDocument(null);
     } catch (error: any) {
-      alert(
-        `Failed to send email: ${error.response?.data?.error ?? error.message}`,
-      );
+      notify({ title: "Email Failed", description: error.response?.data?.error ?? error.message, status: "danger" });
     } finally {
       setSendingEmail(false);
     }
@@ -924,40 +1013,24 @@ export default function SuratKeluarPage() {
       <DocumentUploadDialog
         badgeClassName="bg-violet-500/10 text-violet-500"
         badgeIcon={<FileUp size={22} />}
+        bulkFiles={bulkFiles}
         description="Tambahkan metadata sebelum dokumen keluar disimpan."
         form={uploadForm}
         loading={loading}
         open={uploadOpen}
         submitLabel="Upload Document"
         title="Upload Outgoing Document"
+        uploadMode={uploadMode}
+        onBulkFileChange={handleBulkFileChange}
+        onBulkItemChange={handleBulkItemChange}
+        onBulkItemRemove={handleBulkItemRemove}
+        onBulkSubmit={handleBulkSubmit}
         onClose={closeUploadDialog}
         onFieldChange={handleUploadFieldChange}
         onFileChange={handleUploadFileChange}
+        onModeChange={handleModeChange}
         onSubmit={handleSubmitUpload}
       />
-      {uploadSuccess ? (
-        <div className="fixed bottom-6 right-6 z-50 max-w-md animate-in slide-in-from-bottom-4 fade-in duration-300">
-          <Alert className="shadow-lg" status="warning">
-            <Alert.Indicator />
-            <Alert.Content>
-              <Alert.Title>Document Uploaded Successfully</Alert.Title>
-              <Alert.Description>
-                Your document has been submitted and is pending administrator
-                approval.
-              </Alert.Description>
-            </Alert.Content>
-            <Button
-              isIconOnly
-              className="h-6 min-w-6 w-6"
-              size="sm"
-              variant="ghost"
-              onClick={() => setUploadSuccess(false)}
-            >
-              <X size={14} />
-            </Button>
-          </Alert>
-        </div>
-      ) : null}
       <StatsSection stats={stats} />
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch w-full flex-1 min-h-0">
         <div className="lg:col-span-3 xl:col-span-2 flex flex-col gap-4">

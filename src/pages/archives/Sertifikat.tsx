@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-sort-props */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
 import { FC, useEffect, useState, useRef, useCallback } from "react";
@@ -9,10 +10,8 @@ import {
   Clock,
   CheckCircle2,
   Plus,
-  X,
 } from "lucide-react";
 import {
-  Alert,
   Card,
   Button,
   Tooltip,
@@ -27,6 +26,7 @@ import {
 
 import api from "@/lib/axios";
 import { StorageIndicator } from "@/components/StorageIndicator";
+import { useNotify } from "@/context/NotificationContext";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -524,13 +524,13 @@ export default function SertifikatPage() {
     verified: 0,
   });
   const [searchQuery, setSearchQuery] = useState("");
-  const [uploadSuccess, setUploadSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [issuer, setIssuer] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const limit = 10;
+  const notify = useNotify();
 
   const fetchSertifikat = useCallback(async () => {
     try {
@@ -593,12 +593,11 @@ export default function SertifikatPage() {
       await api.post("/sertifikat", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      setUploadSuccess(true);
+      notify({ title: "Certificate Uploaded", description: "Your document has been submitted and is pending administrator approval.", status: "success" });
       setIssuer("");
       fetchSertifikat();
-      setTimeout(() => setUploadSuccess(false), 5000);
     } catch (error: any) {
-      alert(`Upload failed: ${error.response?.data?.error ?? error.message}`);
+      notify({ title: "Upload Failed", description: error.response?.data?.error ?? error.message, status: "danger" });
     } finally {
       setLoading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -610,9 +609,7 @@ export default function SertifikatPage() {
       await api.delete(`/sertifikat/${id}`);
       fetchSertifikat();
     } catch (error: any) {
-      alert(
-        `Failed to delete: ${error.response?.data?.error ?? error.message}`,
-      );
+      notify({ title: "Delete Failed", description: error.response?.data?.error ?? error.message, status: "danger" });
     }
   };
 
@@ -630,7 +627,7 @@ export default function SertifikatPage() {
       link.click();
       link.remove();
     } catch (error) {
-      alert("Failed to download certificate.");
+      notify({ title: "Download Failed", description: "Failed to download certificate.", status: "danger" });
     }
   };
 
@@ -668,7 +665,7 @@ export default function SertifikatPage() {
         return url;
       });
     } catch (error) {
-      alert("Failed to preview certificate.");
+      notify({ title: "Preview Failed", description: "Failed to preview certificate.", status: "danger" });
       handleClosePreview();
     } finally {
       setPreviewLoading(false);
@@ -684,29 +681,6 @@ export default function SertifikatPage() {
         type="file"
         onChange={handleFileChange}
       />
-      {uploadSuccess ? (
-        <div className="fixed bottom-6 right-6 z-50 max-w-md animate-in slide-in-from-bottom-4 fade-in duration-300">
-          <Alert className="shadow-lg" status="warning">
-            <Alert.Indicator />
-            <Alert.Content>
-              <Alert.Title>Certificate Uploaded Successfully</Alert.Title>
-              <Alert.Description>
-                Your certificate has been submitted and is pending administrator
-                approval.
-              </Alert.Description>
-            </Alert.Content>
-            <Button
-              isIconOnly
-              className="h-6 min-w-6 w-6"
-              size="sm"
-              variant="ghost"
-              onClick={() => setUploadSuccess(false)}
-            >
-              <X size={14} />
-            </Button>
-          </Alert>
-        </div>
-      ) : null}
       <StatsSection stats={stats} />
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch w-full flex-1 min-h-0">
         <div className="lg:col-span-3 xl:col-span-2 flex flex-col gap-4">
@@ -719,10 +693,10 @@ export default function SertifikatPage() {
           <Card className="border-none bg-content1 shadow-sm">
             <Card.Content className="px-4 py-3">
               <StorageIndicator
-                count={stats.total} 
-                label="Storage Usage" 
-                showGb={true} 
-                total={100} 
+                count={stats.total}
+                label="Storage Usage"
+                showGb={true}
+                total={100}
                 // @ts-ignore (prop custom untuk warna)
                 className="[&_.bg-primary]:bg-warning"
               />
