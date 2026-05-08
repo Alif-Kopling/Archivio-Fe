@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { useNavigate } from "react-router-dom";
 import { motion, useAnimation, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";

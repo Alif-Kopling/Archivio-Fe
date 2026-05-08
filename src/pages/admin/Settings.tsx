@@ -1,8 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTheme } from "next-themes";
-import { Card, Button, Select, Label, ListBox, Chip } from "@heroui/react";
+import {
+  AlertDialog,
+  Button,
+  Card,
+  Chip,
+  Label,
+  ListBox,
+  Select,
+} from "@heroui/react";
 import {
   Building2,
   FileText,
@@ -15,9 +23,17 @@ import {
   AlertCircle,
   CheckCircle2,
   Settings as SettingsIcon,
+  Trash2,
+  AlertTriangle,
 } from "lucide-react";
 
-import { getSettings, updateSetting } from "../../services/setting.service";
+import alarmDanger from "@/assets/alarm-danger-danger.mp3";
+import {
+  emptyRejectedTrash,
+  getSettings,
+  getTrashStats,
+  updateSetting,
+} from "../../services/setting.service";
 
 interface SettingCategory {
   id: string;
@@ -58,6 +74,12 @@ const categories: SettingCategory[] = [
     description: "System access and sessions",
   },
   {
+    id: "trash",
+    label: "Trash",
+    icon: <Trash2 size={20} />,
+    description: "Rejected document cleanup",
+  },
+  {
     id: "display",
     label: "Display",
     icon: <Palette size={20} />,
@@ -67,6 +89,9 @@ const categories: SettingCategory[] = [
 
 export default function Settings() {
   const { setTheme } = useTheme();
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const sourceRef = useRef<AudioBufferSourceNode | null>(null);
+  const bufferRef = useRef<AudioBuffer | null>(null);
   const [settings, setSettings] = useState({
     instansi_name: "",
     logo_url: "",
@@ -87,6 +112,9 @@ export default function Settings() {
   const [hasChanges, setHasChanges] = useState(false);
   const [activeCategory, setActiveCategory] = useState("general");
   const [savingCategory, setSavingCategory] = useState("");
+  const [trashRejectedCount, setTrashRejectedCount] = useState(0);
+  const [trashDialogOpen, setTrashDialogOpen] = useState(false);
+  const [trashing, setTrashing] = useState(false);
 
   useEffect(() => {
     fetchSettings();
@@ -94,7 +122,10 @@ export default function Settings() {
 
   const fetchSettings = async () => {
     try {
-      const { data } = await getSettings();
+      const [{ data }, trashResponse] = await Promise.all([
+        getSettings(),
+        getTrashStats(),
+      ]);
       const newSettings = { ...settings };
 
       data.forEach((s: any) => {
@@ -108,10 +139,64 @@ export default function Settings() {
         }
       });
       setSettings(newSettings);
+      setTrashRejectedCount(Number(trashResponse.data?.rejected || 0));
     } catch (error: any) {
       setMessage({ type: "error", text: "Failed to load settings" });
     }
   };
+
+  useEffect(() => {
+    if (!trashDialogOpen) {
+      return;
+    }
+
+    const playSeamlessLoop = async () => {
+      if (!audioContextRef.current) {
+        const AudioContextCtor =
+          window.AudioContext ??
+          (window as Window & { webkitAudioContext?: typeof AudioContext })
+            .webkitAudioContext;
+
+        if (!AudioContextCtor) {
+          console.warn("Web Audio API is not supported in this browser.");
+          return;
+        }
+
+        audioContextRef.current = new AudioContextCtor();
+      }
+
+      if (!bufferRef.current) {
+        try {
+          const response = await fetch(alarmDanger);
+          const arrayBuffer = await response.arrayBuffer();
+
+          bufferRef.current = await audioContextRef.current.decodeAudioData(arrayBuffer);
+        } catch (error) {
+          console.error("Failed to load alarm sound:", error);
+
+          return;
+        }
+      }
+
+      const source = audioContextRef.current.createBufferSource();
+
+      source.buffer = bufferRef.current;
+      source.loop = true;
+      source.connect(audioContextRef.current.destination);
+      source.start(0);
+      sourceRef.current = source;
+    };
+
+    playSeamlessLoop();
+
+    return () => {
+      if (sourceRef.current) {
+        sourceRef.current.stop();
+        sourceRef.current.disconnect();
+        sourceRef.current = null;
+      }
+    };
+  }, [trashDialogOpen]);
 
   const handleSave = async (key: string) => {
     if (loading) return;
@@ -166,6 +251,28 @@ export default function Settings() {
   const handleChange = (key: string, value: any) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
     setHasChanges(true);
+  };
+
+  const handleEmptyRejectedTrash = async () => {
+    if (trashing) return;
+
+    setTrashing(true);
+    try {
+      const response = await emptyRejectedTrash();
+      const deleted = Number(response.data?.deleted || 0);
+
+      setTrashRejectedCount(0);
+      setTrashDialogOpen(false);
+      setMessage({
+        type: "success",
+        text: `Removed ${deleted} rejected documents.`,
+      });
+      setTimeout(() => setMessage({ type: "", text: "" }), 3000);
+    } catch (error: any) {
+      setMessage({ type: "error", text: "Failed to empty rejected trash" });
+    } finally {
+      setTrashing(false);
+    }
   };
 
   const renderGeneralSettings = () => (
@@ -434,6 +541,53 @@ export default function Settings() {
     </div>
   );
 
+  const renderTrashSettings = () => (
+    <div className="space-y-6">
+      <div className="rounded-2xl border border-danger/20 bg-danger/5 p-5">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-danger">
+              <AlertTriangle size={18} />
+              <p className="text-sm font-semibold uppercase tracking-wide">
+                Rejected documents
+              </p>
+            </div>
+            <h3 className="text-xl font-bold text-foreground">
+              Trash bin for rejected files
+            </h3>
+            <p className="text-sm text-foreground/80 max-w-2xl">
+              Rejected documents are kept here until you permanently remove them.
+              Deleting them will also remove the stored file from disk.
+            </p>
+          </div>
+
+          <div className="min-w-[160px] rounded-2xl border border-divider bg-content1 p-4 text-center shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-wide text-default-500">
+              In Trash
+            </p>
+            <p className="mt-2 text-4xl font-bold text-danger">
+              {trashRejectedCount}
+            </p>
+            <p className="text-xs text-default-500">rejected files</p>
+          </div>
+        </div>
+
+        <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <Button
+            className="bg-danger text-white font-medium px-6"
+            isDisabled={trashRejectedCount === 0}
+            onClick={() => setTrashDialogOpen(true)}
+          >
+            Empty Trash
+          </Button>
+          <p className="text-xs text-default-500">
+            This action is permanent and cannot be undone.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderDisplaySettings = () => (
     <div className="space-y-6">
       <div>
@@ -517,6 +671,8 @@ export default function Settings() {
         return renderNotificationSettings();
       case "security":
         return renderSecuritySettings();
+      case "trash":
+        return renderTrashSettings();
       case "display":
         return renderDisplaySettings();
       default:
@@ -623,6 +779,47 @@ export default function Settings() {
           <span className="text-sm font-medium">{message.text}</span>
         </div>
       )}
+
+      <AlertDialog isOpen={trashDialogOpen} onOpenChange={setTrashDialogOpen}>
+        <AlertDialog.Backdrop>
+          <AlertDialog.Container>
+            <AlertDialog.Dialog className="sm:max-w-[420px]">
+              <AlertDialog.CloseTrigger />
+              <AlertDialog.Header>
+                <AlertDialog.Icon status="danger">
+                  <AlertCircle className="size-6" />
+                </AlertDialog.Icon>
+                <AlertDialog.Heading>
+                  Empty rejected trash?
+                </AlertDialog.Heading>
+              </AlertDialog.Header>
+              <AlertDialog.Body>
+                <p className="text-sm text-default-500">
+                  You are about to permanently delete{" "}
+                  <strong className="text-foreground">{trashRejectedCount}</strong>{" "}
+                  rejected documents. Their files will also be removed from storage.
+                </p>
+              </AlertDialog.Body>
+              <AlertDialog.Footer>
+                <Button
+                  variant="ghost"
+                  onPress={() => setTrashDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="font-semibold bg-danger text-white shadow-lg shadow-danger/20"
+                  isDisabled={trashing}
+                  variant="danger"
+                  onPress={handleEmptyRejectedTrash}
+                >
+                  {trashing ? "Deleting..." : "Delete All"}
+                </Button>
+              </AlertDialog.Footer>
+            </AlertDialog.Dialog>
+          </AlertDialog.Container>
+        </AlertDialog.Backdrop>
+      </AlertDialog>
     </div>
   );
 }

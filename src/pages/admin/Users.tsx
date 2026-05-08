@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 
 import api from "@/lib/axios";
+import { useNotify } from "@/context/NotificationContext";
 import alarmDanger from "@/assets/alarm-danger-danger.mp3";
 
 interface UserData {
@@ -69,6 +70,7 @@ function AddMemberAction({ onSuccess }: { onSuccess: () => void }) {
     password: "",
     role: "staff",
   });
+  const notify = useNotify();
 
   const resetForm = () => {
     setFormData({ name: "", email: "", password: "", role: "staff" });
@@ -80,19 +82,19 @@ function AddMemberAction({ onSuccess }: { onSuccess: () => void }) {
       !formData.email.trim() ||
       !formData.password.trim()
     ) {
-      alert("Missing Information: Please fill in all required fields.");
+      notify({ title: "Missing Information", description: "Please fill in all required fields.", status: "warning" });
 
       return;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailRegex.test(formData.email)) {
-      alert("Invalid Entry: Please provide a valid email address.");
+      notify({ title: "Invalid Entry", description: "Please provide a valid email address.", status: "warning" });
 
       return;
     }
     if (formData.password.length < 6) {
-      alert("Security Requirement: Password must be at least 6 characters.");
+      notify({ title: "Security Requirement", description: "Password must be at least 6 characters.", status: "warning" });
 
       return;
     }
@@ -100,14 +102,12 @@ function AddMemberAction({ onSuccess }: { onSuccess: () => void }) {
     try {
       setSubmitting(true);
       await api.post("/users", formData);
-      alert("Success: The new user has been successfully registered.");
+      notify({ title: "Success", description: "The new user has been successfully registered.", status: "success" });
       setIsOpen(false);
       resetForm();
       onSuccess();
     } catch (error: any) {
-      alert(
-        `Registration Failed: ${error.response?.data?.error || error.message}`,
-      );
+      notify({ title: "Registration Failed", description: error.response?.data?.error || error.message, status: "danger" });
     } finally {
       setSubmitting(false);
     }
@@ -263,6 +263,7 @@ function DeleteMemberAction({
   const audioContextRef = useRef<AudioContext | null>(null);
   const sourceRef = useRef<AudioBufferSourceNode | null>(null);
   const bufferRef = useRef<AudioBuffer | null>(null);
+  const notify = useNotify();
 
   const isAdmin = user.role.toLowerCase() === "admin";
 
@@ -270,8 +271,17 @@ function DeleteMemberAction({
     if (isOpen && isAdmin) {
       const playSeamlessLoop = async () => {
         if (!audioContextRef.current) {
-          audioContextRef.current = new (window.AudioContext ||
-            window.webkitAudioContext)();
+          const AudioContextCtor =
+            window.AudioContext ??
+            (window as Window & { webkitAudioContext?: typeof AudioContext })
+              .webkitAudioContext;
+
+          if (!AudioContextCtor) {
+            console.warn("Web Audio API is not supported in this browser.");
+            return;
+          }
+
+          audioContextRef.current = new AudioContextCtor();
         }
 
         if (!bufferRef.current) {
@@ -317,11 +327,11 @@ function DeleteMemberAction({
     }
     try {
       await api.delete(`/users/${user.id}`);
-      alert(`User Removed: ${user.name} has been successfully deleted.`);
+      notify({ title: "User Removed", description: `${user.name} has been successfully deleted.`, status: "success" });
       setIsOpen(false);
       onSuccess();
     } catch (error: any) {
-      alert(`Deletion Failed: ${error.response?.data?.error || error.message}`);
+      notify({ title: "Deletion Failed", description: error.response?.data?.error || error.message, status: "danger" });
     }
   };
 
@@ -403,7 +413,6 @@ function DeleteMemberAction({
 export default function UserManagementPage() {
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchLoading, setSearchLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   const fetchUsers = useCallback(async () => {
@@ -429,12 +438,10 @@ export default function UserManagementPage() {
       console.error("Failed to fetch users:", error);
     } finally {
       setLoading(false);
-      setSearchLoading(false);
     }
   }, [searchQuery]);
 
   useEffect(() => {
-    setSearchLoading(true);
     const timer = setTimeout(fetchUsers, 500);
 
     return () => clearTimeout(timer);

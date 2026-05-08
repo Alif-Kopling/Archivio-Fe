@@ -12,43 +12,46 @@ import ArchiveLayout from "@/layouts/archive";
 import SertifikatPage from "@/pages/archives/Sertifikat";
 import SuratKeluarPage from "@/pages/archives/SuratKeluar";
 import SuratMasukPage from "@/pages/archives/SuratMasuk";
+import { NotificationProvider } from "@/context/NotificationContext";
 
 function App() {
   return (
-    <Routes>
-      {/* Public Routes */}
-      <Route element={<LoginPage />} path="/login" />
-      <Route element={<IndexPage />} path="/" />
+    <NotificationProvider>
+      <Routes>
+        {/* Public Routes */}
+        <Route element={<LoginPage />} path="/login" />
+        <Route element={<IndexPage />} path="/" />
 
-      {/* Admin Specific Routes */}
-      <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
-        <Route element={<AdminLayout />}>
-          <Route element={<AdminPage />} path="/admin" />
-          <Route element={<UsersPage />} path="/admin/users" />
-          <Route element={<SettingsPage />} path="/admin/settings" />
-        </Route>
-      </Route>
-
-      {/* Staff Specific Routes */}
-      <Route element={<ProtectedRoute allowedRoles={["STAFF"]} />}>
-        <Route element={<Navigate replace to="/archives" />} path="/staff" />
-      </Route>
-
-      {/* Shared Protected Routes (Admin & Staff) */}
-      <Route element={<ProtectedRoute allowedRoles={["ADMIN", "STAFF"]} />}>
-        <Route element={<AdminLayout />}>
-          <Route element={<ArchiveLayout />} path="/archives">
-            <Route element={<Navigate replace to="surat-masuk" />} index />
-            <Route element={<SuratMasukPage />} path="surat-masuk" />
-            <Route element={<SuratKeluarPage />} path="surat-keluar" />
-            <Route element={<SertifikatPage />} path="sertifikat" />
+        {/* Admin Specific Routes */}
+        <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
+          <Route element={<AdminLayout />}>
+            <Route element={<AdminPage />} path="/admin" />
+            <Route element={<UsersPage />} path="/admin/users" />
+            <Route element={<SettingsPage />} path="/admin/settings" />
           </Route>
         </Route>
-      </Route>
 
-      {/* Fallback - Kalau nyasar */}
-      <Route element={<Navigate replace to="/" />} path="*" />
-    </Routes>
+        {/* Staff Specific Routes */}
+        <Route element={<ProtectedRoute allowedRoles={["STAFF"]} />}>
+          <Route element={<Navigate replace to="/archives" />} path="/staff" />
+        </Route>
+
+        {/* Shared Protected Routes (Admin & Staff) */}
+        <Route element={<ProtectedRoute allowedRoles={["ADMIN", "STAFF"]} />}>
+          <Route element={<AdminLayout />}>
+            <Route element={<ArchiveLayout />} path="/archives">
+              <Route element={<Navigate replace to="surat-masuk" />} index />
+              <Route element={<SuratMasukPage />} path="surat-masuk" />
+              <Route element={<SuratKeluarPage />} path="surat-keluar" />
+              <Route element={<SertifikatPage />} path="sertifikat" />
+            </Route>
+          </Route>
+        </Route>
+
+        {/* Fallback - Kalau nyasar */}
+        <Route element={<Navigate replace to="/" />} path="*" />
+      </Routes>
+    </NotificationProvider>
   );
 }
 
