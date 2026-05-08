@@ -23,7 +23,7 @@ Archivio mengimplementasikan standar visual modern untuk meningkatkan produktivi
 | **Frontend Framework** | [React 19](https://react.dev/) — Pemrosesan UI asinkron untuk performa optimal. |
 | **Type Safety** | [TypeScript](https://www.typescriptlang.org/) — Menjamin integritas kode dan skalabilitas jangka panjang. |
 | **Build Infrastructure** | [Vite](https://vitejs.dev/) — Pipeline pengembangan dan bundling aset berkecepatan tinggi. |
-| **Component Library** | [HeroUI v3](https://www.heroui.com/) — Set komponen modular dengan standar desain industri. |
+| **Component Library** | [HeroUI v3](https://www.heroui.com/) — Set komponen modular dengan standar desain industri. Mendukung antarmuka pengaturan sistem dinamis dan metadata dokumen. |
 | **Styling Engine** | [TailwindCSS 4](https://tailwindcss.com/) — Framework styling berbasis utility untuk fleksibilitas desain. |
 | **Animation Engine** | [Framer Motion](https://www.framer.com/motion/) — Arsitektur animasi berbasis pegas untuk interaksi natural. |
 | **Data Visualization** | [Recharts](https://recharts.org/) — Representasi grafis statistik dokumen yang akurat dan interaktif. |
