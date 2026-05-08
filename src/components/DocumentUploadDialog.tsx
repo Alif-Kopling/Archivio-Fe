@@ -55,9 +55,12 @@ interface DocumentUploadDialogProps {
   onModeChange: (mode: "single" | "bulk") => void;
   onSubmit: () => void;
   onBulkSubmit: () => void;
+  acceptedFormats?: string;
+  acceptedFormatsLabel?: string;
 }
 
 const ACCEPTED_FORMATS = ".pdf,.docx,.doc,.jpg,.jpeg,.png";
+const DEFAULT_ACCEPTED_FORMATS_LABEL = "PDF, DOCX, DOC, JPG, JPEG, PNG";
 
 const stripFileExtension = (fileName: string) => {
   const baseName = fileName.split(/[\\/]/).pop() || fileName;
@@ -102,6 +105,8 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
   onModeChange,
   onSubmit,
   onBulkSubmit,
+  acceptedFormats = ACCEPTED_FORMATS,
+  acceptedFormatsLabel = DEFAULT_ACCEPTED_FORMATS_LABEL,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bulkFileInputRef = useRef<HTMLInputElement>(null);
@@ -310,7 +315,7 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                   </Label>
                   <input
                     ref={fileInputRef}
-                    accept={ACCEPTED_FORMATS}
+                    accept={acceptedFormats}
                     className="hidden"
                     type="file"
                     onChange={handleFileSelection}
@@ -321,7 +326,7 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                         Pilih file dokumen
                       </p>
                       <p className="text-xs text-default-500">
-                        Format yang diterima: PDF, DOCX, DOC, JPG, PNG.
+                        Format yang diterima: {acceptedFormatsLabel}.
                       </p>
                       <p className="mt-2 truncate text-xs text-default-400">
                         {form.file?.name ?? "No file selected"}
@@ -348,7 +353,7 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                 <input
                   ref={bulkFileInputRef}
                   multiple
-                  accept={ACCEPTED_FORMATS}
+                  accept={acceptedFormats}
                   className="hidden"
                   type="file"
                   onChange={handleBulkFileSelection}

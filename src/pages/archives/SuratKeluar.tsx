@@ -68,6 +68,8 @@ interface EmailFormState {
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const LIST_LAYOUT = new ListLayout({ rowHeight: 65 });
+const ACCEPTED_UPLOAD_FORMATS = ".pdf,.doc,.docx";
+const ACCEPTED_UPLOAD_FORMATS_LABEL = "PDF, DOC, DOCX";
 
 const STAT_CONFIG = [
   {
@@ -1056,6 +1058,8 @@ export default function SuratKeluarPage() {
       <DocumentUploadDialog
         badgeClassName="bg-violet-500/10 text-violet-500"
         badgeIcon={<FileUp size={22} />}
+        acceptedFormats={ACCEPTED_UPLOAD_FORMATS}
+        acceptedFormatsLabel={ACCEPTED_UPLOAD_FORMATS_LABEL}
         bulkFiles={bulkFiles}
         description="Tambahkan metadata sebelum dokumen keluar disimpan."
         form={uploadForm}

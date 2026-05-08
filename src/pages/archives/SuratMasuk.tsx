@@ -57,6 +57,8 @@ interface Stats {
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const LIST_LAYOUT = new ListLayout({ rowHeight: 65 });
+const ACCEPTED_UPLOAD_FORMATS = ".pdf,.doc,.docx";
+const ACCEPTED_UPLOAD_FORMATS_LABEL = "PDF, DOC, DOCX";
 
 const STAT_CONFIG = [
   {
@@ -935,6 +937,8 @@ export default function SuratMasukPage() {
       <DocumentUploadDialog
         badgeClassName="bg-primary/10 text-primary"
         badgeIcon={<FileDown size={22} />}
+        acceptedFormats={ACCEPTED_UPLOAD_FORMATS}
+        acceptedFormatsLabel={ACCEPTED_UPLOAD_FORMATS_LABEL}
         bulkFiles={bulkFiles}
         description="Tambahkan metadata sebelum dokumen masuk ke arsip."
         form={uploadForm}
