@@ -11,6 +11,7 @@ import {
   Clock,
   CheckCircle2,
   Plus,
+  ArrowUpDown,
 } from "lucide-react";
 import {
   Card,
@@ -23,6 +24,7 @@ import {
   ListLayout,
   AlertDialog,
   SearchField,
+  Select,
 } from "@heroui/react";
 
 import api from "@/lib/axios";
@@ -441,6 +443,20 @@ const DocumentRow: FC<{
   );
 };
 
+const STATUS_FILTER_OPTIONS = [
+  { id: "all", label: "All Status" },
+  { id: "pending", label: "Pending" },
+  { id: "final", label: "Verified" },
+  { id: "rejected", label: "Rejected" },
+];
+
+const SORT_OPTIONS = [
+  { id: "createdAt", label: "Upload Date" },
+  { id: "title", label: "Title" },
+  { id: "documentDate", label: "Document Date" },
+  { id: "status", label: "Status" },
+];
+
 const DocumentList: FC<{
   files: Surat[];
   searchQuery: string;
@@ -453,6 +469,12 @@ const DocumentList: FC<{
   onView: (file: Surat) => void;
   onDownload: (file: Surat) => void;
   onDelete: (id: string | number) => void;
+  statusFilter: string;
+  sortBy: string;
+  sortOrder: "asc" | "desc";
+  onStatusFilterChange: (v: string) => void;
+  onSortByChange: (v: string) => void;
+  onSortOrderChange: () => void;
 }> = ({
   files,
   searchQuery,
@@ -465,6 +487,12 @@ const DocumentList: FC<{
   onView,
   onDownload,
   onDelete,
+  statusFilter,
+  sortBy,
+  sortOrder,
+  onStatusFilterChange,
+  onSortByChange,
+  onSortOrderChange,
 }) => (
   <Card className="border-none bg-content1 shadow-sm w-full h-full flex flex-col overflow-hidden">
     <Card.Header className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-5 py-3 gap-3">
@@ -475,18 +503,72 @@ const DocumentList: FC<{
           archives found.
         </p>
       </div>
-      <SearchField
-        aria-label="Search documents"
-        className="w-full sm:max-w-[280px]"
-        value={searchQuery}
-        onChange={onSearchChange}
-      >
-        <SearchField.Group className="w-full">
-          <SearchField.SearchIcon />
-          <SearchField.Input placeholder="Search documents..." />
-          <SearchField.ClearButton />
-        </SearchField.Group>
-      </SearchField>
+      <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap">
+        <Select
+          aria-label="Filter by status"
+          className="w-[110px]"
+          selectedKey={statusFilter}
+          onSelectionChange={(key) => onStatusFilterChange(String(key))}
+        >
+          <Select.Trigger className="h-9 min-h-9">
+            <Select.Value />
+            <Select.Indicator />
+          </Select.Trigger>
+          <Select.Popover>
+            <ListBox>
+              {STATUS_FILTER_OPTIONS.map((opt) => (
+                <ListBox.Item key={opt.id} id={opt.id} textValue={opt.label}>
+                  {opt.label}
+                </ListBox.Item>
+              ))}
+            </ListBox>
+          </Select.Popover>
+        </Select>
+        <Select
+          aria-label="Sort by"
+          className="w-[120px]"
+          selectedKey={sortBy}
+          onSelectionChange={(key) => onSortByChange(String(key))}
+        >
+          <Select.Trigger className="h-9 min-h-9">
+            <Select.Value />
+            <Select.Indicator />
+          </Select.Trigger>
+          <Select.Popover>
+            <ListBox>
+              {SORT_OPTIONS.map((opt) => (
+                <ListBox.Item key={opt.id} id={opt.id} textValue={opt.label}>
+                  {opt.label}
+                </ListBox.Item>
+              ))}
+            </ListBox>
+          </Select.Popover>
+        </Select>
+        <Button
+          isIconOnly
+          aria-label="Toggle sort direction"
+          className="h-9 w-9 min-w-9 text-default-400"
+          variant="ghost"
+          onPress={onSortOrderChange}
+        >
+          <ArrowUpDown
+            className={`transition-transform duration-200 ${sortOrder === "asc" ? "rotate-180" : ""}`}
+            size={16}
+          />
+        </Button>
+        <SearchField
+          aria-label="Search documents"
+          className="w-full sm:max-w-[180px]"
+          value={searchQuery}
+          onChange={onSearchChange}
+        >
+          <SearchField.Group className="w-full">
+            <SearchField.SearchIcon />
+            <SearchField.Input placeholder="Search documents..." />
+            <SearchField.ClearButton />
+          </SearchField.Group>
+        </SearchField>
+      </div>
     </Card.Header>
 
     <Card.Content className="px-1 pb-1 flex-1 overflow-hidden relative">
@@ -638,6 +720,9 @@ export default function SuratMasukPage() {
     verified: 0,
   });
   const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [uploadOpen, setUploadOpen] = useState(false);
   const [uploadForm, setUploadForm] = useState<DocumentUploadFormState>({
     title: "",
@@ -658,7 +743,14 @@ export default function SuratMasukPage() {
     try {
       setLoading(true);
       const response = await api.get("/surat-masuk", {
-        params: { search: searchQuery, page, limit },
+        params: {
+          search: searchQuery,
+          page,
+          limit,
+          sortBy,
+          sortOrder,
+          status: statusFilter,
+        },
       });
       const payload = response.data ?? {};
       const data = Array.isArray(payload.data) ? payload.data : [];
@@ -677,7 +769,7 @@ export default function SuratMasukPage() {
       setLoading(false);
       setSearchLoading(false);
     }
-  }, [searchQuery, page]);
+  }, [searchQuery, page, sortBy, sortOrder, statusFilter]);
 
   useEffect(() => {
     setSearchLoading(true);
@@ -935,10 +1027,10 @@ export default function SuratMasukPage() {
   return (
     <div className="flex flex-col gap-3 w-full h-full pb-2 animate-in fade-in duration-500">
       <DocumentUploadDialog
-        badgeClassName="bg-primary/10 text-primary"
-        badgeIcon={<FileDown size={22} />}
         acceptedFormats={ACCEPTED_UPLOAD_FORMATS}
         acceptedFormatsLabel={ACCEPTED_UPLOAD_FORMATS_LABEL}
+        badgeClassName="bg-primary/10 text-primary"
+        badgeIcon={<FileDown size={22} />}
         bulkFiles={bulkFiles}
         description="Tambahkan metadata sebelum dokumen masuk ke arsip."
         form={uploadForm}
@@ -978,12 +1070,27 @@ export default function SuratMasukPage() {
             page={page}
             searchLoading={searchLoading}
             searchQuery={searchQuery}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            statusFilter={statusFilter}
             total={total}
             totalPages={totalPages}
             onDelete={handleDelete}
             onDownload={handleDownload}
             onPageChange={setPage}
             onSearchChange={setSearchQuery}
+            onSortByChange={(v) => {
+              setSortBy(v);
+              setPage(1);
+            }}
+            onSortOrderChange={() => {
+              setSortOrder((p) => (p === "desc" ? "asc" : "desc"));
+              setPage(1);
+            }}
+            onStatusFilterChange={(v) => {
+              setStatusFilter(v);
+              setPage(1);
+            }}
             onView={handleView}
           />
         </div>
