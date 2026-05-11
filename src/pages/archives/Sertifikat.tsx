@@ -213,172 +213,7 @@ const SORT_OPTIONS = [
   { id: "status", label: "Status" },
 ];
 
-const DocumentList: FC<{
-  files: Sertifikat[];
-  searchQuery: string;
-  searchLoading: boolean;
-  total: number;
-  totalPages: number;
-  page: number;
-  onPageChange: (page: number) => void;
-  onSearchChange: (v: string) => void;
-  onView: (file: Sertifikat) => void;
-  onDownload: (file: Sertifikat) => void;
-  onDelete: (id: string | number) => void;
-  statusFilter: string;
-  sortBy: string;
-  sortOrder: "asc" | "desc";
-  onStatusFilterChange: (v: string) => void;
-  onSortByChange: (v: string) => void;
-  onSortOrderChange: () => void;
-}> = ({
-  files,
-  searchQuery,
-  searchLoading,
-  total,
-  totalPages,
-  page,
-  onPageChange,
-  onSearchChange,
-  onView,
-  onDownload,
-  onDelete,
-  statusFilter,
-  sortBy,
-  sortOrder,
-  onStatusFilterChange,
-  onSortByChange,
-  onSortOrderChange,
-}) => (
-  <Card className="border-none bg-content1 shadow-sm w-full h-full flex flex-col overflow-hidden">
-    <Card.Header className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-5 py-3 gap-3">
-      <div className="flex flex-col">
-        <h3 className="font-bold text-sm text-foreground">Certificate List</h3>
-        <p className="text-default-400 text-[9px] font-medium tracking-wide">
-          Total of <span className="text-primary font-bold">{total}</span>{" "}
-          certificates found.
-        </p>
-      </div>
-      <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap">
-        <Select
-          aria-label="Filter by status"
-          className="w-[110px]"
-          selectedKey={statusFilter}
-          onSelectionChange={(key) => onStatusFilterChange(String(key))}
-        >
-          <Select.Trigger className="h-9 min-h-9">
-            <Select.Value />
-            <Select.Indicator />
-          </Select.Trigger>
-          <Select.Popover>
-            <ListBox>
-              {STATUS_FILTER_OPTIONS.map((opt) => (
-                <ListBox.Item key={opt.id} id={opt.id} textValue={opt.label}>
-                  {opt.label}
-                </ListBox.Item>
-              ))}
-            </ListBox>
-          </Select.Popover>
-        </Select>
-        <Select
-          aria-label="Sort by"
-          className="w-[120px]"
-          selectedKey={sortBy}
-          onSelectionChange={(key) => onSortByChange(String(key))}
-        >
-          <Select.Trigger className="h-9 min-h-9">
-            <Select.Value />
-            <Select.Indicator />
-          </Select.Trigger>
-          <Select.Popover>
-            <ListBox>
-              {SORT_OPTIONS.map((opt) => (
-                <ListBox.Item key={opt.id} id={opt.id} textValue={opt.label}>
-                  {opt.label}
-                </ListBox.Item>
-              ))}
-            </ListBox>
-          </Select.Popover>
-        </Select>
-        <Button
-          isIconOnly
-          aria-label="Toggle sort direction"
-          className="h-9 w-9 min-w-9 text-default-400"
-          variant="ghost"
-          onPress={onSortOrderChange}
-        >
-          <ArrowUpDown
-            className={`transition-transform duration-200 ${sortOrder === "asc" ? "rotate-180" : ""}`}
-            size={16}
-          />
-        </Button>
-        <SearchField
-          className="w-full sm:max-w-[180px]"
-          value={searchQuery}
-          onChange={onSearchChange}
-        >
-          <SearchField.Group className="w-full">
-            <SearchField.SearchIcon />
-            <SearchField.Input placeholder="Search certificates..." />
-            <SearchField.ClearButton />
-          </SearchField.Group>
-        </SearchField>
-      </div>
-    </Card.Header>
-
-    <Card.Content className="px-1 pb-1 flex-1 overflow-hidden relative">
-      {searchLoading ? (
-        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-content1/50 backdrop-blur-[1px] gap-2">
-          <Spinner size="md" />
-          <span className="text-xs font-medium text-default-500">
-            Loading certificates...
-          </span>
-        </div>
-      ) : null}
-      <Virtualizer layout={LIST_LAYOUT}>
-        <ListBox
-          aria-label="Document List"
-          className="h-[380px] overflow-y-auto scrollbar-hide"
-          items={files}
-        >
-          {(file) => (
-            <DocumentRow
-              key={file.id}
-              file={file}
-              type="certificate"
-              onDelete={onDelete}
-              onDownload={onDownload}
-              onView={onView}
-            />
-          )}
-        </ListBox>
-      </Virtualizer>
-    </Card.Content>
-    {totalPages > 1 ? (
-      <Card.Footer className="flex justify-center gap-2 px-5 py-3">
-        <Button
-          isDisabled={page <= 1}
-          size="sm"
-          variant="ghost"
-          onPress={() => onPageChange(page - 1)}
-        >
-          Previous
-        </Button>
-        <span className="flex items-center text-xs text-default-500">
-          Page {page} of {totalPages}
-        </span>
-        <Button
-          isDisabled={page >= totalPages}
-          size="sm"
-          variant="ghost"
-          onPress={() => onPageChange(page + 1)}
-        >
-          Next
-        </Button>
-      </Card.Footer>
-    ) : null}
-  </Card>
-);
+import { DocumentList } from "@/components/DocumentList";
 
 export default function SertifikatPage() {
   const [files, setFiles] = useState<Sertifikat[]>([]);
@@ -631,6 +466,16 @@ export default function SertifikatPage() {
               setPage(1);
             }}
             onView={handleView}
+            renderRow={(file) => (
+              <DocumentRow
+                key={file.id}
+                file={file}
+                type="certificate"
+                onDelete={handleDelete}
+                onDownload={handleDownload}
+                onView={handleView}
+              />
+            )}
           />
         </div>
       </div>
