@@ -38,7 +38,7 @@ import {
 } from "recharts";
 
 import api from "@/lib/axios";
-import { ThemeSwitch } from "@/components/theme-switch";
+import { ThemeSwitch } from "@/components/common/theme-switch";
 import { useNotify } from "@/context/NotificationContext";
 
 // --- Types ---

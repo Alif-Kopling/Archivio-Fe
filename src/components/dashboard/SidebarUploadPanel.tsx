@@ -44,9 +44,10 @@ export const SidebarUploadPanel: FC<UploadPanelProps> = ({
       </p>
       <Button
         className={`w-full font-bold shadow-md ${buttonShadow} h-9 text-[11px] ${buttonColor} rounded-lg flex items-center justify-center gap-2`}
+        isDisabled={loading}
         onClick={onUploadClick}
       >
-        Upload Document
+        {loading ? "Uploading..." : "Upload Document"}
       </Button>
     </Card.Content>
   </Card>
