@@ -160,7 +160,6 @@ function getDownloadFileName(file: Sertifikat): string {
   return file.title || "certificate.pdf";
 }
 
-
 const StatsSection: FC<{ stats: Stats }> = ({ stats }) => (
   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
     {STAT_CONFIG.map(({ key, label, Icon, color, bg }) => (
@@ -220,172 +219,7 @@ const UploadPanel: FC<{
   </Card>
 );
 
-const DocumentRow: FC<{
-  file: Sertifikat;
-  onView: (file: Sertifikat) => void;
-  onDownload: (file: Sertifikat) => void;
-  onDelete: (id: string | number) => void;
-}> = ({ file, onView, onDownload, onDelete }) => {
-  const normalizedStatus = file.status?.toLowerCase();
-  const isFinal = isVerifiedStatus(file.status);
-  const isRejected = normalizedStatus === "rejected";
-  const statusLabel = isFinal
-    ? "VERIFIED"
-    : isRejected
-      ? "REJECTED"
-      : "PENDING";
-  const statusColor = isFinal ? "success" : isRejected ? "danger" : "warning";
-
-  return (
-    <ListBox.Item
-      key={file.id}
-      className="py-2 px-3 border-b border-divider/10 hover:bg-default-100/50 rounded-none first:rounded-t-lg last:rounded-b-lg last:border-none transition-colors"
-      textValue={file.title}
-    >
-      <div className="flex items-center justify-between w-full gap-3">
-        <div className="flex items-center gap-3 overflow-hidden">
-          <div className="w-9 h-9 flex-shrink-0 rounded-xl flex items-center justify-center border shadow-sm bg-amber-500/10 text-amber-600 border-amber-500/20">
-            <Award size={18} />
-          </div>
-          <div className="flex flex-col overflow-hidden">
-            <div className="flex items-center gap-2">
-              <span className="text-[13px] font-bold text-foreground truncate">
-                {file.title}
-              </span>
-              <span className="text-[9px] font-black bg-amber-500/10 text-amber-600 px-1.5 py-0.5 rounded uppercase tracking-wider">
-                Certificate
-              </span>
-            </div>
-            <div className="flex items-center gap-2 mt-0.5">
-              {file.issuer ? (
-                <span className="text-[10px] text-primary font-semibold">
-                  {file.issuer}
-                </span>
-              ) : null}
-              {file.issuer && (
-                <span className="text-[8px] text-default-300">•</span>
-              )}
-              <span className="text-[8px] text-default-500 font-medium bg-default-100 px-1 py-0.5 rounded leading-none uppercase">
-                {getFileExt(file.filePath)}
-              </span>
-              <span className="text-[10px] text-default-400 font-medium">
-                {formatDate(file.createdAt)}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3 flex-shrink-0">
-          <Chip
-            className="font-black border-none h-5 px-2 text-[9px] tracking-tighter"
-            color={statusColor}
-            size="sm"
-            variant="soft"
-          >
-            {statusLabel}
-          </Chip>
-
-          <div className="flex items-center gap-0.5">
-            <Tooltip delay={0}>
-              <Tooltip.Trigger>
-                <Button
-                  isIconOnly
-                  className={`rounded-md w-7 h-7 min-w-7 ${
-                    isFinal
-                      ? "text-default-400 hover:text-primary hover:bg-primary/5"
-                      : "text-default-200 cursor-not-allowed opacity-50"
-                  }`}
-                  isDisabled={!isFinal}
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => isFinal && onView(file)}
-                >
-                  <Eye size={14} />
-                </Button>
-              </Tooltip.Trigger>
-              <Tooltip.Content>View</Tooltip.Content>
-            </Tooltip>
-
-            <Tooltip delay={0}>
-              <Tooltip.Trigger>
-                <Button
-                  isIconOnly
-                  className={`rounded-md w-7 h-7 min-w-7 ${
-                    isFinal
-                      ? "text-default-400 hover:text-success hover:bg-success/5"
-                      : "text-default-200 cursor-not-allowed opacity-50"
-                  }`}
-                  isDisabled={!isFinal}
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => isFinal && onDownload(file)}
-                >
-                  <Download size={14} />
-                </Button>
-              </Tooltip.Trigger>
-              <Tooltip.Content>Download</Tooltip.Content>
-            </Tooltip>
-
-            <AlertDialog>
-              <Tooltip delay={0}>
-                <Tooltip.Trigger>
-                  <Button
-                    isIconOnly
-                    className="text-default-400 hover:text-danger hover:bg-danger/5 rounded-md w-7 h-7 min-w-7"
-                    size="sm"
-                    variant="ghost"
-                  >
-                    <Trash2 size={14} />
-                  </Button>
-                </Tooltip.Trigger>
-                <Tooltip.Content>Delete Certificate</Tooltip.Content>
-              </Tooltip>
-              <AlertDialog.Backdrop>
-                <AlertDialog.Container>
-                  <AlertDialog.Dialog className="sm:max-w-[400px]">
-                    <AlertDialog.CloseTrigger />
-                    <AlertDialog.Header>
-                      <AlertDialog.Icon status="danger" />
-                      <AlertDialog.Heading>
-                        Confirm Permanent Deletion
-                      </AlertDialog.Heading>
-                    </AlertDialog.Header>
-                    <AlertDialog.Body>
-                      <p className="text-sm text-default-500 leading-relaxed">
-                        Are you sure you want to permanently delete{" "}
-                        <strong className="text-foreground">
-                          {file.title}
-                        </strong>
-                        ?
-                      </p>
-                    </AlertDialog.Body>
-                    <AlertDialog.Footer>
-                      <Button
-                        className="font-semibold"
-                        slot="close"
-                        variant="tertiary"
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        className="font-semibold bg-danger text-white shadow-lg shadow-danger/20"
-                        slot="close"
-                        variant="danger"
-                        onClick={() => onDelete(file.id)}
-                      >
-                        Confirm Deletion
-                      </Button>
-                    </AlertDialog.Footer>
-                  </AlertDialog.Dialog>
-                </AlertDialog.Container>
-              </AlertDialog.Backdrop>
-            </AlertDialog>
-          </div>
-        </div>
-      </div>
-    </ListBox.Item>
-  );
-};
+import { DocumentRow } from "@/components/DocumentRow";
 
 const STATUS_FILTER_OPTIONS = [
   { id: "all", label: "All Status" },
@@ -533,6 +367,7 @@ const DocumentList: FC<{
             <DocumentRow
               key={file.id}
               file={file}
+              type="certificate"
               onDelete={onDelete}
               onDownload={onDownload}
               onView={onView}
