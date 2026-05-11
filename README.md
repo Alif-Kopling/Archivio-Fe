@@ -27,6 +27,8 @@ Archivio mengimplementasikan standar visual modern untuk meningkatkan produktivi
 | **Styling Engine** | [TailwindCSS 4](https://tailwindcss.com/) — Framework styling berbasis utility untuk fleksibilitas desain. |
 | **Animation Engine** | [Framer Motion](https://www.framer.com/motion/) — Arsitektur animasi berbasis pegas untuk interaksi natural. |
 | **Data Visualization** | [Recharts](https://recharts.org/) — Representasi grafis statistik dokumen yang akurat dan interaktif. |
+| **Interactive Audio** | **Web Audio API** — Layer umpan balik auditori untuk meningkatkan *user awareness* terhadap aksi sistem. |
+| **Secret Console** | **Custom Terminal UI** — Konsol terintegrasi (`Ctrl + ;`) untuk operasi cepat dan *power-user commands*. |
 
 ---
 
