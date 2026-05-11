@@ -1,7 +1,7 @@
 import { FC, useState, useEffect } from "react";
 import { useTheme } from "next-themes";
 
-import { SunFilledIcon, MoonFilledIcon } from "@/components/icons";
+import { SunFilledIcon, MoonFilledIcon } from "@/components/common/icons";
 
 export interface ThemeSwitchProps {
   className?: string;

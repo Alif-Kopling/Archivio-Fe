@@ -7,8 +7,8 @@ import introSound from "@/assets/sound-awal-masuk-ke-page-home.mp3";
 import exploreSound from "@/assets/sound-succes-login.mp3";
 import hoverSound from "@/assets/select-button.mp3";
 import clickSound from "@/assets/button-sound1.mp3";
-import { ThemeSwitch } from "@/components/theme-switch";
-import { Logo } from "@/components/icons";
+import { ThemeSwitch } from "@/components/common/theme-switch";
+import { Logo } from "@/components/common/icons";
 
 export default function Home() {
   const navigate = useNavigate();

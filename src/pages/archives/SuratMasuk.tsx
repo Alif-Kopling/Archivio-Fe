@@ -2,19 +2,19 @@
 /* eslint-disable no-console */
 /* eslint-disable import/order */
 
-import { SidebarUploadPanel } from "@/components/SidebarUploadPanel";
+import { SidebarUploadPanel } from "@/components/dashboard/SidebarUploadPanel";
 import { FC, useEffect, useState, useCallback } from "react";
 import { FileDown, Inbox, Clock, CheckCircle2 } from "lucide-react";
 import { Card } from "@heroui/react";
 
 import api from "@/lib/axios";
-import { StatCard } from "@/components/StatCard";
+import { StatCard } from "@/components/dashboard/StatCard";
 import {
   DocumentUploadDialog,
   type DocumentUploadFormState,
   type BulkFileItem,
-} from "@/components/DocumentUploadDialog";
-import { StorageIndicator } from "@/components/StorageIndicator";
+} from "@/components/documents/DocumentUploadDialog";
+import { StorageIndicator } from "@/components/dashboard/StorageIndicator";
 import { useNotify } from "@/context/NotificationContext";
 
 // ── Types ───────────────────────────────────────────────────────────────
@@ -161,9 +161,9 @@ const StatsSection: FC<{ stats: Stats }> = ({ stats }) => (
   </div>
 );
 
-import { DocumentRow } from "@/components/DocumentRow";
-import { DocumentList } from "@/components/DocumentList";
-import { DocumentPreviewDialog } from "@/components/DocumentPreviewDialog";
+import { DocumentRow } from "@/components/documents/DocumentRow";
+import { DocumentList } from "@/components/documents/DocumentList";
+import { DocumentPreviewDialog } from "@/components/documents/DocumentPreviewDialog";
 
 export default function SuratMasukPage() {
   const [files, setFiles] = useState<Surat[]>([]);

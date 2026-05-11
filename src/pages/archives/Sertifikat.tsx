@@ -4,15 +4,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
 import { FC, useEffect, useState, useRef, useCallback } from "react";
-import { SidebarUploadPanel } from "@/components/SidebarUploadPanel";
+import { SidebarUploadPanel } from "@/components/dashboard/SidebarUploadPanel";
 import { Award, Clock, CheckCircle2 } from "lucide-react";
 import {
   Card,
 } from "@heroui/react";
 
 import api from "@/lib/axios";
-import { StatCard } from "@/components/StatCard";
-import { DocumentPreviewDialog } from "@/components/DocumentPreviewDialog";
+import { StatCard } from "@/components/dashboard/StatCard";
+import { DocumentPreviewDialog } from "@/components/documents/DocumentPreviewDialog";
 import { useNotify } from "@/context/NotificationContext";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -146,12 +146,9 @@ const StatsSection: FC<{ stats: Stats }> = ({ stats }) => (
 );
 
 
-import { DocumentRow } from "@/components/DocumentRow";
-import { StorageIndicator } from "@/components/StorageIndicator";
-
-
-
-import { DocumentList } from "@/components/DocumentList";
+import { DocumentRow } from "@/components/documents/DocumentRow";
+import { StorageIndicator } from "@/components/dashboard/StorageIndicator";
+import { DocumentList } from "@/components/documents/DocumentList";
 
 export default function SertifikatPage() {
   const [files, setFiles] = useState<Sertifikat[]>([]);

@@ -4,8 +4,8 @@ import { useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 
 import { siteConfig } from "@/config/site";
-import { ThemeSwitch } from "@/components/theme-switch";
-import { Logo } from "@/components/icons";
+import { ThemeSwitch } from "@/components/common/theme-switch";
+import { Logo } from "@/components/common/icons";
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

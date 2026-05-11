@@ -5,18 +5,19 @@ import { FileUp } from "lucide-react";
 import { SendHorizonal, Clock, CheckCircle2 } from "lucide-react";
 import { Card, Button, Input } from "@heroui/react";
 
-import { SidebarUploadPanel } from "@/components/SidebarUploadPanel";
-import { DocumentPreviewDialog } from "@/components/DocumentPreviewDialog";
-import api from "@/lib/axios";
-import { StatCard } from "@/components/StatCard";
+import { SidebarUploadPanel } from "@/components/dashboard/SidebarUploadPanel";
+import { DocumentPreviewDialog } from "@/components/documents/DocumentPreviewDialog";
+import { StatCard } from "@/components/dashboard/StatCard";
 import {
   DocumentUploadDialog,
   type DocumentUploadFormState,
   type BulkFileItem,
-} from "@/components/DocumentUploadDialog";
-import { StorageIndicator } from "@/components/StorageIndicator";
-// eslint-disable-next-line import/order
+} from "@/components/documents/DocumentUploadDialog";
+import { StorageIndicator } from "@/components/dashboard/StorageIndicator";
+import { DocumentRow } from "@/components/documents/DocumentRow";
+import { DocumentList } from "@/components/documents/DocumentList";
 import { useNotify } from "@/context/NotificationContext";
+import api from "@/lib/axios";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -260,9 +261,6 @@ const SendEmailDialog: FC<{
     </div>
   );
 };
-
-import { DocumentRow } from "@/components/DocumentRow";
-import { DocumentList } from "@/components/DocumentList";
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 

@@ -11,7 +11,7 @@ import {
 import { NavLink, useNavigate } from "react-router-dom";
 import { Button, Avatar, Tooltip } from "@heroui/react";
 
-import { Logo } from "@/components/icons";
+import { Logo } from "@/components/common/icons";
 import { getRole, getUserFromToken } from "@/lib/auth";
 
 export const Sidebar: FC = () => {

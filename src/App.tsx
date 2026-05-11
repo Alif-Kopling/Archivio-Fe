@@ -5,7 +5,7 @@ import AdminPage from "@/pages/admin/Dashboard";
 import UsersPage from "@/pages/admin/Users";
 import SettingsPage from "@/pages/admin/Settings";
 import LoginPage from "@/pages/auth/Login";
-import ProtectedRoute from "@/components/ProtectedRoute";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import IndexPage from "@/pages/Home";
 import AdminLayout from "@/layouts/admin";
 import ArchiveLayout from "@/layouts/archive";
@@ -13,7 +13,7 @@ import SertifikatPage from "@/pages/archives/Sertifikat";
 import SuratKeluarPage from "@/pages/archives/SuratKeluar";
 import SuratMasukPage from "@/pages/archives/SuratMasuk";
 import { NotificationProvider } from "@/context/NotificationContext";
-import SecretConsole from "@/components/SecretConsole";
+import SecretConsole from "@/components/ui/SecretConsole";
 
 function App() {
   return (
