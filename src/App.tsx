@@ -13,10 +13,12 @@ import SertifikatPage from "@/pages/archives/Sertifikat";
 import SuratKeluarPage from "@/pages/archives/SuratKeluar";
 import SuratMasukPage from "@/pages/archives/SuratMasuk";
 import { NotificationProvider } from "@/context/NotificationContext";
+import SecretConsole from "@/components/SecretConsole";
 
 function App() {
   return (
     <NotificationProvider>
+      <SecretConsole />
       <Routes>
         {/* Public Routes */}
         <Route element={<LoginPage />} path="/login" />
