@@ -1,18 +1,6 @@
 import { FC } from "react";
-import {
-  FileText,
-  Download,
-  Eye,
-  Trash2,
-  Mail,
-} from "lucide-react";
-import {
-  Button,
-  Tooltip,
-  Chip,
-  ListBox,
-  AlertDialog,
-} from "@heroui/react";
+import { FileText, Download, Eye, Trash2, Mail } from "lucide-react";
+import { Button, Tooltip, Chip, ListBox, AlertDialog } from "@heroui/react";
 
 interface DocumentRowProps {
   file: any;
@@ -26,7 +14,8 @@ interface DocumentRowProps {
 const getFileExt = (filePath: string): string =>
   filePath?.split(".").pop()?.toUpperCase() || "FILE";
 
-const formatDate = (iso: string): string => new Date(iso).toLocaleDateString("en-US");
+const formatDate = (iso: string): string =>
+  new Date(iso).toLocaleDateString("en-US");
 
 export const DocumentRow: FC<DocumentRowProps> = ({
   file,
@@ -38,9 +27,19 @@ export const DocumentRow: FC<DocumentRowProps> = ({
 }) => {
   const isPdf = file.filePath?.toUpperCase().endsWith(".PDF");
   const normalizedStatus = file.status?.toLowerCase();
-  const isFinal = ["final", "approved", "approve", "publish", "published"].includes(normalizedStatus);
+  const isFinal = [
+    "final",
+    "approved",
+    "approve",
+    "publish",
+    "published",
+  ].includes(normalizedStatus);
   const isRejected = normalizedStatus === "rejected";
-  const statusLabel = isFinal ? "VERIFIED" : isRejected ? "REJECTED" : "PENDING";
+  const statusLabel = isFinal
+    ? "VERIFIED"
+    : isRejected
+      ? "REJECTED"
+      : "PENDING";
   const statusColor = isFinal ? "success" : isRejected ? "danger" : "warning";
 
   return (
@@ -167,16 +166,25 @@ export const DocumentRow: FC<DocumentRowProps> = ({
                     <AlertDialog.CloseTrigger />
                     <AlertDialog.Header>
                       <AlertDialog.Icon status="danger" />
-                      <AlertDialog.Heading>Confirm Deletion</AlertDialog.Heading>
+                      <AlertDialog.Heading>
+                        Confirm Deletion
+                      </AlertDialog.Heading>
                     </AlertDialog.Header>
                     <AlertDialog.Body>
                       <p className="text-sm text-default-500">
-                        Are you sure you want to permanently delete <strong>{file.title}</strong>?
+                        Are you sure you want to permanently delete{" "}
+                        <strong>{file.title}</strong>?
                       </p>
                     </AlertDialog.Body>
                     <AlertDialog.Footer>
-                      <Button slot="close" variant="tertiary">Cancel</Button>
-                      <Button className="bg-danger text-white" slot="close" onClick={() => onDelete(file.id)}>
+                      <Button slot="close" variant="tertiary">
+                        Cancel
+                      </Button>
+                      <Button
+                        className="bg-danger text-white"
+                        slot="close"
+                        onClick={() => onDelete(file.id)}
+                      >
                         Confirm
                       </Button>
                     </AlertDialog.Footer>

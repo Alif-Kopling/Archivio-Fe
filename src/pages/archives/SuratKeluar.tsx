@@ -4,11 +4,6 @@
 import { FC, useEffect, useState, useCallback } from "react";
 import {
   FileUp,
-  FileText,
-  Download,
-  Eye,
-  Trash2,
-  Mail,
   SendHorizonal,
   Clock,
   CheckCircle2,
@@ -18,15 +13,12 @@ import {
 import {
   Card,
   Button,
-  Tooltip,
-  Chip,
   Input,
   Spinner,
   Separator,
   Virtualizer,
   ListBox,
   ListLayout,
-  AlertDialog,
   SearchField,
   Select,
 } from "@heroui/react";
@@ -39,6 +31,7 @@ import {
   type BulkFileItem,
 } from "@/components/DocumentUploadDialog";
 import { StorageIndicator } from "@/components/StorageIndicator";
+// eslint-disable-next-line import/order
 import { useNotify } from "@/context/NotificationContext";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -200,7 +193,6 @@ function stripFileExtension(fileName: string): string {
   return baseName.slice(0, lastDotIndex);
 }
 
-
 const StatsSection: FC<{ stats: Stats }> = ({ stats }) => (
   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
     {STAT_CONFIG.map(({ key, label, Icon, color, bg }) => (
@@ -209,8 +201,8 @@ const StatsSection: FC<{ stats: Stats }> = ({ stats }) => (
         Icon={Icon}
         bg={bg}
         color={color}
-        label={label}
         count={stats[key]}
+        label={label}
       />
     ))}
   </div>

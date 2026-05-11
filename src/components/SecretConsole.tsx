@@ -18,6 +18,7 @@ export default function SecretConsole() {
 
   const handleSubmit = useCallback(async () => {
     const cmd = input.trim();
+
     if (!cmd) return;
 
     addEntry({ type: "input", text: `> ${cmd}` });

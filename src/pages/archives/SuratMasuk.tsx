@@ -1,12 +1,9 @@
+/* eslint-disable import/order */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
 import { FC, useEffect, useState, useCallback } from "react";
 import {
   FileDown,
-  FileText,
-  Download,
-  Eye,
-  Trash2,
   Inbox,
   Clock,
   CheckCircle2,
@@ -16,13 +13,10 @@ import {
 import {
   Card,
   Button,
-  Tooltip,
-  Chip,
   Spinner,
   Virtualizer,
   ListBox,
   ListLayout,
-  AlertDialog,
   SearchField,
   Select,
 } from "@heroui/react";
@@ -152,16 +146,6 @@ function stripFileExtension(fileName: string): string {
   return baseName.slice(0, lastDotIndex);
 }
 
-function formatDate(iso?: string | null): string {
-  if (!iso) return "-";
-
-  const parsed = new Date(iso);
-
-  if (Number.isNaN(parsed.getTime())) return "-";
-
-  return parsed.toLocaleDateString("en-US");
-}
-
 function isPdfFile(filePath: string): boolean {
   return filePath?.toUpperCase().endsWith(".PDF");
 }
@@ -189,7 +173,6 @@ function getTodayDateString(): string {
   return `${year}-${month}-${day}`;
 }
 
-
 const StatsSection: FC<{ stats: Stats }> = ({ stats }) => (
   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
     {STAT_CONFIG.map(({ key, label, Icon, color, bg }) => (
@@ -198,8 +181,8 @@ const StatsSection: FC<{ stats: Stats }> = ({ stats }) => (
         Icon={Icon}
         bg={bg}
         color={color}
-        label={label}
         count={stats[key]}
+        label={label}
       />
     ))}
   </div>

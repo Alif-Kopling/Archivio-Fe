@@ -1,27 +1,17 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable import/order */
 /* eslint-disable react/jsx-sort-props */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
 import { FC, useEffect, useState, useRef, useCallback } from "react";
-import {
-  Download,
-  Eye,
-  Trash2,
-  Award,
-  Clock,
-  CheckCircle2,
-  Plus,
-  ArrowUpDown,
-} from "lucide-react";
+import { Award, Clock, CheckCircle2, Plus, ArrowUpDown } from "lucide-react";
 import {
   Card,
   Button,
-  Tooltip,
-  Chip,
   Spinner,
   Virtualizer,
   ListBox,
   ListLayout,
-  AlertDialog,
   SearchField,
   Select,
 } from "@heroui/react";
@@ -138,11 +128,7 @@ function getFileExt(filePath: string): string {
   return filePath?.split(".").pop()?.toUpperCase() || "FILE";
 }
 
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-US");
-}
-
-function isPdfFile(filePath: string): boolean {
+function isPdfFile({ filePath }: { filePath: string; }): boolean {
   return filePath?.toUpperCase().endsWith(".PDF");
 }
 
@@ -709,7 +695,7 @@ export default function SertifikatPage() {
                   className="mx-auto max-h-[70vh] w-auto max-w-full rounded-lg object-contain"
                   src={previewUrl}
                 />
-              ) : isPdfFile(previewFile.filePath) ? (
+              ) : isPdfFile({ filePath: previewFile.filePath }) ? (
                 <iframe
                   className="h-[70vh] w-full rounded-lg bg-white"
                   src={previewUrl}
