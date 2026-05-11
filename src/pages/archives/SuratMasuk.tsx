@@ -1,9 +1,11 @@
-/* eslint-disable import/order */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
+/* eslint-disable import/order */
+
+import { SidebarUploadPanel } from "@/components/SidebarUploadPanel";
 import { FC, useEffect, useState, useCallback } from "react";
-import { FileDown, Inbox, Clock, CheckCircle2, Plus } from "lucide-react";
-import { Card, Button } from "@heroui/react";
+import { FileDown, Inbox, Clock, CheckCircle2 } from "lucide-react";
+import { Card } from "@heroui/react";
 
 import api from "@/lib/axios";
 import { StatCard } from "@/components/StatCard";
@@ -159,44 +161,8 @@ const StatsSection: FC<{ stats: Stats }> = ({ stats }) => (
   </div>
 );
 
-const UploadPanel: FC<{ loading: boolean; onUploadClick: () => void }> = ({
-  loading,
-  onUploadClick,
-}) => (
-  <Card className="border-none bg-content1 shadow-sm h-fit">
-    <Card.Header className="flex flex-col items-start px-4 pt-4 pb-1 gap-2">
-      <div className="p-2.5 bg-primary/10 rounded-xl text-primary">
-        <FileDown size={22} />
-      </div>
-      <div className="space-y-0.5">
-        <h3 className="font-bold text-base tracking-tight text-foreground">
-          Incoming Mail
-        </h3>
-        <p className="text-default-400 text-[10px] leading-tight">
-          Manage incoming digital archives.
-        </p>
-      </div>
-    </Card.Header>
-    <Card.Content className="px-4 pb-4 pt-1 flex flex-col gap-3">
-      <p className="text-[11px] text-default-600 leading-snug bg-default-50/50 p-3 rounded-lg border border-default-100 italic">
-        Accepted formats: <span className="font-bold text-foreground">PDF</span>{" "}
-        or <span className="font-bold text-foreground">DOCX</span>.
-      </p>
-      <Button
-        className="w-full font-bold shadow-md shadow-primary/20 h-9 text-[11px] bg-primary text-primary-foreground rounded-lg flex items-center justify-center gap-2"
-        onClick={onUploadClick}
-      >
-        {!loading && <Plus size={16} strokeWidth={3} />}
-        Upload Document
-      </Button>
-    </Card.Content>
-  </Card>
-);
-
 import { DocumentRow } from "@/components/DocumentRow";
-
 import { DocumentList } from "@/components/DocumentList";
-
 import { DocumentPreviewDialog } from "@/components/DocumentPreviewDialog";
 
 export default function SuratMasukPage() {
@@ -544,7 +510,14 @@ export default function SuratMasukPage() {
       <StatsSection stats={stats} />
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch w-full flex-1 min-h-0">
         <div className="lg:col-span-3 xl:col-span-2 flex flex-col gap-4">
-          <UploadPanel loading={loading} onUploadClick={openUploadDialog} />
+          <SidebarUploadPanel
+            acceptedFormats={ACCEPTED_UPLOAD_FORMATS_LABEL}
+            description="Manage incoming digital archives."
+            icon={<FileDown size={22} />}
+            loading={loading}
+            title="Incoming Mail"
+            onUploadClick={openUploadDialog}
+          />
           <Card className="border-none bg-content1 shadow-sm">
             <Card.Content className="px-4 py-3">
               <StorageIndicator

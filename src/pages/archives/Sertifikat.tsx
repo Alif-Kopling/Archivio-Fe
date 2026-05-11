@@ -4,10 +4,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
 import { FC, useEffect, useState, useRef, useCallback } from "react";
-import { Award, Clock, CheckCircle2, Plus } from "lucide-react";
+import { SidebarUploadPanel } from "@/components/SidebarUploadPanel";
+import { Award, Clock, CheckCircle2 } from "lucide-react";
 import {
   Card,
-  Button,
 } from "@heroui/react";
 
 import api from "@/lib/axios";
@@ -145,49 +145,6 @@ const StatsSection: FC<{ stats: Stats }> = ({ stats }) => (
   </div>
 );
 
-const UploadPanel: FC<{
-  loading: boolean;
-  issuer: string;
-  onUploadClick: () => void;
-  onIssuerChange: (value: string) => void;
-}> = ({ loading, issuer, onUploadClick, onIssuerChange }) => (
-  <Card className="border-none bg-content1 shadow-sm h-fit">
-    <Card.Header className="flex flex-col items-start px-4 pt-4 pb-1 gap-2">
-      <div className="p-2.5 bg-amber-900/10 rounded-xl text-amber-500">
-        <Award size={22} />
-      </div>
-      <div className="space-y-0.5">
-        <h3 className="font-bold text-base tracking-tight text-foreground">
-          Certificates
-        </h3>
-        <p className="text-default-400 text-[10px] leading-tight">
-          Manage digital certificates.
-        </p>
-      </div>
-    </Card.Header>
-    <Card.Content className="px-4 pb-4 pt-1 flex flex-col gap-3">
-      <p className="text-[11px] text-default-600 leading-snug bg-default-50/50 p-3 rounded-lg border border-default-100 italic">
-        Accepted: <span className="font-bold text-foreground">PDF</span>,{" "}
-        <span className="font-bold text-foreground">JPG</span>, or{" "}
-        <span className="font-bold text-foreground">PNG</span>.
-      </p>
-      <input
-        className="w-full h-10 px-4 rounded-lg border border-divider bg-default-100 focus:outline-none focus:ring-2 focus:ring-warning text-sm"
-        placeholder="Certificate issuer (optional)"
-        type="text"
-        value={issuer}
-        onChange={(e) => onIssuerChange(e.target.value)}
-      />
-      <Button
-        className="w-full font-bold shadow-md shadow-warning/20 h-9 text-[11px] bg-[#d97706] text-white rounded-lg flex items-center justify-center gap-2 hover:bg-[#b45309]"
-        onClick={onUploadClick}
-      >
-        {!loading && <Plus size={16} strokeWidth={3} />}
-        Upload Certificate
-      </Button>
-    </Card.Content>
-  </Card>
-);
 
 import { DocumentRow } from "@/components/DocumentRow";
 import { StorageIndicator } from "@/components/StorageIndicator";
@@ -400,10 +357,15 @@ export default function SertifikatPage() {
       <StatsSection stats={stats} />
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch w-full flex-1 min-h-0">
         <div className="lg:col-span-3 xl:col-span-2 flex flex-col gap-4">
-          <UploadPanel
-            issuer={issuer}
+          <SidebarUploadPanel
+            acceptedFormats="PDF, JPG, PNG"
+            badgeColor="bg-amber-900/10 text-amber-500"
+            buttonColor="bg-[#d97706] text-white hover:bg-[#b45309]"
+            buttonShadow="shadow-warning/20"
+            description="Manage digital certificates."
+            icon={<Award size={22} />}
             loading={loading}
-            onIssuerChange={setIssuer}
+            title="Certificates"
             onUploadClick={handleUploadClick}
           />
           <Card className="border-none bg-content1 shadow-sm">
