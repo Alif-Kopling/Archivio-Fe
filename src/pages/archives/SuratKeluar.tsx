@@ -32,6 +32,7 @@ import {
 } from "@heroui/react";
 
 import api from "@/lib/axios";
+import { StatCard } from "@/components/StatCard";
 import {
   DocumentUploadDialog,
   type DocumentUploadFormState,
@@ -199,33 +200,6 @@ function stripFileExtension(fileName: string): string {
   return baseName.slice(0, lastDotIndex);
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-const StatCard: FC<{
-  label: string;
-  value: number;
-  Icon: FC<{ size?: number }>;
-  color: string;
-  bg: string;
-}> = ({ label, value, Icon, color, bg }) => (
-  <Card className="border-none bg-content1 shadow-sm transition-transform hover:scale-[1.01]">
-    <Card.Content className="flex items-center gap-3 p-3">
-      <div
-        className={`p-3 rounded-xl ${bg} ${color} flex items-center justify-center`}
-      >
-        <Icon size={20} />
-      </div>
-      <div className="flex flex-col">
-        <span className="text-default-500 text-[10px] font-bold uppercase tracking-wider">
-          {label}
-        </span>
-        <span className="text-xl font-bold tracking-tight leading-none mt-1">
-          {value}
-        </span>
-      </div>
-    </Card.Content>
-  </Card>
-);
 
 const StatsSection: FC<{ stats: Stats }> = ({ stats }) => (
   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -236,7 +210,7 @@ const StatsSection: FC<{ stats: Stats }> = ({ stats }) => (
         bg={bg}
         color={color}
         label={label}
-        value={stats[key]}
+        count={stats[key]}
       />
     ))}
   </div>
