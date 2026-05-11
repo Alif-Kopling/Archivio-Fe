@@ -4,16 +4,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
 import { FC, useEffect, useState, useRef, useCallback } from "react";
-import { Award, Clock, CheckCircle2, Plus, ArrowUpDown } from "lucide-react";
+import { Award, Clock, CheckCircle2, Plus } from "lucide-react";
 import {
   Card,
   Button,
-  Spinner,
-  Virtualizer,
-  ListBox,
-  ListLayout,
-  SearchField,
-  Select,
 } from "@heroui/react";
 
 import api from "@/lib/axios";
@@ -42,7 +36,6 @@ interface Stats {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const LIST_LAYOUT = new ListLayout({ rowHeight: 65 });
 
 const ACCEPTED_FORMATS = ".pdf,.jpg,.jpeg,.png";
 
@@ -199,19 +192,7 @@ const UploadPanel: FC<{
 import { DocumentRow } from "@/components/DocumentRow";
 import { StorageIndicator } from "@/components/StorageIndicator";
 
-const STATUS_FILTER_OPTIONS = [
-  { id: "all", label: "All Status" },
-  { id: "pending", label: "Pending" },
-  { id: "final", label: "Verified" },
-  { id: "rejected", label: "Rejected" },
-];
 
-const SORT_OPTIONS = [
-  { id: "createdAt", label: "Upload Date" },
-  { id: "title", label: "Title" },
-  { id: "documentDate", label: "Document Date" },
-  { id: "status", label: "Status" },
-];
 
 import { DocumentList } from "@/components/DocumentList";
 

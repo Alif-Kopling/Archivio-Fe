@@ -1,26 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
 import { FC, useEffect, useState, useCallback } from "react";
-import {
-  FileUp,
-  SendHorizonal,
-  Clock,
-  CheckCircle2,
-  Plus,
-  ArrowUpDown,
-} from "lucide-react";
-import {
-  Card,
-  Button,
-  Input,
-  Spinner,
-  Separator,
-  Virtualizer,
-  ListBox,
-  ListLayout,
-  SearchField,
-  Select,
-} from "@heroui/react";
+import { FileUp, SendHorizonal, Clock, CheckCircle2, Plus } from "lucide-react";
+import { Card, Button, Input, Separator } from "@heroui/react";
 
 import { DocumentPreviewDialog } from "@/components/DocumentPreviewDialog";
 import api from "@/lib/axios";
@@ -63,7 +45,6 @@ interface EmailFormState {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const LIST_LAYOUT = new ListLayout({ rowHeight: 65 });
 const ACCEPTED_UPLOAD_FORMATS = ".pdf,.doc,.docx";
 const ACCEPTED_UPLOAD_FORMATS_LABEL = "PDF, DOC, DOCX";
 
@@ -314,21 +295,6 @@ const SendEmailDialog: FC<{
 };
 
 import { DocumentRow } from "@/components/DocumentRow";
-
-const STATUS_FILTER_OPTIONS = [
-  { id: "all", label: "All Status" },
-  { id: "pending", label: "Pending" },
-  { id: "final", label: "Verified" },
-  { id: "rejected", label: "Rejected" },
-];
-
-const SORT_OPTIONS = [
-  { id: "createdAt", label: "Upload Date" },
-  { id: "title", label: "Title" },
-  { id: "documentDate", label: "Document Date" },
-  { id: "status", label: "Status" },
-];
-
 import { DocumentList } from "@/components/DocumentList";
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -756,6 +722,16 @@ export default function SuratKeluarPage() {
           <DocumentList
             files={files}
             page={page}
+            renderRow={(file) => (
+              <DocumentRow
+                key={file.id}
+                file={file}
+                onDelete={handleDelete}
+                onDownload={handleDownload}
+                onSendEmail={handleOpenSendEmail}
+                onView={handleView}
+              />
+            )}
             searchLoading={searchLoading}
             searchQuery={searchQuery}
             sortBy={sortBy}
@@ -781,16 +757,6 @@ export default function SuratKeluarPage() {
               setPage(1);
             }}
             onView={handleView}
-            renderRow={(file) => (
-              <DocumentRow
-                key={file.id}
-                file={file}
-                onDelete={handleDelete}
-                onDownload={handleDownload}
-                onSendEmail={handleOpenSendEmail}
-                onView={handleView}
-              />
-            )}
           />
         </div>
       </div>

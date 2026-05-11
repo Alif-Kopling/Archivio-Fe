@@ -2,24 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
 import { FC, useEffect, useState, useCallback } from "react";
-import {
-  FileDown,
-  Inbox,
-  Clock,
-  CheckCircle2,
-  Plus,
-  ArrowUpDown,
-} from "lucide-react";
-import {
-  Card,
-  Button,
-  Spinner,
-  Virtualizer,
-  ListBox,
-  ListLayout,
-  SearchField,
-  Select,
-} from "@heroui/react";
+import { FileDown, Inbox, Clock, CheckCircle2, Plus } from "lucide-react";
+import { Card, Button } from "@heroui/react";
 
 import api from "@/lib/axios";
 import { StatCard } from "@/components/StatCard";
@@ -53,7 +37,6 @@ interface Stats {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const LIST_LAYOUT = new ListLayout({ rowHeight: 65 });
 const ACCEPTED_UPLOAD_FORMATS = ".pdf,.doc,.docx";
 const ACCEPTED_UPLOAD_FORMATS_LABEL = "PDF, DOC, DOCX";
 
@@ -211,20 +194,6 @@ const UploadPanel: FC<{ loading: boolean; onUploadClick: () => void }> = ({
 );
 
 import { DocumentRow } from "@/components/DocumentRow";
-
-const STATUS_FILTER_OPTIONS = [
-  { id: "all", label: "All Status" },
-  { id: "pending", label: "Pending" },
-  { id: "final", label: "Verified" },
-  { id: "rejected", label: "Rejected" },
-];
-
-const SORT_OPTIONS = [
-  { id: "createdAt", label: "Upload Date" },
-  { id: "title", label: "Title" },
-  { id: "documentDate", label: "Document Date" },
-  { id: "status", label: "Status" },
-];
 
 import { DocumentList } from "@/components/DocumentList";
 
@@ -591,6 +560,15 @@ export default function SuratMasukPage() {
           <DocumentList
             files={files}
             page={page}
+            renderRow={(file) => (
+              <DocumentRow
+                key={file.id}
+                file={file}
+                onDelete={handleDelete}
+                onDownload={handleDownload}
+                onView={handleView}
+              />
+            )}
             searchLoading={searchLoading}
             searchQuery={searchQuery}
             sortBy={sortBy}
@@ -614,15 +592,6 @@ export default function SuratMasukPage() {
               setStatusFilter(v);
               setPage(1);
             }}
-            renderRow={(file) => (
-              <DocumentRow
-                key={file.id}
-                file={file}
-                onDelete={handleDelete}
-                onDownload={handleDownload}
-                onView={handleView}
-              />
-            )}
           />
         </div>
       </div>

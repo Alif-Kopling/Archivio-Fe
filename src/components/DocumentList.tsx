@@ -72,7 +72,8 @@ export const DocumentList: FC<DocumentListProps> = ({
         <div className="flex flex-col">
           <h3 className="font-bold text-sm text-foreground">Document List</h3>
           <p className="text-default-400 text-[9px] font-medium tracking-wide">
-            Total of <span className="text-primary font-bold">{total}</span> archives found.
+            Total of <span className="text-primary font-bold">{total}</span>{" "}
+            archives found.
           </p>
         </div>
         <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap">
@@ -147,7 +148,9 @@ export const DocumentList: FC<DocumentListProps> = ({
         {searchLoading ? (
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-content1/50 backdrop-blur-[1px] gap-2">
             <Spinner size="md" />
-            <span className="text-xs font-medium text-default-500">Loading documents...</span>
+            <span className="text-xs font-medium text-default-500">
+              Loading documents...
+            </span>
           </div>
         ) : null}
         <Virtualizer layout={LIST_LAYOUT}>
@@ -162,11 +165,23 @@ export const DocumentList: FC<DocumentListProps> = ({
       </Card.Content>
       {totalPages > 1 ? (
         <Card.Footer className="flex justify-center gap-2 px-5 py-3">
-          <Button isDisabled={page <= 1} size="sm" variant="ghost" onPress={() => onPageChange(page - 1)}>
+          <Button
+            isDisabled={page <= 1}
+            size="sm"
+            variant="ghost"
+            onPress={() => onPageChange(page - 1)}
+          >
             Previous
           </Button>
-          <span className="flex items-center text-xs text-default-500">Page {page} of {totalPages}</span>
-          <Button isDisabled={page >= totalPages} size="sm" variant="ghost" onPress={() => onPageChange(page + 1)}>
+          <span className="flex items-center text-xs text-default-500">
+            Page {page} of {totalPages}
+          </span>
+          <Button
+            isDisabled={page >= totalPages}
+            size="sm"
+            variant="ghost"
+            onPress={() => onPageChange(page + 1)}
+          >
             Next
           </Button>
         </Card.Footer>
