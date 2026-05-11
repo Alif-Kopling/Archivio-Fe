@@ -131,11 +131,7 @@ function resolveStats(
   return computeStats(data);
 }
 
-function getFileExt(filePath: string): string {
-  return filePath?.split(".").pop()?.toUpperCase() || "FILE";
-}
-
-function stripFileExtension(fileName: string): string {
+function stripFileExtension({ fileName }: { fileName: string }): string {
   const baseName = fileName.split(/[\\/]/).pop() || fileName;
   const lastDotIndex = baseName.lastIndexOf(".");
 
@@ -144,14 +140,6 @@ function stripFileExtension(fileName: string): string {
   }
 
   return baseName.slice(0, lastDotIndex);
-}
-
-function isPdfFile(filePath: string): boolean {
-  return filePath?.toUpperCase().endsWith(".PDF");
-}
-
-function isImageFile(filePath: string): boolean {
-  return /\.(png|jpe?g)$/i.test(filePath || "");
 }
 
 function getDownloadFileName(file: Surat): string {
@@ -405,88 +393,7 @@ const DocumentList: FC<{
   </Card>
 );
 
-const PreviewDialog: FC<{
-  file: Surat;
-  onClose: () => void;
-  onDownload: (file: Surat) => void;
-  previewUrl: string;
-  previewLoading: boolean;
-}> = ({ file, onClose, onDownload, previewUrl, previewLoading }) => (
-  <div
-    className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-    role="presentation"
-    tabIndex={-1}
-    onClick={onClose}
-    onKeyDown={(e) => {
-      if (e.key === "Escape") onClose();
-    }}
-  >
-    {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
-    <div
-      className="w-full max-w-5xl overflow-hidden rounded-2xl bg-content1 shadow-2xl"
-      role="document"
-      onClick={(e) => e.stopPropagation()}
-      onKeyDown={(e) => {
-        if (e.key === "Escape") onClose();
-      }}
-    >
-      <div className="flex items-center justify-between gap-3 border-b border-divider px-4 py-3">
-        <div className="min-w-0">
-          <h3 className="truncate font-bold text-foreground">{file.title}</h3>
-          <p className="text-xs text-default-500">
-            {getFileExt(file.filePath)} preview
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            className="font-semibold"
-            size="sm"
-            variant="primary"
-            onClick={() => onDownload(file)}
-          >
-            Download
-          </Button>
-          <Button size="sm" variant="ghost" onClick={onClose}>
-            Close
-          </Button>
-        </div>
-      </div>
-      <div className="min-h-[60vh] bg-black/5 p-4">
-        {previewLoading ? (
-          <div className="flex min-h-[60vh] items-center justify-center">
-            <Spinner size="md" />
-          </div>
-        ) : isImageFile(file.filePath) ? (
-          <img
-            alt={file.title}
-            className="mx-auto max-h-[70vh] w-auto max-w-full rounded-lg object-contain"
-            src={previewUrl}
-          />
-        ) : isPdfFile(file.filePath) ? (
-          <iframe
-            className="h-[70vh] w-full rounded-lg bg-white"
-            src={previewUrl}
-            title={file.title}
-          />
-        ) : (
-          <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3 text-center">
-            <p className="text-sm font-medium text-default-600">
-              Preview is not available for this file type.
-            </p>
-            <Button
-              className="font-semibold"
-              size="sm"
-              variant="primary"
-              onClick={() => onDownload(file)}
-            >
-              Download instead
-            </Button>
-          </div>
-        )}
-      </div>
-    </div>
-  </div>
-);
+import { DocumentPreviewDialog } from "@/components/DocumentPreviewDialog";
 
 export default function SuratMasukPage() {
   const [files, setFiles] = useState<Surat[]>([]);
@@ -651,7 +558,7 @@ export default function SuratMasukPage() {
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      const title = stripFileExtension(file.name);
+      const title = stripFileExtension({ fileName: file.name });
 
       newFiles.push({
         id: `${Date.now()}-${i}`,
@@ -877,7 +784,7 @@ export default function SuratMasukPage() {
         </div>
       </div>
       {previewFile ? (
-        <PreviewDialog
+        <DocumentPreviewDialog
           file={previewFile}
           previewLoading={previewLoading}
           previewUrl={previewUrl}

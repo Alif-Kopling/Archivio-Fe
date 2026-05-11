@@ -18,7 +18,7 @@ import {
 
 import api from "@/lib/axios";
 import { StatCard } from "@/components/StatCard";
-import { StorageIndicator } from "@/components/StorageIndicator";
+import { DocumentPreviewDialog } from "@/components/DocumentPreviewDialog";
 import { useNotify } from "@/context/NotificationContext";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -124,17 +124,8 @@ function resolveStats(
   return computeStats(data);
 }
 
-function getFileExt(filePath: string): string {
-  return filePath?.split(".").pop()?.toUpperCase() || "FILE";
-}
 
-function isPdfFile({ filePath }: { filePath: string; }): boolean {
-  return filePath?.toUpperCase().endsWith(".PDF");
-}
 
-function isImageFile(filePath: string): boolean {
-  return /\.(png|jpe?g)$/i.test(filePath || "");
-}
 
 function getDownloadFileName(file: Sertifikat): string {
   const originalName = file.filePath?.split(/[\\/]/).pop();
@@ -206,6 +197,7 @@ const UploadPanel: FC<{
 );
 
 import { DocumentRow } from "@/components/DocumentRow";
+import { StorageIndicator } from "@/components/StorageIndicator";
 
 const STATUS_FILTER_OPTIONS = [
   { id: "all", label: "All Status" },
@@ -643,82 +635,13 @@ export default function SertifikatPage() {
         </div>
       </div>
       {previewFile ? (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-          role="presentation"
-          tabIndex={-1}
-          onClick={handleClosePreview}
-          onKeyDown={(e) => {
-            if (e.key === "Escape") handleClosePreview();
-          }}
-        >
-          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
-          <div
-            className="w-full max-w-5xl overflow-hidden rounded-2xl bg-content1 shadow-2xl"
-            role="document"
-            onClick={(e) => e.stopPropagation()}
-            onKeyDown={(e) => {
-              if (e.key === "Escape") handleClosePreview();
-            }}
-          >
-            <div className="flex items-center justify-between gap-3 border-b border-divider px-4 py-3">
-              <div className="min-w-0">
-                <h3 className="truncate font-bold text-foreground">
-                  {previewFile.title}
-                </h3>
-                <p className="text-xs text-default-500">
-                  {getFileExt(previewFile.filePath)} preview
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  className="font-semibold"
-                  size="sm"
-                  variant="primary"
-                  onClick={() => handleDownload(previewFile)}
-                >
-                  Download
-                </Button>
-                <Button size="sm" variant="ghost" onClick={handleClosePreview}>
-                  Close
-                </Button>
-              </div>
-            </div>
-            <div className="min-h-[60vh] bg-black/5 p-4">
-              {previewLoading ? (
-                <div className="flex min-h-[60vh] items-center justify-center">
-                  <Spinner size="md" />
-                </div>
-              ) : isImageFile(previewFile.filePath) ? (
-                <img
-                  alt={previewFile.title}
-                  className="mx-auto max-h-[70vh] w-auto max-w-full rounded-lg object-contain"
-                  src={previewUrl}
-                />
-              ) : isPdfFile({ filePath: previewFile.filePath }) ? (
-                <iframe
-                  className="h-[70vh] w-full rounded-lg bg-white"
-                  src={previewUrl}
-                  title={previewFile.title}
-                />
-              ) : (
-                <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3 text-center">
-                  <p className="text-sm font-medium text-default-600">
-                    Preview is not available for this file type.
-                  </p>
-                  <Button
-                    className="font-semibold"
-                    size="sm"
-                    variant="primary"
-                    onClick={() => handleDownload(previewFile)}
-                  >
-                    Download instead
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        <DocumentPreviewDialog
+          file={previewFile}
+          onClose={handleClosePreview}
+          onDownload={handleDownload}
+          previewUrl={previewUrl}
+          previewLoading={previewLoading}
+        />
       ) : null}
     </div>
   );
