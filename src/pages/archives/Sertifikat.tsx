@@ -430,4 +430,4 @@ export default function SertifikatPage() {
       ) : null}
     </div>
   );
-}
+} 
