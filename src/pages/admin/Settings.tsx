@@ -183,13 +183,15 @@ export default function Settings() {
       const gain = ctx.createGain();
 
       gain.connect(ctx.destination);
-      gain.gain.setValueAtTime(0, ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.5, ctx.currentTime);
 
       const source = ctx.createBufferSource();
 
       source.buffer = bufferRef.current;
       source.loop = true;
+      // Trim slightly at the end to avoid MP3 padding silence
+      source.loopStart = 0;
+      source.loopEnd = bufferRef.current.duration - 0.05;
       source.connect(gain);
       source.start(0);
       sourceRef.current = source;
