@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "next-themes";
+import { useSearchParams } from "react-router-dom";
 import {
   Alert,
   AlertDialog,
@@ -94,6 +95,7 @@ const categories: SettingCategory[] = [
 
 export default function Settings() {
   const { setTheme } = useTheme();
+  const [searchParams] = useSearchParams();
   const audioContextRef = useRef<AudioContext | null>(null);
   const sourceRef = useRef<AudioBufferSourceNode | null>(null);
   const gainRef = useRef<GainNode | null>(null);
@@ -116,18 +118,26 @@ export default function Settings() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
   const [hasChanges, setHasChanges] = useState(false);
-  const [activeCategory, setActiveCategory] = useState("general");
+  const [activeCategory, setActiveCategory] = useState(searchParams.get("tab") || "general");
   const [savingCategory, setSavingCategory] = useState("");
   const [trashRejectedCount, setTrashRejectedCount] = useState(0);
   const [trashDialogOpen, setTrashDialogOpen] = useState(false);
   const [trashing, setTrashing] = useState(false);
 
   useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab && categories.some(c => c.id === tab)) {
+      setActiveCategory(tab);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
     fetchSettings();
-  }, []);
+  }, [activeCategory]);
 
   const fetchSettings = async () => {
     try {
+      setLoading(true);
       const [{ data }, trashResponse] = await Promise.all([
         getSettings(),
         getTrashStats(),

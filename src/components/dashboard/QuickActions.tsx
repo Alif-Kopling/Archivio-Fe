@@ -13,7 +13,7 @@ export const QuickActions: FC = () => {
     { label: "Manage Users", icon: Users, href: "/admin/users", color: "text-blue-500", bg: "bg-blue-500/10" },
     { label: "Approval System", icon: ClipboardCheck, href: "/admin/approvals", color: "text-amber-500", bg: "bg-amber-500/10" },
     { label: "System Settings", icon: Settings, href: "/admin/settings", color: "text-violet-500", bg: "bg-violet-500/10" },
-    { label: "Trash Bin", icon: Trash2, href: "/admin/settings", color: "text-danger", bg: "bg-danger/10" },
+    { label: "Trash Bin", icon: Trash2, href: "/admin/settings?tab=trash", color: "text-danger", bg: "bg-danger/10" },
   ];
 
   return (
