@@ -2,6 +2,7 @@
 import { Route, Routes, Navigate } from "react-router-dom";
 
 import AdminPage from "@/pages/admin/Dashboard";
+import ApprovalsPage from "@/pages/admin/Approvals";
 import UsersPage from "@/pages/admin/Users";
 import SettingsPage from "@/pages/admin/Settings";
 import LoginPage from "@/pages/auth/Login";
@@ -28,6 +29,7 @@ function App() {
         <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
           <Route element={<AdminLayout />}>
             <Route element={<AdminPage />} path="/admin" />
+            <Route element={<ApprovalsPage />} path="/admin/approvals" />
             <Route element={<UsersPage />} path="/admin/users" />
             <Route element={<SettingsPage />} path="/admin/settings" />
           </Route>

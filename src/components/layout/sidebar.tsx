@@ -1,6 +1,7 @@
 import { FC } from "react";
 import {
   LayoutDashboard,
+  ClipboardCheck,
   FileText,
   Settings,
   Users,
@@ -26,6 +27,12 @@ export const Sidebar: FC = () => {
       icon: LayoutDashboard,
       label: "Dashboard",
       href: "/admin",
+      roles: ["ADMIN"],
+    },
+    {
+      icon: ClipboardCheck,
+      label: "Approvals",
+      href: "/admin/approvals",
       roles: ["ADMIN"],
     },
     {
