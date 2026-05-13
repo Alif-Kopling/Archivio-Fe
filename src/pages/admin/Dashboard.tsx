@@ -29,6 +29,7 @@ import {
 import api from "@/lib/axios";
 import { ThemeSwitch } from "@/components/common/theme-switch";
 import { useNotify } from "@/context/NotificationContext";
+import { QuickActions } from "@/components/dashboard/QuickActions";
 
 // --- Types ---
 interface Stats {
@@ -48,7 +49,7 @@ const Header: FC = () => (
       <div>
         <h1 className="text-2xl font-bold">Admin Dashboard</h1>
         <p className="text-default-500 text-sm">
-          Monitor and manage archive statistics.
+          Welcome back! Monitor and manage your archive statistics.
         </p>
       </div>
     </div>
@@ -275,7 +276,7 @@ export default function AdminDashboard() {
   }, [fetchData]);
 
   return (
-    <div className="p-6 overflow-y-auto h-full">
+    <div className="p-6 overflow-y-auto h-full space-y-6">
       <Header />
       {loading ? (
         <div className="flex items-center justify-center h-64">
@@ -285,6 +286,7 @@ export default function AdminDashboard() {
         <>
           <StatsGrid stats={stats} />
           <ChartsSection stats={stats} />
+          <QuickActions />
         </>
       )}
     </div>
