@@ -1,6 +1,7 @@
 import { FC } from "react";
 import { Card } from "@heroui/react";
 import { HardDrive } from "lucide-react";
+
 import { StorageIndicator } from "./StorageIndicator";
 
 interface StorageOverviewProps {
@@ -16,12 +17,21 @@ export const StorageOverview: FC<StorageOverviewProps> = ({ totalDocs }) => (
           <h4 className="font-bold text-lg">System Storage</h4>
         </div>
         <div className="p-6 rounded-3xl bg-default-50 border border-divider mb-6">
-          <StorageIndicator count={totalDocs} label="Global Storage" total={5000} showGb />
+          <StorageIndicator
+            showGb
+            count={totalDocs}
+            label="Global Storage"
+            total={5000}
+          />
         </div>
       </div>
       <div className="space-y-2">
         <p className="text-xs text-default-500 font-medium">
-          Your storage is approximately <span className="text-foreground font-bold">{((totalDocs * 10 / 1024) / 10 * 100).toFixed(1)}%</span> full.
+          Your storage is approximately{" "}
+          <span className="text-foreground font-bold">
+            {(((totalDocs * 10) / 1024 / 10) * 100).toFixed(1)}%
+          </span>{" "}
+          full.
         </p>
         <p className="text-[10px] text-default-400">
           Estimated based on {totalDocs} total documents in the database.

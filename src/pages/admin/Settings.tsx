@@ -118,7 +118,9 @@ export default function Settings() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
   const [hasChanges, setHasChanges] = useState(false);
-  const [activeCategory, setActiveCategory] = useState(searchParams.get("tab") || "general");
+  const [activeCategory, setActiveCategory] = useState(
+    searchParams.get("tab") || "general",
+  );
   const [savingCategory, setSavingCategory] = useState("");
   const [trashRejectedCount, setTrashRejectedCount] = useState(0);
   const [trashDialogOpen, setTrashDialogOpen] = useState(false);
@@ -126,7 +128,8 @@ export default function Settings() {
 
   useEffect(() => {
     const tab = searchParams.get("tab");
-    if (tab && categories.some(c => c.id === tab)) {
+
+    if (tab && categories.some((c) => c.id === tab)) {
       setActiveCategory(tab);
     }
   }, [searchParams]);

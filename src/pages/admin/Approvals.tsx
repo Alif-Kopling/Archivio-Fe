@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
-import { FC, memo, useEffect, useMemo, useState, useCallback } from "react";
+import { FC, memo, useEffect, useState, useCallback } from "react";
 import {
   Card,
   Button,
