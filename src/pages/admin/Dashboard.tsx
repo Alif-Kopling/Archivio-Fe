@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-/* eslint-disable @typescript-eslint/no-unused-vars */
+ 
 /* eslint-disable no-console */
 import { FC, memo, useEffect, useMemo, useState, useCallback } from "react";
 import {
@@ -28,7 +28,6 @@ import {
 
 import api from "@/lib/axios";
 import { ThemeSwitch } from "@/components/common/theme-switch";
-import { useNotify } from "@/context/NotificationContext";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 
 // --- Types ---
@@ -251,7 +250,6 @@ export default function AdminDashboard() {
   });
   const [loading, setLoading] = useState(true);
   
-  const notify = useNotify();
 
   const fetchData = useCallback(async () => {
     try {
@@ -259,6 +257,7 @@ export default function AdminDashboard() {
       const response = await api.get("/dashboard");
 
       const payload = response.data ?? {};
+
       setStats({
         total: Number(payload.stats?.total || 0),
         pending: Number(payload.stats?.pending || 0),

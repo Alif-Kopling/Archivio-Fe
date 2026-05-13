@@ -1,4 +1,5 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 import type { DateValue } from "@internationalized/date";
 
 import { FC, ReactNode, useRef, useState } from "react";
