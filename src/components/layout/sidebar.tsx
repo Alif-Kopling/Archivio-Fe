@@ -36,16 +36,16 @@ export const Sidebar: FC = () => {
       roles: ["ADMIN"],
     },
     {
-      icon: Users,
-      label: "Master Users",
-      href: "/admin/users",
-      roles: ["ADMIN"],
-    },
-    {
       icon: FileText,
       label: "Document Archive",
       href: "/archives",
       roles: ["ADMIN", "STAFF"],
+    },
+    {
+      icon: Users,
+      label: "Master Users",
+      href: "/admin/users",
+      roles: ["ADMIN"],
     },
     {
       icon: Settings,
