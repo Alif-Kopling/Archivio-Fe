@@ -1,448 +1,25 @@
-/* eslint-disable no-console */
-import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Avatar,
-  Button,
-  Card,
-  Chip,
-  Input,
-  Label,
-  ListBox,
-  Select,
-  Spinner,
-  Table,
-  Tooltip,
-  Modal,
-  AlertDialog,
-  SearchField,
-} from "@heroui/react";
-import {
-  AlertCircle,
-  Crown,
-  Mail,
-  Shield,
-  Trash2,
-  User,
-  UserPlus,
-  X,
-} from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { Card, Spinner, Table } from "@heroui/react";
+import { Shield } from "lucide-react";
 
 import api from "@/lib/axios";
-import { useNotify } from "@/context/NotificationContext";
-import alarmDanger from "@/assets/alarm-danger-danger.mp3";
+import {
+  AddMemberModal,
+  UserSearchHeader,
+  UserTableRow,
+  UserData,
+} from "@/components/users";
 
-interface UserData {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-  _count?: {
-    documents: number;
-  };
-}
+function sortUsersByRole(users: UserData[]): UserData[] {
+  return [...users].sort((a, b) => {
+    const aIsAdmin = a.role.toLowerCase() === "admin";
+    const bIsAdmin = b.role.toLowerCase() === "admin";
 
-interface RoleOption {
-  id: string;
-  label: string;
-  textValue: string;
-}
+    if (aIsAdmin && !bIsAdmin) return -1;
+    if (!aIsAdmin && bIsAdmin) return 1;
 
-const ROLE_OPTIONS: RoleOption[] = [
-  {
-    id: "staff",
-    label: "Staff (Restricted Access)",
-    textValue: "Staff Restricted Access",
-  },
-  {
-    id: "admin",
-    label: "Administrator (Full Access)",
-    textValue: "Admin Full Access",
-  },
-];
-
-function AddMemberAction({ onSuccess }: { onSuccess: () => void }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    role: "staff",
+    return 0;
   });
-  const notify = useNotify();
-
-  const resetForm = () => {
-    setFormData({ name: "", email: "", password: "", role: "staff" });
-  };
-
-  const handleSubmit = async () => {
-    if (
-      !formData.name.trim() ||
-      !formData.email.trim() ||
-      !formData.password.trim()
-    ) {
-      notify({
-        title: "Missing Information",
-        description: "Please fill in all required fields.",
-        status: "warning",
-      });
-
-      return;
-    }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!emailRegex.test(formData.email)) {
-      notify({
-        title: "Invalid Entry",
-        description: "Please provide a valid email address.",
-        status: "warning",
-      });
-
-      return;
-    }
-    if (formData.password.length < 6) {
-      notify({
-        title: "Security Requirement",
-        description: "Password must be at least 6 characters.",
-        status: "warning",
-      });
-
-      return;
-    }
-
-    try {
-      setSubmitting(true);
-      await api.post("/users", formData);
-      notify({
-        title: "Success",
-        description: "The new user has been successfully registered.",
-        status: "success",
-      });
-      setIsOpen(false);
-      resetForm();
-      onSuccess();
-    } catch (error: any) {
-      notify({
-        title: "Registration Failed",
-        description: error.response?.data?.error || error.message,
-        status: "danger",
-      });
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  return (
-    <Modal isOpen={isOpen} onOpenChange={setIsOpen}>
-      <Button className="gap-2 shadow-lg shadow-primary/20" variant="primary">
-        <UserPlus size={18} />
-        Register User
-      </Button>
-
-      <Modal.Backdrop
-        className="bg-black/35 backdrop-blur-0"
-        variant="transparent"
-      >
-        <Modal.Container placement="center" scroll="outside" size="md">
-          <Modal.Dialog className="w-full max-w-[520px]">
-            <Modal.CloseTrigger className="absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-lg text-default-500 transition-colors hover:bg-default-100">
-              <X size={16} />
-            </Modal.CloseTrigger>
-            <Modal.Header className="flex flex-col gap-1 p-6 pb-2">
-              <Modal.Heading className="text-xl font-bold">
-                User Registration
-              </Modal.Heading>
-              <p className="text-sm text-default-500">
-                Provide the details below to create a new system account.
-              </p>
-            </Modal.Header>
-            <Modal.Body className="flex flex-col gap-4 p-6 py-2">
-              <div className="space-y-1.5">
-                <Label
-                  className="flex items-center gap-1.5 text-xs font-bold text-foreground"
-                  htmlFor="user-name"
-                >
-                  <User size={14} /> Full Name
-                </Label>
-                <Input
-                  className="h-10 w-full"
-                  id="user-name"
-                  placeholder="Enter full name"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                />
-              </div>
-              <div className="space-y-1.5 mt-2">
-                <Label
-                  className="flex items-center gap-1.5 text-xs font-bold text-foreground"
-                  htmlFor="user-email"
-                >
-                  <Mail size={14} /> Email Address
-                </Label>
-                <Input
-                  className="h-10 w-full"
-                  id="user-email"
-                  placeholder="Enter email address"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                />
-              </div>
-              <div className="space-y-1.5 mt-2">
-                <Label
-                  className="flex items-center gap-1.5 text-xs font-bold text-foreground"
-                  htmlFor="user-password"
-                >
-                  <Shield size={14} /> Password
-                </Label>
-                <Input
-                  className="h-10 w-full"
-                  id="user-password"
-                  placeholder="Set a secure password"
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) =>
-                    setFormData({ ...formData, password: e.target.value })
-                  }
-                />
-              </div>
-              <div className="space-y-1.5 mt-2">
-                <Label
-                  className="flex items-center gap-1.5 text-xs font-bold text-foreground"
-                  htmlFor="user-role"
-                >
-                  <Shield size={14} /> Account Role
-                </Label>
-                <Select
-                  aria-label="Select user role"
-                  className="w-full"
-                  selectedKey={formData.role}
-                  onSelectionChange={(key) =>
-                    setFormData({ ...formData, role: String(key) })
-                  }
-                >
-                  <Select.Trigger className="h-11 w-full">
-                    <Select.Value />
-                    <Select.Indicator />
-                  </Select.Trigger>
-                  <Select.Popover>
-                    <ListBox>
-                      {ROLE_OPTIONS.map((option) => (
-                        <ListBox.Item
-                          key={option.id}
-                          id={option.id}
-                          textValue={option.textValue}
-                        >
-                          {option.label}
-                        </ListBox.Item>
-                      ))}
-                    </ListBox>
-                  </Select.Popover>
-                </Select>
-              </div>
-            </Modal.Body>
-            <Modal.Footer className="flex justify-end gap-3 p-6 pt-4">
-              <Button
-                className="font-semibold"
-                variant="tertiary"
-                onPress={() => {
-                  setIsOpen(false);
-                  resetForm();
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                className="font-semibold"
-                variant="primary"
-                onPress={handleSubmit}
-              >
-                {submitting ? "Processing..." : "Create Account"}
-              </Button>
-            </Modal.Footer>
-          </Modal.Dialog>
-        </Modal.Container>
-      </Modal.Backdrop>
-    </Modal>
-  );
-}
-
-function DeleteMemberAction({
-  user,
-  onSuccess,
-}: {
-  user: UserData;
-  onSuccess: () => void;
-}) {
-  const [isOpen, setIsOpen] = useState(false);
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const sourceRef = useRef<AudioBufferSourceNode | null>(null);
-  const gainRef = useRef<GainNode | null>(null);
-  const bufferRef = useRef<AudioBuffer | null>(null);
-  const notify = useNotify();
-
-  const isAdmin = user.role.toLowerCase() === "admin";
-
-  useEffect(() => {
-    if (!isOpen || !isAdmin) return;
-
-    const AudioContextCtor =
-      window.AudioContext ??
-      (window as Window & { webkitAudioContext?: typeof AudioContext })
-        .webkitAudioContext;
-
-    if (!AudioContextCtor) return;
-
-    const ctx = audioContextRef.current ?? new AudioContextCtor();
-
-    audioContextRef.current = ctx;
-
-    const startLoop = async () => {
-      if (ctx.state === "suspended") await ctx.resume();
-
-      if (!bufferRef.current) {
-        try {
-          const res = await fetch(alarmDanger);
-
-          bufferRef.current = await ctx.decodeAudioData(
-            await res.arrayBuffer(),
-          );
-        } catch {
-          return;
-        }
-      }
-
-      const gain = ctx.createGain();
-
-      gain.connect(ctx.destination);
-      gain.gain.setValueAtTime(0.5, ctx.currentTime);
-
-      const source = ctx.createBufferSource();
-
-      source.buffer = bufferRef.current;
-      source.loop = true;
-      // skip trailing silence in mp3 loop
-      source.loopStart = 0;
-      source.loopEnd = bufferRef.current.duration - 0.05;
-      source.connect(gain);
-      source.start(0);
-      sourceRef.current = source;
-      gainRef.current = gain;
-    };
-
-    startLoop();
-
-    return () => {
-      const { current: gain } = gainRef;
-      const { current: source } = sourceRef;
-
-      if (gain && source) {
-        const now = ctx.currentTime;
-
-        gain.gain.cancelScheduledValues(now);
-        gain.gain.setValueAtTime(gain.gain.value, now);
-        gain.gain.linearRampToValueAtTime(0, now + 0.3);
-        source.stop(now + 0.35);
-      } else {
-        source?.stop();
-      }
-
-      source?.disconnect();
-      gain?.disconnect();
-      sourceRef.current = null;
-      gainRef.current = null;
-    };
-  }, [isOpen, isAdmin]);
-
-  const handleDelete = async () => {
-    try {
-      await api.delete(`/users/${user.id}`);
-      notify({
-        title: "User Removed",
-        description: `${user.name} has been successfully deleted.`,
-        status: "success",
-      });
-      setIsOpen(false);
-      onSuccess();
-    } catch (error: any) {
-      notify({
-        title: "Deletion Failed",
-        description: error.response?.data?.error || error.message,
-        status: "danger",
-      });
-    }
-  };
-
-  return (
-    <AlertDialog isOpen={isOpen} onOpenChange={setIsOpen}>
-      <Tooltip delay={0}>
-        <Tooltip.Trigger>
-          <Button
-            isIconOnly
-            aria-label={`Delete ${user.name}`}
-            className="rounded-md text-danger hover:bg-danger/5"
-            size="sm"
-            variant="ghost"
-            onPress={() => setIsOpen(true)}
-          >
-            <Trash2 size={16} />
-          </Button>
-        </Tooltip.Trigger>
-        <Tooltip.Content>Delete User</Tooltip.Content>
-      </Tooltip>
-
-      <AlertDialog.Backdrop
-        className="bg-linear-to-t from-red-950/90 via-red-950/50 to-transparent dark:from-red-950/95 dark:via-red-950/60"
-        variant="blur"
-      >
-        <AlertDialog.Container>
-          <AlertDialog.Dialog className="w-full max-w-[420px]">
-            <AlertDialog.CloseTrigger className="absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-lg text-default-500 transition-colors hover:bg-default-100">
-              <X size={16} />
-            </AlertDialog.CloseTrigger>
-
-            <AlertDialog.Header className="flex flex-col items-center gap-3 p-6 pb-2 text-center">
-              <AlertDialog.Icon status="danger">
-                <AlertCircle className="size-6" />
-              </AlertDialog.Icon>
-              <AlertDialog.Heading className="text-xl font-bold">
-                Permanently delete this account?
-              </AlertDialog.Heading>
-            </AlertDialog.Header>
-
-            <AlertDialog.Body className="p-6 py-2 text-center">
-              <p className="text-sm leading-relaxed text-default-500">
-                This action cannot be undone. All data associated with{" "}
-                <strong className="text-foreground">{user.name}</strong> will be
-                permanently removed from the system registry.
-              </p>
-            </AlertDialog.Body>
-
-            <AlertDialog.Footer className="flex flex-col-reverse gap-3 p-6 pt-4">
-              <Button
-                className="w-full font-semibold"
-                variant="tertiary"
-                onPress={() => setIsOpen(false)}
-              >
-                Keep Account
-              </Button>
-              <Button
-                className="w-full font-semibold"
-                variant="danger"
-                onPress={handleDelete}
-              >
-                Delete Forever
-              </Button>
-            </AlertDialog.Footer>
-          </AlertDialog.Dialog>
-        </AlertDialog.Container>
-      </AlertDialog.Backdrop>
-    </AlertDialog>
-  );
 }
 
 export default function UserManagementPage() {
@@ -458,17 +35,8 @@ export default function UserManagementPage() {
       });
 
       const fetchedUsers = Array.isArray(response.data) ? response.data : [];
-      const sortedUsers = [...fetchedUsers].sort((a, b) => {
-        const aAdmin = a.role.toLowerCase() === "admin";
-        const bAdmin = b.role.toLowerCase() === "admin";
 
-        if (aAdmin && !bAdmin) return -1;
-        if (!aAdmin && bAdmin) return 1;
-
-        return 0;
-      });
-
-      setUsers(sortedUsers);
+      setUsers(sortUsersByRole(fetchedUsers));
     } catch (error) {
       console.error("Failed to fetch users:", error);
     } finally {
@@ -497,27 +65,14 @@ export default function UserManagementPage() {
           </div>
         </div>
 
-        <AddMemberAction onSuccess={fetchUsers} />
+        <AddMemberModal onSuccess={fetchUsers} />
       </div>
 
       <Card className="overflow-hidden border-none bg-content1 shadow-sm">
-        <Card.Header className="flex flex-col gap-4 border-b border-divider p-4 sm:flex-row sm:items-center sm:justify-between">
-          <SearchField
-            className="w-full sm:max-w-[320px]"
-            value={searchQuery}
-            onChange={setSearchQuery}
-          >
-            <SearchField.Group className="w-full">
-              <SearchField.SearchIcon />
-              <SearchField.Input placeholder="Search by user identity..." />
-              <SearchField.ClearButton />
-            </SearchField.Group>
-          </SearchField>
-          <div className="flex items-center gap-2 text-xs font-medium italic text-default-400">
-            <AlertCircle size={14} />
-            Access privileges are strictly governed by assigned roles.
-          </div>
-        </Card.Header>
+        <UserSearchHeader
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
 
         <Card.Content className="p-0">
           <Table aria-label="User management table" className="bg-transparent">
@@ -560,66 +115,13 @@ export default function UserManagementPage() {
                       </Table.Cell>
                     </Table.Row>
                   ) : (
-                    users.map((user) => {
-                      const isAdmin = user.role.toLowerCase() === "admin";
-
-                      return (
-                        <Table.Row
-                          key={user.id}
-                          className="border-b border-divider/50 transition-colors hover:bg-default-50"
-                        >
-                          <Table.Cell className="px-4 py-3 align-middle">
-                            <div className="flex items-center gap-3">
-                              <Avatar
-                                className="bg-primary/10 text-primary"
-                                size="sm"
-                              >
-                                <Avatar.Fallback>
-                                  {isAdmin ? (
-                                    <Crown className="text-warning" size={14} />
-                                  ) : (
-                                    <User size={14} />
-                                  )}
-                                </Avatar.Fallback>
-                              </Avatar>
-                              <div className="flex flex-col">
-                                <span className="text-sm font-bold text-foreground">
-                                  {user.name}
-                                </span>
-                                <span className="flex items-center gap-1 text-[11px] text-default-500">
-                                  <Mail size={10} />
-                                  {user.email}
-                                </span>
-                              </div>
-                            </div>
-                          </Table.Cell>
-
-                          <Table.Cell className="px-4 py-3 align-middle">
-                            <Chip
-                              className="h-6 border-none px-2 text-[10px] font-bold"
-                              color={isAdmin ? "accent" : "default"}
-                              size="sm"
-                              variant="soft"
-                            >
-                              {user.role.toUpperCase()}
-                            </Chip>
-                          </Table.Cell>
-
-                          <Table.Cell className="px-4 py-3 text-center align-middle">
-                            <span className="text-sm font-semibold text-default-600">
-                              {user._count?.documents || 0}
-                            </span>
-                          </Table.Cell>
-
-                          <Table.Cell className="px-4 py-3 text-center align-middle">
-                            <DeleteMemberAction
-                              user={user}
-                              onSuccess={fetchUsers}
-                            />
-                          </Table.Cell>
-                        </Table.Row>
-                      );
-                    })
+                    users.map((user) => (
+                      <UserTableRow
+                        key={user.id}
+                        user={user}
+                        onUserDeleted={fetchUsers}
+                      />
+                    ))
                   )}
                 </Table.Body>
               </Table.Content>
