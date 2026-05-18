@@ -439,9 +439,9 @@ export default function ApprovalsPage() {
                   selectionMode="multiple"
                   onSelectionChange={(keys: string | Set<string | number>) => {
                     if (keys === "all") {
-                      onSelectionChange(new Set(pendingDocs.map(d => d.id)));
+                      setSelectedKeys(new Set(pendingDocs.map(d => d.id)));
                     } else {
-                      onSelectionChange(keys as Set<string | number>);
+                      setSelectedKeys(keys as Set<string | number>);
                     }
                   }}
                 >
