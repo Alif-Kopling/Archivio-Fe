@@ -38,6 +38,7 @@ export default function UserManagementPage() {
 
       setUsers(sortUsersByRole(fetchedUsers));
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Failed to fetch users:", error);
     } finally {
       setLoading(false);
