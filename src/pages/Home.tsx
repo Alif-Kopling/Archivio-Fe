@@ -47,7 +47,7 @@ export default function Home() {
     audio.play().catch((e) => console.log("Intro sound failed:", e));
     setShowSplash(false);
 
-    // Sequence logo animation to synchronize with intro audio completion (approx. 13.5s)
+    // start logo animation after intro audio
     setTimeout(async () => {
       setIsLocked(false);
       await logoControls.start({
@@ -67,20 +67,18 @@ export default function Home() {
     }, 13500);
   };
 
-  /**
-   * Manages transition to the authenticated application area with synchronized audio effects
-   */
+  // handle navigation with audio feedback
   const handleExplore = () => {
     playClickSound();
 
-    // 500ms delay to prevent audio overlapping between click and success events
+    // delay to prevent audio overlap
     setTimeout(() => {
       const audio = new Audio(exploreSound);
 
       audio.volume = 0.5;
       audio.play().catch((e) => console.log("Audio play failed:", e));
 
-      // Post-success audio buffer before navigation to ensure completion of auditory feedback
+      // buffer before redirect so audio finishes
       setTimeout(() => {
         navigate("/login");
       }, 300);

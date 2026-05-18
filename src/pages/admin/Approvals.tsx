@@ -27,7 +27,7 @@ import api from "@/lib/axios";
 import { ThemeSwitch } from "@/components/common/theme-switch";
 import { useNotify } from "@/context/NotificationContext";
 
-// --- Types ---
+// types
 interface Document {
   id: string | number;
   title: string;
@@ -99,7 +99,7 @@ const getSourceChipProps = (sourceType: Document["sourceType"]) => {
   }
 };
 
-// --- Sub-components ---
+// sub-components
 
 const Header: FC = () => (
   <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">

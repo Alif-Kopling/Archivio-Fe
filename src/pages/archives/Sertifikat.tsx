@@ -15,7 +15,7 @@ import { StatCard } from "@/components/dashboard/StatCard";
 import { DocumentPreviewDialog } from "@/components/documents/DocumentPreviewDialog";
 import { useNotify } from "@/context/NotificationContext";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+// types
 
 interface Sertifikat {
   id: string | number;
@@ -34,7 +34,7 @@ interface Stats {
   verified: number;
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// constants
 
 
 const ACCEPTED_FORMATS = ".pdf,.jpg,.jpeg,.png";
@@ -87,7 +87,7 @@ const STAT_CONFIG = [
   },
 ] as const;
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// helpers
 
 function computeStats(data: Sertifikat[]): Stats {
   return {
@@ -372,7 +372,7 @@ export default function SertifikatPage() {
                 label="Storage Usage"
                 showGb={true}
                 total={100}
-                // @ts-ignore (prop custom untuk warna)
+                // @ts-ignore - custom color prop
                 className="[&_.bg-primary]:bg-warning"
               />
             </Card.Content>

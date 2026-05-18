@@ -52,7 +52,7 @@ function App() {
           </Route>
         </Route>
 
-        {/* Fallback - Kalau nyasar */}
+        {/* fallback - catch all unmatched routes */}
         <Route element={<Navigate replace to="/" />} path="*" />
       </Routes>
     </NotificationProvider>

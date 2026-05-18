@@ -19,7 +19,7 @@ import { DocumentList } from "@/components/documents/DocumentList";
 import { useNotify } from "@/context/NotificationContext";
 import api from "@/lib/axios";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+// types
 
 interface Surat {
   id: string | number;
@@ -46,7 +46,7 @@ interface EmailFormState {
   message: string;
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// constants
 
 const ACCEPTED_UPLOAD_FORMATS = ".pdf,.doc,.docx";
 const ACCEPTED_UPLOAD_FORMATS_LABEL = "PDF, DOC, DOCX";
@@ -75,7 +75,7 @@ const STAT_CONFIG = [
   },
 ] as const;
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// helpers
 
 function computeStats(data: Surat[]): Stats {
   return {
@@ -262,7 +262,7 @@ const SendEmailDialog: FC<{
   );
 };
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// page
 
 export default function SuratKeluarPage() {
   const [files, setFiles] = useState<Surat[]>([]);

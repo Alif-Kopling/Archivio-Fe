@@ -30,14 +30,14 @@ import api from "@/lib/axios";
 import { ThemeSwitch } from "@/components/common/theme-switch";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 
-// --- Types ---
+// types
 interface Stats {
   total: number;
   pending: number;
   verified: number;
 }
 
-// --- Sub-components ---
+// sub-components
 
 const Header: FC = () => (
   <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">

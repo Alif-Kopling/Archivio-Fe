@@ -4,13 +4,12 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
 });
 
-// Interceptor buat nambahin token otomatis kalau kamu udah login
+// attach auth token to every request
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
 
     if (token) {
-      // Pastikan formatnya "Bearer <token>" sesuai standar JWT
       config.headers.Authorization = `Bearer ${token}`;
     }
 
@@ -21,17 +20,17 @@ api.interceptors.request.use(
   },
 );
 
-// Tambahin interceptor response buat nangani kalau token tiba-tiba expired
+// handle expired tokens
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Kalau dapet 401 (Unauthorized), hapus token dan tendang ke login
+      // clear session and redirect
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       localStorage.removeItem("role");
 
-      // Jangan langsung redirect di sini kalau lagi proses login
+      // skip redirect if already on login page
       if (!window.location.pathname.includes("/login")) {
         window.location.href = "/login";
       }

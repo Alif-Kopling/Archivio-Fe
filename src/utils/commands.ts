@@ -10,7 +10,7 @@ export interface Command {
 }
 
 const commands: Command[] = [
-  // ─── SERIOUS COMMANDS ───
+  // system commands
   {
     name: "/help",
     desc: "Menampilkan daftar perintah",

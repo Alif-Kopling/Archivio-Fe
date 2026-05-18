@@ -70,7 +70,7 @@ export default function LoginPage() {
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Play button click sound
+    // button click sound
     const audio = new Audio(loginButtonSound);
 
     audio.volume = 0.5;
@@ -93,7 +93,7 @@ export default function LoginPage() {
 
       const userRole = user.role.toUpperCase();
 
-      // Give a little time for the user to see the success alert before redirecting
+      // brief delay so user sees the success message
       setTimeout(() => {
         if (userRole === "ADMIN") {
           navigate("/admin");

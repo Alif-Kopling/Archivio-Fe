@@ -325,7 +325,7 @@ function DeleteMemberAction({
 
       source.buffer = bufferRef.current;
       source.loop = true;
-      // Trim slightly at the end to avoid MP3 padding silence
+      // skip trailing silence in mp3 loop
       source.loopStart = 0;
       source.loopEnd = bufferRef.current.duration - 0.05;
       source.connect(gain);
