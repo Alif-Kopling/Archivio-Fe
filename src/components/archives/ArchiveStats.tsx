@@ -1,6 +1,7 @@
-import { StatCard } from "@/components/dashboard/StatCard";
 import { LucideIcon } from "lucide-react";
 import { FC } from "react";
+
+import { StatCard } from "@/components/dashboard/StatCard";
 
 export interface StatConfigItem {
   key: string;
