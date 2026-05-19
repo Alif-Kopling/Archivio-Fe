@@ -2,20 +2,17 @@ import { FC } from "react";
 import { FileText, Download, Eye, Trash2, Mail } from "lucide-react";
 import { Button, Tooltip, Chip, ListBox, AlertDialog } from "@heroui/react";
 
+import { Document } from "@/types/document";
+import { getStatusInfo, getFileExt, formatDate } from "@/utils/document";
+
 interface DocumentRowProps {
-  file: any;
-  onView?: (file: any) => void;
-  onDownload?: (file: any) => void;
+  file: Document;
+  onView?: (file: Document) => void;
+  onDownload?: (file: Document) => void;
   onDelete: (id: string | number) => void;
-  onSendEmail?: (file: any) => void;
+  onSendEmail?: (file: Document) => void;
   type?: "document" | "certificate";
 }
-
-const getFileExt = (filePath: string): string =>
-  filePath?.split(".").pop()?.toUpperCase() || "FILE";
-
-const formatDate = (iso: string): string =>
-  new Date(iso).toLocaleDateString("en-US");
 
 export const DocumentRow: FC<DocumentRowProps> = ({
   file,
@@ -25,22 +22,8 @@ export const DocumentRow: FC<DocumentRowProps> = ({
   onSendEmail,
   type = "document",
 }) => {
+  const { isFinal, label, color } = getStatusInfo(file.status);
   const isPdf = file.filePath?.toUpperCase().endsWith(".PDF");
-  const normalizedStatus = file.status?.toLowerCase();
-  const isFinal = [
-    "final",
-    "approved",
-    "approve",
-    "publish",
-    "published",
-  ].includes(normalizedStatus);
-  const isRejected = normalizedStatus === "rejected";
-  const statusLabel = isFinal
-    ? "VERIFIED"
-    : isRejected
-      ? "REJECTED"
-      : "PENDING";
-  const statusColor = isFinal ? "success" : isRejected ? "danger" : "warning";
 
   return (
     <ListBox.Item
@@ -84,11 +67,11 @@ export const DocumentRow: FC<DocumentRowProps> = ({
         <div className="flex items-center gap-3 flex-shrink-0">
           <Chip
             className="font-black border-none h-5 px-2 text-[9px] tracking-tighter"
-            color={statusColor as any}
+            color={color as any}
             size="sm"
             variant="soft"
           >
-            {statusLabel}
+            {label}
           </Chip>
 
           <div className="flex items-center gap-0.5">

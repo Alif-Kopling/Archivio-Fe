@@ -11,8 +11,10 @@ import {
   Select,
 } from "@heroui/react";
 
+import { Document } from "@/types/document";
+
 interface DocumentListProps {
-  files: any[];
+  files: Document[];
   total: number;
   totalPages: number;
   page: number;
@@ -21,16 +23,16 @@ interface DocumentListProps {
   statusFilter: string;
   sortBy: string;
   sortOrder: "asc" | "desc";
-  renderRow: (file: any) => ReactNode;
+  renderRow: (file: Document) => ReactNode;
   onPageChange: (page: number) => void;
   onSearchChange: (value: string) => void;
   onStatusFilterChange: (value: string) => void;
   onSortByChange: (value: string) => void;
   onSortOrderChange: () => void;
   onDelete?: (id: string | number) => void;
-  onDownload?: (file: any) => void;
-  onView?: (file: any) => void;
-  onSendEmail?: (file: any) => void;
+  onDownload?: (file: Document) => void;
+  onView?: (file: Document) => void;
+  onSendEmail?: (file: Document) => void;
   statusOptions?: { id: string; label: string }[];
   sortOptions?: { id: string; label: string }[];
 }

@@ -17,21 +17,11 @@ import {
   Tabs,
 } from "@heroui/react";
 
-export interface DocumentUploadFormState {
-  title: string;
-  documentDate: string;
-  sender: string;
-  file: File | null;
-}
-
-export interface BulkFileItem {
-  id: string;
-  file: File;
-  title: string;
-  sender: string;
-  documentDate: string;
-  isValid: boolean;
-}
+import {
+  DocumentUploadFormState,
+  BulkFileItem,
+  UploadMode,
+} from "@/types/document";
 
 interface DocumentUploadDialogProps {
   open: boolean;
@@ -43,7 +33,7 @@ interface DocumentUploadDialogProps {
   submitLabel: string;
   form: DocumentUploadFormState;
   bulkFiles: BulkFileItem[];
-  uploadMode: "single" | "bulk";
+  uploadMode: UploadMode;
   onClose: () => void;
   onFieldChange: (
     field: keyof Omit<DocumentUploadFormState, "file">,
@@ -53,7 +43,7 @@ interface DocumentUploadDialogProps {
   onBulkFileChange: (files: FileList | null) => void;
   onBulkItemChange: (id: string, field: string, value: string) => void;
   onBulkItemRemove: (id: string) => void;
-  onModeChange: (mode: "single" | "bulk") => void;
+  onModeChange: (mode: UploadMode) => void;
   onSubmit: () => void;
   onBulkSubmit: () => void;
   acceptedFormats?: string;
@@ -208,7 +198,7 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
             orientation="vertical"
             selectedKey={uploadMode}
             variant="secondary"
-            onSelectionChange={(key) => onModeChange(key as "single" | "bulk")}
+            onSelectionChange={(key) => onModeChange(key as UploadMode)}
           >
             <Tabs.ListContainer className="w-full lg:w-44 shrink-0">
               <Tabs.List aria-label="Upload mode" className="w-full">
