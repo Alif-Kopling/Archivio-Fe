@@ -1,43 +1,16 @@
-/* eslint-disable prettier/prettier */
-/* eslint-disable import/order */
-/* eslint-disable react/jsx-sort-props */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-console */
-import { FC, useEffect, useState, useRef, useCallback } from "react";
-import { SidebarUploadPanel } from "@/components/dashboard/SidebarUploadPanel";
+import { useRef, useState } from "react";
 import { Award, Clock, CheckCircle2 } from "lucide-react";
-import {
-  Card,
-} from "@heroui/react";
+import { Card } from "@heroui/react";
 
-import api from "@/lib/axios";
+import { SidebarUploadPanel } from "@/components/dashboard/SidebarUploadPanel";
 import { DocumentPreviewDialog } from "@/components/documents/DocumentPreviewDialog";
+import { StorageIndicator } from "@/components/dashboard/StorageIndicator";
+import { ArchiveStats, type StatConfigItem } from "@/components/archives";
+import { DocumentRow } from "@/components/documents/DocumentRow";
+import { DocumentList } from "@/components/documents/DocumentList";
+import { useDocumentManagement } from "@/hooks/useDocumentManagement";
 import { useNotify } from "@/context/NotificationContext";
-import {
-  ArchiveStats,
-  type StatConfigItem,
-} from "@/components/archives";
-
-// types
-
-interface Sertifikat {
-  id: string | number;
-  title: string;
-  filePath: string;
-  type: string;
-  status: string;
-  createdAt: string;
-  issuer?: string;
-  size?: string;
-}
-
-interface Stats {
-  total: number;
-  pending: number;
-  verified: number;
-}
-
-// constants
+import api from "@/lib/axios";
 
 const ACCEPTED_FORMATS = ".pdf,.jpg,.jpeg,.png";
 
@@ -65,139 +38,37 @@ const STAT_CONFIG: readonly StatConfigItem[] = [
   },
 ] as const;
 
-// helpers
-
-function computeStats(data: Sertifikat[]): Stats {
-  return {
-    total: data.length,
-    pending: data.filter((s) => {
-        const normalizedStatus = s.status?.toLowerCase();
-        return (
-            normalizedStatus === "pending" ||
-            normalizedStatus === "draft" ||
-            normalizedStatus === "submitted" ||
-            normalizedStatus === "review" ||
-            normalizedStatus === "waiting"
-        );
-    }).length,
-    verified: data.filter((s) => {
-        const normalizedStatus = s.status?.toLowerCase();
-        return (
-            normalizedStatus === "final" ||
-            normalizedStatus === "approved" ||
-            normalizedStatus === "approve" ||
-            normalizedStatus === "publish" ||
-            normalizedStatus === "published"
-        );
-    }).length,
-  };
-}
-
-function resolveStats(
-  payloadStats: Partial<Stats> | undefined,
-  data: Sertifikat[],
-): Stats {
-  if (
-    payloadStats &&
-    typeof payloadStats.total === "number" &&
-    typeof payloadStats.pending === "number" &&
-    typeof payloadStats.verified === "number"
-  ) {
-    return {
-      total: payloadStats.total,
-      pending: payloadStats.pending,
-      verified: payloadStats.verified,
-    };
-  }
-
-  return computeStats(data);
-}
-
-function getDownloadFileName(file: Sertifikat): string {
-  const originalName = file.filePath?.split(/[\\/]/).pop();
-
-  if (originalName && originalName.includes(".")) {
-    return originalName.replace(/^\d{13}-/, "");
-  }
-
-  return file.title || "certificate.pdf";
-}
-
-import { DocumentRow } from "@/components/documents/DocumentRow";
-import { StorageIndicator } from "@/components/dashboard/StorageIndicator";
-import { DocumentList } from "@/components/documents/DocumentList";
-
 export default function SertifikatPage() {
-  const [files, setFiles] = useState<Sertifikat[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchLoading, setSearchLoading] = useState(true);
-  const [previewFile, setPreviewFile] = useState<Sertifikat | null>(null);
-  const [previewUrl, setPreviewUrl] = useState("");
-  const [previewLoading, setPreviewLoading] = useState(false);
-  const [stats, setStats] = useState<Stats>({
-    total: 0,
-    pending: 0,
-    verified: 0,
-  });
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [sortBy, setSortBy] = useState("createdAt");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const notify = useNotify();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [issuer, setIssuer] = useState("");
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [total, setTotal] = useState(0);
-  const limit = 10;
-  const notify = useNotify();
 
-  const fetchSertifikat = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await api.get("/sertifikat", {
-        params: {
-          search: searchQuery,
-          page,
-          limit,
-          sortBy,
-          sortOrder,
-          status: statusFilter,
-        },
-      });
-      const payload = response.data ?? {};
-      const data = Array.isArray(payload.data) ? payload.data : [];
-      const totalCount =
-        typeof payload.total === "number" ? payload.total : data.length;
-      const pages =
-        typeof payload.totalPages === "number" ? payload.totalPages : 1;
-
-      setFiles(data);
-      setTotal(totalCount || 0);
-      setTotalPages(pages || 1);
-      setStats(resolveStats(payload.stats, data));
-    } catch (error) {
-      console.error("Failed to fetch certificates:", error);
-    } finally {
-      setLoading(false);
-      setSearchLoading(false);
-    }
-  }, [searchQuery, page, sortBy, sortOrder, statusFilter]);
-
-  useEffect(() => {
-    setSearchLoading(true);
-    const timer = setTimeout(fetchSertifikat, 500);
-
-    return () => clearTimeout(timer);
-  }, [fetchSertifikat]);
-
-  useEffect(
-    () => () => {
-      if (previewUrl) {
-        window.URL.revokeObjectURL(previewUrl);
-      }
-    },
-    [previewUrl],
-  );
+  const {
+    files,
+    loading,
+    searchLoading,
+    previewFile,
+    previewUrl,
+    previewLoading,
+    stats,
+    searchQuery,
+    setSearchQuery,
+    statusFilter,
+    setStatusFilter,
+    sortBy,
+    setSortBy,
+    sortOrder,
+    setSortOrder,
+    page,
+    setPage,
+    totalPages,
+    total,
+    handleDelete,
+    handleDownload,
+    handleView,
+    handleClosePreview,
+    fetchDocuments,
+  } = useDocumentManagement({ endpoint: "/sertifikat" });
 
   const handleUploadClick = () => fileInputRef.current?.click();
 
@@ -205,6 +76,7 @@ export default function SertifikatPage() {
     const file = e.target.files?.[0];
 
     if (!file) return;
+
     const formData = new FormData();
 
     formData.append("file", file);
@@ -215,7 +87,6 @@ export default function SertifikatPage() {
     }
 
     try {
-      setLoading(true);
       await api.post("/sertifikat", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -226,7 +97,7 @@ export default function SertifikatPage() {
         status: "success",
       });
       setIssuer("");
-      fetchSertifikat();
+      fetchDocuments();
     } catch (error: any) {
       notify({
         title: "Upload Failed",
@@ -234,88 +105,7 @@ export default function SertifikatPage() {
         status: "danger",
       });
     } finally {
-      setLoading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
-    }
-  };
-
-  const handleDelete = async (id: string | number) => {
-    try {
-      await api.delete(`/sertifikat/${id}`);
-      fetchSertifikat();
-    } catch (error: any) {
-      notify({
-        title: "Delete Failed",
-        description: error.response?.data?.error ?? error.message,
-        status: "danger",
-      });
-    }
-  };
-
-  const handleDownload = async (file: Sertifikat) => {
-    try {
-      const response = await api.get(`/sertifikat/download/${file.id}`, {
-        responseType: "blob",
-      });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-
-      link.href = url;
-      link.setAttribute("download", getDownloadFileName(file));
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } catch (error) {
-      notify({
-        title: "Download Failed",
-        description: "Failed to download certificate.",
-        status: "danger",
-      });
-    }
-  };
-
-  const handleClosePreview = () => {
-    if (previewUrl) {
-      window.URL.revokeObjectURL(previewUrl);
-    }
-
-    setPreviewUrl("");
-    setPreviewFile(null);
-    setPreviewLoading(false);
-  };
-
-  const handleView = async (file: Sertifikat) => {
-    try {
-      setPreviewFile(file);
-      setPreviewLoading(true);
-
-      const response = await api.get(`/sertifikat/download/${file.id}`, {
-        responseType: "blob",
-      });
-      const contentType = String(
-        response.headers?.["content-type"] || "application/octet-stream",
-      );
-      const blob = new Blob([response.data], {
-        type: contentType,
-      });
-      const url = window.URL.createObjectURL(blob);
-
-      setPreviewUrl((current) => {
-        if (current) {
-          window.URL.revokeObjectURL(current);
-        }
-
-        return url;
-      });
-    } catch (error) {
-      notify({
-        title: "Preview Failed",
-        description: "Failed to preview certificate.",
-        status: "danger",
-      });
-      handleClosePreview();
-    } finally {
-      setPreviewLoading(false);
     }
   };
 
@@ -359,6 +149,16 @@ export default function SertifikatPage() {
           <DocumentList
             files={files}
             page={page}
+            renderRow={(file) => (
+              <DocumentRow
+                key={file.id}
+                file={file}
+                type="certificate"
+                onDelete={handleDelete}
+                onDownload={handleDownload}
+                onView={handleView}
+              />
+            )}
             searchLoading={searchLoading}
             searchQuery={searchQuery}
             sortBy={sortBy}
@@ -383,28 +183,18 @@ export default function SertifikatPage() {
               setPage(1);
             }}
             onView={handleView}
-            renderRow={(file) => (
-              <DocumentRow
-                key={file.id}
-                file={file}
-                type="certificate"
-                onDelete={handleDelete}
-                onDownload={handleDownload}
-                onView={handleView}
-              />
-            )}
           />
         </div>
       </div>
       {previewFile ? (
         <DocumentPreviewDialog
           file={previewFile}
+          previewLoading={previewLoading}
+          previewUrl={previewUrl}
           onClose={handleClosePreview}
           onDownload={handleDownload}
-          previewUrl={previewUrl}
-          previewLoading={previewLoading}
         />
       ) : null}
     </div>
   );
-} 
+}
