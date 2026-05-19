@@ -1,51 +1,23 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-console */
-import { useEffect, useState, useCallback } from "react";
-import { FileUp } from "lucide-react";
-import { SendHorizonal, Clock, CheckCircle2 } from "lucide-react";
+import { useState } from "react";
+import { FileUp, SendHorizonal, Clock, CheckCircle2 } from "lucide-react";
 import { Card } from "@heroui/react";
 
 import { SidebarUploadPanel } from "@/components/dashboard/SidebarUploadPanel";
 import { DocumentPreviewDialog } from "@/components/documents/DocumentPreviewDialog";
-import {
-  DocumentUploadDialog,
-  type DocumentUploadFormState,
-  type BulkFileItem,
-} from "@/components/documents/DocumentUploadDialog";
+import { DocumentUploadDialog } from "@/components/documents/DocumentUploadDialog";
 import { StorageIndicator } from "@/components/dashboard/StorageIndicator";
 import { DocumentRow } from "@/components/documents/DocumentRow";
 import { DocumentList } from "@/components/documents/DocumentList";
-import { useNotify } from "@/context/NotificationContext";
-import api from "@/lib/axios";
 import {
   ArchiveStats,
   SendEmailDialog,
   type EmailFormState,
   type StatConfigItem,
 } from "@/components/archives";
-
-// types
-
-interface Surat {
-  id: string | number;
-  title: string;
-  sender?: string | null;
-  documentDate?: string | null;
-  filePath: string;
-  type: string;
-  status: string;
-  createdAt: string;
-  recipient?: string;
-  size?: string;
-}
-
-interface Stats {
-  total: number;
-  pending: number;
-  verified: number;
-}
-
-// constants
+import { useDocumentManagement } from "@/hooks/useDocumentManagement";
+import { useNotify } from "@/context/NotificationContext";
+import api from "@/lib/axios";
+import { Document } from "@/types/document";
 
 const ACCEPTED_UPLOAD_FORMATS = ".pdf,.doc,.docx";
 const ACCEPTED_UPLOAD_FORMATS_LABEL = "PDF, DOC, DOCX";
@@ -74,333 +46,59 @@ const STAT_CONFIG: readonly StatConfigItem[] = [
   },
 ] as const;
 
-// helpers
-
-function computeStats(data: Surat[]): Stats {
-  return {
-    total: data.length,
-    pending: data.filter((s) => {
-      const status = s.status?.toLowerCase();
-
-      return (
-        status === "draft" ||
-        status === "pending" ||
-        status === "submitted" ||
-        status === "review" ||
-        status === "waiting"
-      );
-    }).length,
-    verified: data.filter((s) => {
-      const status = s.status?.toLowerCase();
-
-      return (
-        status === "final" ||
-        status === "approved" ||
-        status === "approve" ||
-        status === "publish" ||
-        status === "published"
-      );
-    }).length,
-  };
-}
-
-function resolveStats(
-  payloadStats: Partial<Stats> | undefined,
-  data: Surat[],
-): Stats {
-  if (
-    payloadStats &&
-    typeof payloadStats.total === "number" &&
-    typeof payloadStats.pending === "number" &&
-    typeof payloadStats.verified === "number"
-  ) {
-    return {
-      total: payloadStats.total,
-      pending: payloadStats.pending,
-      verified: payloadStats.verified,
-    };
-  }
-
-  return computeStats(data);
-}
-
-function getDownloadFileName(file: Surat): string {
-  const originalName = file.filePath?.split(/[\\/]/).pop();
-
-  if (originalName && originalName.includes(".")) {
-    return originalName.replace(/^\d{13}-/, "");
-  }
-
-  return file.title || "document.pdf";
-}
-
-function getTodayDateString(): string {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, "0");
-  const day = String(today.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-}
-
-function stripFileExtension(fileName: string): string {
-  const baseName = fileName.split(/[\\/]/).pop() || fileName;
-  const lastDotIndex = baseName.lastIndexOf(".");
-
-  if (lastDotIndex <= 0) {
-    return baseName;
-  }
-
-  return baseName.slice(0, lastDotIndex);
-}
-
-// page
-
 export default function SuratKeluarPage() {
-  const [files, setFiles] = useState<Surat[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchLoading, setSearchLoading] = useState(true);
-  const [previewFile, setPreviewFile] = useState<Surat | null>(null);
-  const [previewUrl, setPreviewUrl] = useState("");
-  const [previewLoading, setPreviewLoading] = useState(false);
-  const [stats, setStats] = useState<Stats>({
-    total: 0,
-    pending: 0,
-    verified: 0,
-  });
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [sortBy, setSortBy] = useState("createdAt");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
-  const [selectedDocument, setSelectedDocument] = useState<Surat | null>(null);
+  const notify = useNotify();
+  const {
+    files,
+    loading,
+    searchLoading,
+    previewFile,
+    previewUrl,
+    previewLoading,
+    stats,
+    searchQuery,
+    setSearchQuery,
+    statusFilter,
+    setStatusFilter,
+    sortBy,
+    setSortBy,
+    sortOrder,
+    setSortOrder,
+    uploadOpen,
+    uploadForm,
+    bulkFiles,
+    uploadMode,
+    page,
+    setPage,
+    totalPages,
+    total,
+    openUploadDialog,
+    closeUploadDialog,
+    handleUploadFieldChange,
+    handleUploadFileChange,
+    handleSubmitUpload,
+    handleDelete,
+    handleDownload,
+    handleView,
+    handleClosePreview,
+    handleBulkFileChange,
+    handleBulkItemChange,
+    handleBulkItemRemove,
+    handleBulkSubmit,
+    setUploadMode,
+  } = useDocumentManagement({ endpoint: "/surat-keluar" });
+
+  const [selectedDocument, setSelectedDocument] = useState<Document | null>(
+    null,
+  );
   const [sendingEmail, setSendingEmail] = useState(false);
-  const [uploadOpen, setUploadOpen] = useState(false);
-  const [uploadForm, setUploadForm] = useState<DocumentUploadFormState>({
-    title: "",
-    documentDate: "",
-    sender: "",
-    file: null,
-  });
-  const [bulkFiles, setBulkFiles] = useState<BulkFileItem[]>([]);
-  const [uploadMode, setUploadMode] = useState<"single" | "bulk">("single");
   const [emailForm, setEmailForm] = useState<EmailFormState>({
     to: "",
     subject: "",
     message: "",
   });
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [total, setTotal] = useState(0);
-  const limit = 10;
-  const notify = useNotify();
-  const todayDate = getTodayDateString();
 
-  const fetchSurat = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await api.get("/surat-keluar", {
-        params: {
-          search: searchQuery,
-          page,
-          limit,
-          sortBy,
-          sortOrder,
-          status: statusFilter,
-        },
-      });
-      const payload = response.data ?? {};
-      const data = Array.isArray(payload.data) ? payload.data : [];
-      const totalCount =
-        typeof payload.total === "number" ? payload.total : data.length;
-      const pages =
-        typeof payload.totalPages === "number" ? payload.totalPages : 1;
-
-      setFiles(data);
-      setTotal(totalCount || 0);
-      setTotalPages(pages || 1);
-      setStats(resolveStats(payload.stats, data));
-    } catch (error) {
-      console.error("Failed to fetch documents:", error);
-    } finally {
-      setLoading(false);
-      setSearchLoading(false);
-    }
-  }, [searchQuery, page, sortBy, sortOrder, statusFilter]);
-
-  useEffect(() => {
-    setSearchLoading(true);
-    const timer = setTimeout(fetchSurat, 500);
-
-    return () => clearTimeout(timer);
-  }, [fetchSurat]);
-
-  useEffect(
-    () => () => {
-      if (previewUrl) {
-        window.URL.revokeObjectURL(previewUrl);
-      }
-    },
-    [previewUrl],
-  );
-
-  const openUploadDialog = () => {
-    setUploadForm({
-      title: "",
-      documentDate: todayDate,
-      sender: "",
-      file: null,
-    });
-    setUploadOpen(true);
-  };
-
-  const closeUploadDialog = () => {
-    if (loading) return;
-    setUploadOpen(false);
-  };
-
-  const handleUploadFieldChange = (
-    field: keyof Omit<DocumentUploadFormState, "file">,
-    value: string,
-  ) => {
-    setUploadForm((current) => ({ ...current, [field]: value }));
-  };
-
-  const handleUploadFileChange = (file: File | null) => {
-    setUploadForm((current) => ({ ...current, file }));
-  };
-
-  const handleSubmitUpload = async () => {
-    if (!uploadForm.file) {
-      notify({
-        title: "No File Selected",
-        description: "Please choose a file first.",
-        status: "warning",
-      });
-
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const formData = new FormData();
-
-      formData.append("file", uploadForm.file);
-      formData.append("title", uploadForm.title.trim());
-      formData.append("documentDate", uploadForm.documentDate);
-      formData.append("sender", uploadForm.sender.trim());
-      formData.append("status", "draft");
-
-      await api.post("/surat-keluar", formData);
-      setUploadOpen(false);
-      notify({
-        title: "Document Uploaded",
-        description:
-          "Your document has been submitted and is pending administrator approval.",
-        status: "success",
-      });
-      setUploadForm({
-        title: "",
-        documentDate: todayDate,
-        sender: "",
-        file: null,
-      });
-      fetchSurat();
-    } catch (error: any) {
-      console.error(
-        "Upload surat keluar failed:",
-        error?.response?.data || error,
-      );
-      notify({
-        title: "Upload Failed",
-        description: error.response?.data?.error ?? error.message,
-        status: "danger",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDelete = async (id: string | number) => {
-    try {
-      await api.delete(`/surat-keluar/${id}`);
-      fetchSurat();
-    } catch (error: any) {
-      notify({
-        title: "Delete Failed",
-        description: error.response?.data?.error ?? error.message,
-        status: "danger",
-      });
-    }
-  };
-
-  const handleDownload = async (file: Surat) => {
-    try {
-      const response = await api.get(`/surat-keluar/download/${file.id}`, {
-        responseType: "blob",
-      });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-
-      link.href = url;
-      link.setAttribute("download", getDownloadFileName(file));
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } catch (error) {
-      notify({
-        title: "Download Failed",
-        description: "Failed to download document.",
-        status: "danger",
-      });
-    }
-  };
-
-  const handleClosePreview = () => {
-    if (previewUrl) {
-      window.URL.revokeObjectURL(previewUrl);
-    }
-
-    setPreviewUrl("");
-    setPreviewFile(null);
-    setPreviewLoading(false);
-  };
-
-  const handleView = async (file: Surat) => {
-    try {
-      setPreviewFile(file);
-      setPreviewLoading(true);
-
-      const response = await api.get(`/surat-keluar/download/${file.id}`, {
-        responseType: "blob",
-      });
-      const contentType = String(
-        response.headers?.["content-type"] || "application/octet-stream",
-      );
-      const blob = new Blob([response.data], {
-        type: contentType,
-      });
-      const url = window.URL.createObjectURL(blob);
-
-      setPreviewUrl((current) => {
-        if (current) {
-          window.URL.revokeObjectURL(current);
-        }
-
-        return url;
-      });
-    } catch (error) {
-      notify({
-        title: "Preview Failed",
-        description: "Failed to preview document.",
-        status: "danger",
-      });
-      handleClosePreview();
-    } finally {
-      setPreviewLoading(false);
-    }
-  };
-
-  const handleOpenSendEmail = (file: Surat) => {
+  const handleOpenSendEmail = (file: Document) => {
     setSelectedDocument(file);
     setEmailForm({
       to: "",
@@ -414,86 +112,6 @@ export default function SuratKeluarPage() {
     setSelectedDocument(null);
   };
 
-  const handleBulkFileChange = (files: FileList | null) => {
-    if (!files) return;
-    const newFiles: BulkFileItem[] = [];
-
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      const title = stripFileExtension(file.name);
-
-      newFiles.push({
-        id: `${Date.now()}-${i}`,
-        file,
-        title,
-        sender: "",
-        documentDate: todayDate,
-        isValid: false,
-      });
-    }
-
-    setBulkFiles(newFiles);
-  };
-
-  const handleBulkItemChange = (id: string, field: string, value: string) => {
-    setBulkFiles((current) =>
-      current.map((item) => {
-        if (item.id !== id) return item;
-
-        const updated = { ...item, [field]: value };
-
-        updated.isValid =
-          Boolean(updated.sender.trim()) && Boolean(updated.documentDate);
-
-        return updated;
-      }),
-    );
-  };
-
-  const handleBulkItemRemove = (id: string) => {
-    setBulkFiles((current) => current.filter((item) => item.id !== id));
-  };
-
-  const handleModeChange = (mode: "single" | "bulk") => {
-    setUploadMode(mode);
-  };
-
-  const handleBulkSubmit = async () => {
-    try {
-      setLoading(true);
-      const formData = new FormData();
-
-      bulkFiles.forEach((item, index) => {
-        formData.append("files", item.file);
-        formData.append(`title_${item.file.name}_${index}`, item.title);
-        formData.append(`sender_${item.file.name}_${index}`, item.sender);
-        formData.append(
-          `documentDate_${item.file.name}_${index}`,
-          item.documentDate,
-        );
-      });
-
-      await api.post("/surat-keluar/bulk", formData);
-      notify({
-        title: "Bulk Upload Success",
-        description: `${bulkFiles.length} documents have been submitted and are pending administrator approval.`,
-        status: "success",
-      });
-      setBulkFiles([]);
-      setUploadOpen(false);
-      fetchSurat();
-    } catch (error: any) {
-      console.error("Bulk upload failed:", error?.response?.data || error);
-      notify({
-        title: "Bulk Upload Failed",
-        description: error.response?.data?.error ?? error.message,
-        status: "danger",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleEmailFieldChange = (
     field: keyof EmailFormState,
     value: string,
@@ -503,7 +121,6 @@ export default function SuratKeluarPage() {
 
   const handleSendEmail = async () => {
     if (!selectedDocument) return;
-
     try {
       setSendingEmail(true);
       await api.post(
@@ -557,7 +174,7 @@ export default function SuratKeluarPage() {
         onClose={closeUploadDialog}
         onFieldChange={handleUploadFieldChange}
         onFileChange={handleUploadFileChange}
-        onModeChange={handleModeChange}
+        onModeChange={setUploadMode}
         onSubmit={handleSubmitUpload}
       />
       <ArchiveStats configs={STAT_CONFIG} stats={stats as any} />
