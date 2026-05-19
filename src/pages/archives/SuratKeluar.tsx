@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
-import { FC, useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { FileUp } from "lucide-react";
 import { SendHorizonal, Clock, CheckCircle2 } from "lucide-react";
-import { Card, Button, Input } from "@heroui/react";
+import { Card } from "@heroui/react";
 
 import { SidebarUploadPanel } from "@/components/dashboard/SidebarUploadPanel";
 import { DocumentPreviewDialog } from "@/components/documents/DocumentPreviewDialog";
-import { StatCard } from "@/components/dashboard/StatCard";
 import {
   DocumentUploadDialog,
   type DocumentUploadFormState,
@@ -18,6 +17,12 @@ import { DocumentRow } from "@/components/documents/DocumentRow";
 import { DocumentList } from "@/components/documents/DocumentList";
 import { useNotify } from "@/context/NotificationContext";
 import api from "@/lib/axios";
+import {
+  ArchiveStats,
+  SendEmailDialog,
+  type EmailFormState,
+  type StatConfigItem,
+} from "@/components/archives";
 
 // types
 
@@ -40,34 +45,28 @@ interface Stats {
   verified: number;
 }
 
-interface EmailFormState {
-  to: string;
-  subject: string;
-  message: string;
-}
-
 // constants
 
 const ACCEPTED_UPLOAD_FORMATS = ".pdf,.doc,.docx";
 const ACCEPTED_UPLOAD_FORMATS_LABEL = "PDF, DOC, DOCX";
 
-const STAT_CONFIG = [
+const STAT_CONFIG: readonly StatConfigItem[] = [
   {
-    key: "total" as keyof Stats,
+    key: "total",
     label: "Total Documents",
     Icon: SendHorizonal,
     color: "text-violet-500",
     bg: "bg-violet-500/10",
   },
   {
-    key: "pending" as keyof Stats,
+    key: "pending",
     label: "Pending / Draft",
     Icon: Clock,
     color: "text-warning",
     bg: "bg-warning/10",
   },
   {
-    key: "verified" as keyof Stats,
+    key: "verified",
     label: "Verified / Final",
     Icon: CheckCircle2,
     color: "text-success",
@@ -154,113 +153,6 @@ function stripFileExtension(fileName: string): string {
 
   return baseName.slice(0, lastDotIndex);
 }
-
-const StatsSection: FC<{ stats: Stats }> = ({ stats }) => (
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-    {STAT_CONFIG.map(({ key, label, Icon, color, bg }) => (
-      <StatCard
-        key={key}
-        Icon={Icon}
-        bg={bg}
-        color={color}
-        count={stats[key]}
-        label={label}
-      />
-    ))}
-  </div>
-);
-
-const SendEmailDialog: FC<{
-  document: Surat | null;
-  form: EmailFormState;
-  sending: boolean;
-  onChange: (field: keyof EmailFormState, value: string) => void;
-  onClose: () => void;
-  onSubmit: () => void;
-}> = ({ document, form, sending, onChange, onClose, onSubmit }) => {
-  if (!document) return null;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 p-4 backdrop-blur-[2px]">
-      <Card className="w-full max-w-lg border-none bg-content1 shadow-2xl">
-        <Card.Header className="flex items-start justify-between gap-4 px-6 pt-6 pb-2">
-          <div>
-            <h3 className="text-lg font-bold text-foreground">
-              Send Document via Email
-            </h3>
-            <p className="mt-1 text-xs text-default-500">
-              Document:{" "}
-              <span className="font-semibold text-foreground">
-                {document.title}
-              </span>
-            </p>
-          </div>
-          <Button size="sm" variant="ghost" onClick={onClose}>
-            Close
-          </Button>
-        </Card.Header>
-        <Card.Content className="space-y-4 px-6 pb-6 pt-3">
-          <div className="space-y-1.5">
-            <label
-              className="text-xs font-bold text-foreground"
-              htmlFor="send-email-to"
-            >
-              Recipient Email
-            </label>
-            <Input
-              id="send-email-to"
-              placeholder="name@email.com"
-              type="email"
-              value={form.to}
-              onChange={(e) => onChange("to", e.target.value)}
-            />
-          </div>
-          <div className="space-y-1.5">
-            <label
-              className="text-xs font-bold text-foreground"
-              htmlFor="send-email-subject"
-            >
-              Subject
-            </label>
-            <Input
-              id="send-email-subject"
-              placeholder="Email subject"
-              value={form.subject}
-              onChange={(e) => onChange("subject", e.target.value)}
-            />
-          </div>
-          <div className="space-y-1.5">
-            <label
-              className="text-xs font-bold text-foreground"
-              htmlFor="send-email-message"
-            >
-              Message
-            </label>
-            <textarea
-              className="min-h-32 w-full rounded-xl border border-default-200 bg-transparent px-3 py-2 text-sm outline-none transition focus:border-violet-500"
-              id="send-email-message"
-              placeholder="Write your email message here..."
-              value={form.message}
-              onChange={(e) => onChange("message", e.target.value)}
-            />
-          </div>
-          <div className="flex justify-end gap-2 pt-2">
-            <Button isDisabled={sending} variant="tertiary" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button
-              className="bg-violet-500 text-white"
-              isDisabled={sending || !form.to.trim()}
-              onClick={onSubmit}
-            >
-              {sending ? "Sending..." : "Send Email"}
-            </Button>
-          </div>
-        </Card.Content>
-      </Card>
-    </div>
-  );
-};
 
 // page
 
@@ -668,7 +560,7 @@ export default function SuratKeluarPage() {
         onModeChange={handleModeChange}
         onSubmit={handleSubmitUpload}
       />
-      <StatsSection stats={stats} />
+      <ArchiveStats configs={STAT_CONFIG} stats={stats as any} />
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch w-full flex-1 min-h-0">
         <div className="lg:col-span-3 xl:col-span-2 flex flex-col gap-4">
           <SidebarUploadPanel

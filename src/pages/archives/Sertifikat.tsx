@@ -11,9 +11,12 @@ import {
 } from "@heroui/react";
 
 import api from "@/lib/axios";
-import { StatCard } from "@/components/dashboard/StatCard";
 import { DocumentPreviewDialog } from "@/components/documents/DocumentPreviewDialog";
 import { useNotify } from "@/context/NotificationContext";
+import {
+  ArchiveStats,
+  type StatConfigItem,
+} from "@/components/archives";
 
 // types
 
@@ -36,50 +39,25 @@ interface Stats {
 
 // constants
 
-
 const ACCEPTED_FORMATS = ".pdf,.jpg,.jpeg,.png";
 
-const isPendingStatus = (status?: string) => {
-  const normalizedStatus = status?.toLowerCase();
-
-  return (
-    normalizedStatus === "pending" ||
-    normalizedStatus === "draft" ||
-    normalizedStatus === "submitted" ||
-    normalizedStatus === "review" ||
-    normalizedStatus === "waiting"
-  );
-};
-
-const isVerifiedStatus = (status?: string) => {
-  const normalizedStatus = status?.toLowerCase();
-
-  return (
-    normalizedStatus === "final" ||
-    normalizedStatus === "approved" ||
-    normalizedStatus === "approve" ||
-    normalizedStatus === "publish" ||
-    normalizedStatus === "published"
-  );
-};
-
-const STAT_CONFIG = [
+const STAT_CONFIG: readonly StatConfigItem[] = [
   {
-    key: "total" as keyof Stats,
+    key: "total",
     label: "Total Certificates",
     Icon: Award,
     color: "text-amber-500",
     bg: "bg-amber-900/10",
   },
   {
-    key: "pending" as keyof Stats,
+    key: "pending",
     label: "Pending / Draft",
     Icon: Clock,
     color: "text-amber-500",
     bg: "bg-amber-900/10",
   },
   {
-    key: "verified" as keyof Stats,
+    key: "verified",
     label: "Verified / Final",
     Icon: CheckCircle2,
     color: "text-success",
@@ -92,8 +70,26 @@ const STAT_CONFIG = [
 function computeStats(data: Sertifikat[]): Stats {
   return {
     total: data.length,
-    pending: data.filter((s) => isPendingStatus(s.status)).length,
-    verified: data.filter((s) => isVerifiedStatus(s.status)).length,
+    pending: data.filter((s) => {
+        const normalizedStatus = s.status?.toLowerCase();
+        return (
+            normalizedStatus === "pending" ||
+            normalizedStatus === "draft" ||
+            normalizedStatus === "submitted" ||
+            normalizedStatus === "review" ||
+            normalizedStatus === "waiting"
+        );
+    }).length,
+    verified: data.filter((s) => {
+        const normalizedStatus = s.status?.toLowerCase();
+        return (
+            normalizedStatus === "final" ||
+            normalizedStatus === "approved" ||
+            normalizedStatus === "approve" ||
+            normalizedStatus === "publish" ||
+            normalizedStatus === "published"
+        );
+    }).length,
   };
 }
 
@@ -117,9 +113,6 @@ function resolveStats(
   return computeStats(data);
 }
 
-
-
-
 function getDownloadFileName(file: Sertifikat): string {
   const originalName = file.filePath?.split(/[\\/]/).pop();
 
@@ -129,22 +122,6 @@ function getDownloadFileName(file: Sertifikat): string {
 
   return file.title || "certificate.pdf";
 }
-
-const StatsSection: FC<{ stats: Stats }> = ({ stats }) => (
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-    {STAT_CONFIG.map(({ key, label, Icon, color, bg }) => (
-      <StatCard
-        key={key}
-        Icon={Icon}
-        bg={bg}
-        color={color}
-        label={label}
-        count={stats[key]}
-      />
-    ))}
-  </div>
-);
-
 
 import { DocumentRow } from "@/components/documents/DocumentRow";
 import { StorageIndicator } from "@/components/dashboard/StorageIndicator";
@@ -351,7 +328,7 @@ export default function SertifikatPage() {
         type="file"
         onChange={handleFileChange}
       />
-      <StatsSection stats={stats} />
+      <ArchiveStats configs={STAT_CONFIG} stats={stats as any} />
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch w-full flex-1 min-h-0">
         <div className="lg:col-span-3 xl:col-span-2 flex flex-col gap-4">
           <SidebarUploadPanel

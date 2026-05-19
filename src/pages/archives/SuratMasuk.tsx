@@ -8,7 +8,6 @@ import { FileDown, Inbox, Clock, CheckCircle2 } from "lucide-react";
 import { Card } from "@heroui/react";
 
 import api from "@/lib/axios";
-import { StatCard } from "@/components/dashboard/StatCard";
 import {
   DocumentUploadDialog,
   type DocumentUploadFormState,
@@ -16,6 +15,10 @@ import {
 } from "@/components/documents/DocumentUploadDialog";
 import { StorageIndicator } from "@/components/dashboard/StorageIndicator";
 import { useNotify } from "@/context/NotificationContext";
+import {
+  ArchiveStats,
+  type StatConfigItem,
+} from "@/components/archives";
 
 // types
 
@@ -42,23 +45,23 @@ interface Stats {
 const ACCEPTED_UPLOAD_FORMATS = ".pdf,.doc,.docx";
 const ACCEPTED_UPLOAD_FORMATS_LABEL = "PDF, DOC, DOCX";
 
-const STAT_CONFIG = [
+const STAT_CONFIG: readonly StatConfigItem[] = [
   {
-    key: "total" as keyof Stats,
+    key: "total",
     label: "Total Documents",
     Icon: Inbox,
     color: "text-blue-500",
     bg: "bg-blue-500/10",
   },
   {
-    key: "pending" as keyof Stats,
+    key: "pending",
     label: "Pending / Draft",
     Icon: Clock,
     color: "text-warning",
     bg: "bg-warning/10",
   },
   {
-    key: "verified" as keyof Stats,
+    key: "verified",
     label: "Verified / Final",
     Icon: CheckCircle2,
     color: "text-success",
@@ -145,21 +148,6 @@ function getTodayDateString(): string {
 
   return `${year}-${month}-${day}`;
 }
-
-const StatsSection: FC<{ stats: Stats }> = ({ stats }) => (
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-    {STAT_CONFIG.map(({ key, label, Icon, color, bg }) => (
-      <StatCard
-        key={key}
-        Icon={Icon}
-        bg={bg}
-        color={color}
-        count={stats[key]}
-        label={label}
-      />
-    ))}
-  </div>
-);
 
 import { DocumentRow } from "@/components/documents/DocumentRow";
 import { DocumentList } from "@/components/documents/DocumentList";
@@ -507,7 +495,7 @@ export default function SuratMasukPage() {
         onModeChange={handleModeChange}
         onSubmit={handleSubmitUpload}
       />
-      <StatsSection stats={stats} />
+      <ArchiveStats configs={STAT_CONFIG} stats={stats as any} />
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch w-full flex-1 min-h-0">
         <div className="lg:col-span-3 xl:col-span-2 flex flex-col gap-4">
           <SidebarUploadPanel

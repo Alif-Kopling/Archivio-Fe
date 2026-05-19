@@ -8,13 +8,6 @@ import {
   AlertDialog,
   Button,
   Card,
-  Chip,
-  Input,
-  Label,
-  ListBox,
-  Select,
-  Switch,
-  TextField,
 } from "@heroui/react";
 import {
   Building2,
@@ -23,13 +16,9 @@ import {
   Bell,
   Shield,
   Palette,
-  Save,
-  RefreshCw,
   AlertCircle,
   CheckCircle2,
-  Settings as SettingsIcon,
   Trash2,
-  AlertTriangle,
 } from "lucide-react";
 
 import {
@@ -40,13 +29,18 @@ import {
 } from "../../services/setting.service";
 
 import alarmDanger from "@/assets/alarm-danger-danger.mp3";
-
-interface SettingCategory {
-  id: string;
-  label: string;
-  icon: React.ReactNode;
-  description: string;
-}
+import {
+  CategorySidebar,
+  DisplaySettings,
+  DocumentSettings,
+  GeneralSettings,
+  NotificationSettings,
+  SecuritySettings,
+  SettingsHeader,
+  StorageSettings,
+  TrashSettings,
+  type SettingCategory,
+} from "../../components/settings";
 
 const categories: SettingCategory[] = [
   {
@@ -161,6 +155,8 @@ export default function Settings() {
       setTrashRejectedCount(Number(trashResponse.data?.rejected || 0));
     } catch (error: any) {
       setMessage({ type: "error", text: "Failed to load settings" });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -312,483 +308,114 @@ export default function Settings() {
     }
   };
 
-  const renderGeneralSettings = () => (
-    <div className="space-y-6">
-      <div>
-        <TextField name="instansi_name">
-          <Label className="block text-sm font-semibold mb-2 text-foreground">
-            Agency Name
-          </Label>
-          <Input
-            className="w-full h-12"
-            placeholder="Enter agency name"
-            value={settings.instansi_name}
-            onChange={(e) => handleChange("instansi_name", e.target.value)}
-          />
-        </TextField>
-        <p className="text-xs text-foreground mt-1.5">
-          Agency name will be displayed in headers and reports
-        </p>
-      </div>
-      <div>
-        <TextField name="logo_url">
-          <Label className="block text-sm font-semibold mb-2 text-foreground">
-            Logo URL
-          </Label>
-          <Input
-            className="w-full h-12"
-            placeholder="https://example.com/logo.png"
-            value={settings.logo_url}
-            onChange={(e) => handleChange("logo_url", e.target.value)}
-          />
-        </TextField>
-        <p className="text-xs text-foreground mt-1.5">
-          Logo will be displayed in sidebar and header
-        </p>
-      </div>
-      <div className="flex justify-end pt-4 border-t border-divider">
-        <Button
-          className="bg-primary text-white font-medium px-6"
-          isDisabled={loading && savingCategory === "general"}
-          onClick={() => {
-            setSavingCategory("general");
-            handleSave("instansi_name");
-            handleSave("logo_url");
-          }}
-        >
-          {savingCategory === "general" ? "Saving..." : "Save Changes"}
-        </Button>
-      </div>
-    </div>
-  );
-
-  const renderDocumentSettings = () => (
-    <div className="space-y-6">
-      <div>
-        <Label className="block text-sm font-semibold mb-2 text-foreground">
-          Items per Page
-        </Label>
-        <Select
-          className="w-full"
-          selectedKey={settings.items_per_page}
-          onSelectionChange={(key) => handleChange("items_per_page", key)}
-        >
-          <Select.Trigger className="h-12">
-            <Select.Value />
-            <Select.Indicator />
-          </Select.Trigger>
-          <Select.Popover>
-            <ListBox>
-              <ListBox.Item id="10" textValue="10 items per page">
-                10 items per page
-              </ListBox.Item>
-              <ListBox.Item id="25" textValue="25 items per page">
-                25 items per page
-              </ListBox.Item>
-              <ListBox.Item id="50" textValue="50 items per page">
-                50 items per page
-              </ListBox.Item>
-              <ListBox.Item id="100" textValue="100 items per page">
-                100 items per page
-              </ListBox.Item>
-            </ListBox>
-          </Select.Popover>
-        </Select>
-      </div>
-      <div>
-        <Label className="block text-sm font-semibold mb-2 text-foreground">
-          Date Format
-        </Label>
-        <Select
-          className="w-full"
-          selectedKey={settings.date_format}
-          onSelectionChange={(key) => handleChange("date_format", key)}
-        >
-          <Select.Trigger className="h-12">
-            <Select.Value />
-            <Select.Indicator />
-          </Select.Trigger>
-          <Select.Popover>
-            <ListBox>
-              <ListBox.Item id="DD/MM/YYYY" textValue="DD/MM/YYYY">
-                DD/MM/YYYY
-              </ListBox.Item>
-              <ListBox.Item id="MM/DD/YYYY" textValue="MM/DD/YYYY">
-                MM/DD/YYYY
-              </ListBox.Item>
-              <ListBox.Item id="YYYY-MM-DD" textValue="YYYY-MM-DD">
-                YYYY-MM-DD
-              </ListBox.Item>
-            </ListBox>
-          </Select.Popover>
-        </Select>
-      </div>
-      <div>
-        <TextField name="retention_period" type="number">
-          <Label className="block text-sm font-semibold mb-2 text-foreground">
-            Retention Period (Years)
-          </Label>
-          <Input
-            className="w-full h-12"
-            placeholder="5"
-            value={settings.retention_period}
-            onChange={(e) => handleChange("retention_period", e.target.value)}
-          />
-        </TextField>
-        <p className="text-xs text-foreground mt-1.5">
-          Documents will be archived after the retention period ends
-        </p>
-      </div>
-      <div className="flex justify-end pt-4 border-t border-divider">
-        <Button
-          className="bg-primary text-white font-medium px-6"
-          isDisabled={loading && savingCategory === "documents"}
-          onClick={() => {
-            setSavingCategory("documents");
-            handleSave("items_per_page");
-            handleSave("date_format");
-            handleSave("retention_period");
-          }}
-        >
-          {savingCategory === "documents" ? "Saving..." : "Save Changes"}
-        </Button>
-      </div>
-    </div>
-  );
-
-  const renderStorageSettings = () => (
-    <div className="space-y-6">
-      <div>
-        <TextField name="max_file_size" type="number">
-          <Label className="block text-sm font-semibold mb-2 text-foreground">
-            Max File Size (MB)
-          </Label>
-          <Input
-            className="w-full h-12"
-            placeholder="10"
-            value={settings.max_file_size}
-            onChange={(e) => handleChange("max_file_size", e.target.value)}
-          />
-        </TextField>
-        <p className="text-xs text-foreground mt-1.5">
-          Maximum file size that can be uploaded
-        </p>
-      </div>
-      <div>
-        <TextField name="allowed_file_types">
-          <Label className="block text-sm font-semibold mb-2 text-foreground">
-            Allowed File Types
-          </Label>
-          <Input
-            className="w-full h-12"
-            placeholder="pdf,doc,docx,jpg,png"
-            value={settings.allowed_file_types}
-            onChange={(e) => handleChange("allowed_file_types", e.target.value)}
-          />
-        </TextField>
-        <p className="text-xs text-foreground mt-1.5">
-          Separate with commas (e.g.: pdf,doc,docx)
-        </p>
-      </div>
-      <div className="flex justify-end pt-4 border-t border-divider">
-        <Button
-          className="bg-primary text-white font-medium px-6"
-          isDisabled={loading && savingCategory === "storage"}
-          onClick={() => {
-            setSavingCategory("storage");
-            handleSave("max_file_size");
-            handleSave("allowed_file_types");
-          }}
-        >
-          {savingCategory === "storage" ? "Saving..." : "Save Changes"}
-        </Button>
-      </div>
-    </div>
-  );
-
-  const renderNotificationSettings = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between p-4 rounded-lg bg-default-50 hover:bg-default-100 transition-colors">
-        <div className="flex-1">
-          <p className="font-semibold text-foreground">Email Notifications</p>
-          <p className="text-sm text-foreground mt-0.5">
-            Send email for documents that need verification
-          </p>
-        </div>
-        <Switch
-          isSelected={settings.email_notification}
-          onChange={(checked) => {
-            handleChange("email_notification", checked);
-            handleSave("email_notification");
-          }}
-        >
-          <Switch.Control>
-            <Switch.Thumb />
-          </Switch.Control>
-        </Switch>
-      </div>
-      <div className="flex items-center justify-between p-4 rounded-lg bg-default-50 hover:bg-default-100 transition-colors">
-        <div className="flex-1">
-          <p className="font-semibold text-foreground">Auto Archive</p>
-          <p className="text-sm text-foreground mt-0.5">
-            Automatically archive documents after retention period
-          </p>
-        </div>
-        <Switch
-          isSelected={settings.auto_archive}
-          onChange={(checked) => {
-            handleChange("auto_archive", checked);
-            handleSave("auto_archive");
-          }}
-        >
-          <Switch.Control>
-            <Switch.Thumb />
-          </Switch.Control>
-        </Switch>
-      </div>
-    </div>
-  );
-
-  const renderSecuritySettings = () => (
-    <div className="space-y-6">
-      <div>
-        <TextField name="session_timeout" type="number">
-          <Label className="block text-sm font-semibold mb-2 text-foreground">
-            Session Timeout (Minutes)
-          </Label>
-          <Input
-            className="w-full h-12"
-            placeholder="30"
-            value={settings.session_timeout}
-            onChange={(e) => handleChange("session_timeout", e.target.value)}
-          />
-        </TextField>
-        <p className="text-xs text-foreground mt-1.5">
-          Session will end after a period of inactivity
-        </p>
-      </div>
-      <div className="flex justify-end pt-4 border-t border-divider">
-        <Button
-          className="bg-primary text-white font-medium px-6"
-          isDisabled={loading && savingCategory === "security"}
-          onClick={() => {
-            setSavingCategory("security");
-            handleSave("session_timeout");
-          }}
-        >
-          {savingCategory === "security" ? "Saving..." : "Save Changes"}
-        </Button>
-      </div>
-    </div>
-  );
-
-  const renderTrashSettings = () => (
-    <div className="space-y-6">
-      <div className="rounded-2xl border border-danger/20 bg-danger/5 p-5">
-        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-danger">
-              <AlertTriangle size={18} />
-              <p className="text-sm font-semibold uppercase tracking-wide">
-                Rejected documents
-              </p>
-            </div>
-            <h3 className="text-xl font-bold text-foreground">
-              Trash bin for rejected files
-            </h3>
-            <p className="text-sm text-foreground/80 max-w-2xl">
-              Rejected documents are kept here until you permanently remove
-              them. Deleting them will also remove the stored file from disk.
-            </p>
-          </div>
-
-          <div className="min-w-[160px] rounded-2xl border border-divider bg-content1 p-4 text-center shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-wide text-default-500">
-              In Trash
-            </p>
-            <p className="mt-2 text-4xl font-bold text-danger">
-              {trashRejectedCount}
-            </p>
-            <p className="text-xs text-default-500">rejected files</p>
-          </div>
-        </div>
-
-        <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <Button
-            className="bg-danger text-white font-medium px-6"
-            isDisabled={trashRejectedCount === 0}
-            onClick={() => setTrashDialogOpen(true)}
-          >
-            Empty Trash
-          </Button>
-          <p className="text-xs text-default-500">
-            This action is permanent and cannot be undone.
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderDisplaySettings = () => (
-    <div className="space-y-6">
-      <div>
-        <Label className="block text-sm font-semibold mb-2 text-foreground">
-          Language
-        </Label>
-        <Select
-          className="w-full"
-          selectedKey={settings.language}
-          onSelectionChange={(key) => handleChange("language", key)}
-        >
-          <Select.Trigger className="h-12">
-            <Select.Value />
-            <Select.Indicator />
-          </Select.Trigger>
-          <Select.Popover>
-            <ListBox>
-              <ListBox.Item id="id" textValue="Indonesian">
-                Indonesian
-              </ListBox.Item>
-              <ListBox.Item id="en" textValue="English">
-                English
-              </ListBox.Item>
-            </ListBox>
-          </Select.Popover>
-        </Select>
-      </div>
-      <div>
-        <Label className="block text-sm font-semibold mb-2 text-foreground">
-          Default Theme
-        </Label>
-        <Select
-          className="w-full"
-          selectedKey={settings.default_theme}
-          onSelectionChange={(key) => handleChange("default_theme", key)}
-        >
-          <Select.Trigger className="h-12">
-            <Select.Value />
-            <Select.Indicator />
-          </Select.Trigger>
-          <Select.Popover>
-            <ListBox>
-              <ListBox.Item id="system" textValue="System Default">
-                System Default
-              </ListBox.Item>
-              <ListBox.Item id="light" textValue="Light">
-                Light
-              </ListBox.Item>
-              <ListBox.Item id="dark" textValue="Dark">
-                Dark
-              </ListBox.Item>
-            </ListBox>
-          </Select.Popover>
-        </Select>
-      </div>
-      <div className="flex justify-end pt-4 border-t border-divider">
-        <Button
-          className="bg-primary text-white font-medium px-6"
-          isDisabled={loading && savingCategory === "display"}
-          onClick={() => {
-            setSavingCategory("display");
-            handleSave("language");
-            handleSave("default_theme");
-          }}
-        >
-          {savingCategory === "display" ? "Saving ..." : "Save Changes"}
-        </Button>
-      </div>
-    </div>
-  );
-
   const renderContent = () => {
     switch (activeCategory) {
       case "general":
-        return renderGeneralSettings();
+        return (
+          <GeneralSettings
+            loading={loading}
+            savingCategory={savingCategory}
+            settings={settings}
+            onChange={handleChange}
+            onSave={() => {
+              setSavingCategory("general");
+              handleSave("instansi_name");
+              handleSave("logo_url");
+            }}
+          />
+        );
       case "documents":
-        return renderDocumentSettings();
+        return (
+          <DocumentSettings
+            loading={loading}
+            savingCategory={savingCategory}
+            settings={settings}
+            onChange={handleChange}
+            onSave={() => {
+              setSavingCategory("documents");
+              handleSave("items_per_page");
+              handleSave("date_format");
+              handleSave("retention_period");
+            }}
+          />
+        );
       case "storage":
-        return renderStorageSettings();
+        return (
+          <StorageSettings
+            loading={loading}
+            savingCategory={savingCategory}
+            settings={settings}
+            onChange={handleChange}
+            onSave={() => {
+              setSavingCategory("storage");
+              handleSave("max_file_size");
+              handleSave("allowed_file_types");
+            }}
+          />
+        );
       case "notifications":
-        return renderNotificationSettings();
+        return (
+          <NotificationSettings
+            settings={settings}
+            onChange={handleChange}
+            onSave={handleSave}
+          />
+        );
       case "security":
-        return renderSecuritySettings();
+        return (
+          <SecuritySettings
+            loading={loading}
+            savingCategory={savingCategory}
+            settings={settings}
+            onChange={handleChange}
+            onSave={() => {
+              setSavingCategory("security");
+              handleSave("session_timeout");
+            }}
+          />
+        );
       case "trash":
-        return renderTrashSettings();
+        return (
+          <TrashSettings
+            trashRejectedCount={trashRejectedCount}
+            onEmptyTrash={() => setTrashDialogOpen(true)}
+          />
+        );
       case "display":
-        return renderDisplaySettings();
+        return (
+          <DisplaySettings
+            loading={loading}
+            savingCategory={savingCategory}
+            settings={settings}
+            onChange={handleChange}
+            onSave={() => {
+              setSavingCategory("display");
+              handleSave("language");
+              handleSave("default_theme");
+            }}
+          />
+        );
       default:
-        return renderGeneralSettings();
+        return null;
     }
   };
 
   return (
     <div className="h-screen flex flex-col p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6 flex-shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-primary/10 text-primary">
-            <SettingsIcon size={24} />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Settings</h1>
-            <p className="text-gray-500 dark:text-gray-400 text-sm">
-              Manage Archivio configurations
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          {hasChanges && (
-            <Chip color="warning" size="sm" variant="soft">
-              Unsaved changes
-            </Chip>
-          )}
-          <Button isDisabled={loading} variant="ghost" onClick={fetchSettings}>
-            <RefreshCw className="mr-2" size={16} />
-            Reset
-          </Button>
-          <Button
-            className="bg-primary text-white font-medium px-6"
-            isDisabled={!hasChanges || loading}
-            onClick={handleSaveAll}
-          >
-            {loading ? (
-              <RefreshCw className="animate-spin mr-2" size={16} />
-            ) : (
-              <Save className="mr-2" size={16} />
-            )}
-            {loading ? "Saving..." : "Save All"}
-          </Button>
-        </div>
-      </div>
+      <SettingsHeader
+        hasChanges={hasChanges}
+        loading={loading}
+        onReset={fetchSettings}
+        onSaveAll={handleSaveAll}
+      />
 
-      {/* Main Content - Sidebar + Content */}
       <div className="flex-1 flex gap-6 min-h-0">
-        {/* Sidebar Navigation */}
-        <Card className="w-60 flex-shrink-0 p-2 h-fit">
-          <nav className="space-y-0.5">
-            {categories.map((cat) => (
-              <Button
-                key={cat.id}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 justify-start text-left ${
-                  activeCategory === cat.id
-                    ? "bg-primary/10 text-primary"
-                    : "hover:bg-default-50 text-default-600"
-                }`}
-                variant="ghost"
-                onPress={() => setActiveCategory(cat.id)}
-              >
-                <div
-                  className={activeCategory === cat.id ? "text-primary" : ""}
-                >
-                  {cat.icon}
-                </div>
-                <span className="font-medium text-sm">{cat.label}</span>
-              </Button>
-            ))}
-          </nav>
-        </Card>
+        <CategorySidebar
+          activeCategory={activeCategory}
+          categories={categories}
+          onCategoryChange={setActiveCategory}
+        />
 
-        {/* Content Area */}
         <div className="flex-1 overflow-y-auto">
           <Card className="p-8">
             <div className="mb-6">
@@ -804,7 +431,6 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* Message Toast */}
       {message.text && (
         <div className="fixed bottom-6 right-6 z-50 w-full max-w-sm">
           <Alert status={message.type === "error" ? "danger" : "success"}>

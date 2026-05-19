@@ -1,237 +1,33 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
-import { FC, memo, useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   Card,
   Button,
-  Avatar,
   Table,
-  Chip,
-  Tooltip,
-  Input,
   Spinner,
   Modal,
 } from "@heroui/react";
 import {
-  CheckCircle2,
-  XCircle,
-  Search,
-  X,
   Terminal,
   AlertTriangle,
-  ClipboardCheck,
 } from "lucide-react";
 
 import api from "@/lib/axios";
-import { ThemeSwitch } from "@/components/common/theme-switch";
 import { useNotify } from "@/context/NotificationContext";
-
-// types
-interface Document {
-  id: string | number;
-  title: string;
-  filePath?: string;
-  status: string;
-  createdAt: string;
-  type: "masuk" | "keluar" | "sertifikat";
-  sourceType: "incoming" | "outgoing" | "certificate";
-}
+import {
+  ApprovalHeader,
+  ApprovalRow,
+  ApprovalSearchBar,
+  mapSourceType,
+  type ApprovalDocument,
+} from "@/components/approvals";
 
 const APPROVAL_PAGE_SIZE = 5;
 
-const getFileExt = (filePath?: string) => {
-  if (!filePath) return "FILE";
-
-  return filePath.split(".").pop()?.toUpperCase() || "FILE";
-};
-
-const mapSourceType = (type: Document["type"]): Document["sourceType"] => {
-  switch (type) {
-    case "masuk":
-      return "incoming";
-    case "keluar":
-      return "outgoing";
-    case "sertifikat":
-    default:
-      return "certificate";
-  }
-};
-
-const getSourceLabel = (sourceType: Document["sourceType"]) => {
-  switch (sourceType) {
-    case "incoming":
-      return "Incoming Mail";
-    case "outgoing":
-      return "Outgoing Mail";
-    case "certificate":
-      return "Certificate";
-    default:
-      return "Document";
-  }
-};
-
-const getSourceChipProps = (sourceType: Document["sourceType"]) => {
-  switch (sourceType) {
-    case "incoming":
-      return {
-        className:
-          "bg-blue-500/10 text-blue-600 border border-blue-500/20 font-bold",
-        variant: "soft" as const,
-      };
-    case "outgoing":
-      return {
-        className:
-          "bg-violet-500/10 text-violet-600 border border-violet-500/20 font-bold",
-        variant: "soft" as const,
-      };
-    case "certificate":
-      return {
-        className:
-          "bg-amber-500/10 text-amber-600 border border-amber-500/20 font-bold",
-        variant: "soft" as const,
-      };
-    default:
-      return {
-        className: "bg-default-100 text-default-600 border border-divider font-bold",
-        variant: "soft" as const,
-      };
-  }
-};
-
-// sub-components
-
-const Header: FC = () => (
-  <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-    <div className="flex items-center gap-3">
-      <div className="p-2 rounded-xl bg-primary/10 text-primary">
-        <ClipboardCheck size={24} />
-      </div>
-      <div>
-        <h1 className="text-2xl font-bold">Approval System</h1>
-        <p className="text-default-500 text-sm">
-          Review and verify incoming documents for the archive.
-        </p>
-      </div>
-    </div>
-    <div className="flex items-center gap-3">
-      <ThemeSwitch />
-    </div>
-  </header>
-);
-
-const ApprovalSearchBar: FC<{
-  searchQuery: string;
-  onSearchChange: (query: string) => void;
-}> = memo(({ searchQuery, onSearchChange }) => (
-  <div className="flex flex-col gap-4 mb-4 lg:flex-row lg:items-end lg:justify-between">
-    <div>
-      <h4 className="text-lg font-bold">Pending Documents</h4>
-      <p className="text-sm text-default-500">
-        Review documents waiting in the queue.
-      </p>
-    </div>
-    <div className="relative w-full lg:max-w-[320px]">
-      <Search
-        aria-hidden="true"
-        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-default-400"
-        size={16}
-      />
-      <Input
-        aria-label="Search pending documents"
-        className="w-full pl-10 pr-10"
-        placeholder="Search documents or use /bulk commands..."
-        value={searchQuery}
-        onChange={(event) => onSearchChange(event.target.value)}
-      />
-      {searchQuery ? (
-        <button
-          aria-label="Clear search"
-          className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-default-400 transition hover:bg-default-100 hover:text-default-600"
-          type="button"
-          onClick={() => onSearchChange("")}
-        >
-          <X size={14} />
-        </button>
-      ) : null}
-    </div>
-  </div>
-));
-
-ApprovalSearchBar.displayName = "ApprovalSearchBar";
-
-const ApprovalRow: FC<{
-  doc: Document;
-  onApprove: (doc: Document) => void;
-  onReject: (doc: Document) => void;
-}> = memo(({ doc, onApprove, onReject }) => (
-  <Table.Row
-    key={`${doc.sourceType}-${doc.id}`}
-    className="border-b border-divider/50 hover:bg-default-100/50 transition-colors"
-  >
-    <Table.Cell>
-      <div className="flex items-center gap-3 py-1">
-        <Avatar className="bg-primary/10 text-primary" size="sm">
-          <Avatar.Fallback className="text-[10px] font-bold">
-            {getFileExt(doc.filePath)}
-          </Avatar.Fallback>
-        </Avatar>
-        <span className="font-medium text-sm text-foreground">
-          {doc.title}
-        </span>
-      </div>
-    </Table.Cell>
-    <Table.Cell>
-      <Chip
-        className={`capitalize ${getSourceChipProps(doc.sourceType).className}`}
-        size="sm"
-        variant={getSourceChipProps(doc.sourceType).variant}
-      >
-        {getSourceLabel(doc.sourceType)}
-      </Chip>
-    </Table.Cell>
-    <Table.Cell className="text-default-500 text-sm">
-      {new Date(doc.createdAt).toLocaleDateString()}
-    </Table.Cell>
-    <Table.Cell>
-      <div className="flex gap-2 justify-center">
-        <Tooltip>
-          <Tooltip.Trigger>
-            <Button
-              isIconOnly
-              className="text-success hover:bg-success/10"
-              size="sm"
-              variant="ghost"
-              onClick={() => onApprove(doc)}
-            >
-              <CheckCircle2 size={16} />
-            </Button>
-          </Tooltip.Trigger>
-          <Tooltip.Content>Approve Document</Tooltip.Content>
-        </Tooltip>
-        <Tooltip>
-          <Tooltip.Trigger>
-            <Button
-              isIconOnly
-              className="text-danger hover:bg-danger/10"
-              size="sm"
-              variant="ghost"
-              onClick={() => onReject(doc)}
-            >
-              <XCircle size={16} />
-            </Button>
-          </Tooltip.Trigger>
-          <Tooltip.Content>Reject Document</Tooltip.Content>
-        </Tooltip>
-      </div>
-    </Table.Cell>
-  </Table.Row>
-));
-
-ApprovalRow.displayName = "ApprovalRow";
-
 export default function ApprovalsPage() {
-  const [pendingDocs, setPendingDocs] = useState<Document[]>([]);
+  const [pendingDocs, setPendingDocs] = useState<ApprovalDocument[]>([]);
   const [approvalSearchInput, setApprovalSearchInput] = useState("");
   const [approvalQuery, setApprovalQuery] = useState({
     search: "",
@@ -322,7 +118,7 @@ export default function ApprovalsPage() {
     }));
   };
 
-  const handleApprove = async (doc: Document) => {
+  const handleApprove = async (doc: ApprovalDocument) => {
     try {
       const endpoint =
         doc.sourceType === "incoming"
@@ -339,7 +135,7 @@ export default function ApprovalsPage() {
     }
   };
 
-  const handleReject = async (doc: Document) => {
+  const handleReject = async (doc: ApprovalDocument) => {
     try {
       const endpoint =
         doc.sourceType === "incoming"
@@ -414,7 +210,7 @@ export default function ApprovalsPage() {
 
   return (
     <div className="p-6 overflow-y-auto h-full">
-      <Header />
+      <ApprovalHeader />
       
       <div className="mb-8">
         <ApprovalSearchBar
