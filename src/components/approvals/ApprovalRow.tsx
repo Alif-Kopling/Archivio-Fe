@@ -1,6 +1,7 @@
 import { Avatar, Button, Chip, Table, Tooltip } from "@heroui/react";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { FC, memo } from "react";
+
 import {
   ApprovalDocument,
   getFileExt,
@@ -27,7 +28,9 @@ export const ApprovalRow: FC<ApprovalRowProps> = memo(
               {getFileExt(doc.filePath)}
             </Avatar.Fallback>
           </Avatar>
-          <span className="font-medium text-sm text-foreground">{doc.title}</span>
+          <span className="font-medium text-sm text-foreground">
+            {doc.title}
+          </span>
         </div>
       </Table.Cell>
       <Table.Cell>

@@ -14,7 +14,9 @@ export const getFileExt = (filePath?: string) => {
   return filePath.split(".").pop()?.toUpperCase() || "FILE";
 };
 
-export const mapSourceType = (type: ApprovalDocument["type"]): ApprovalDocument["sourceType"] => {
+export const mapSourceType = (
+  type: ApprovalDocument["type"],
+): ApprovalDocument["sourceType"] => {
   switch (type) {
     case "masuk":
       return "incoming";
@@ -39,7 +41,9 @@ export const getSourceLabel = (sourceType: ApprovalDocument["sourceType"]) => {
   }
 };
 
-export const getSourceChipProps = (sourceType: ApprovalDocument["sourceType"]) => {
+export const getSourceChipProps = (
+  sourceType: ApprovalDocument["sourceType"],
+) => {
   switch (sourceType) {
     case "incoming":
       return {
@@ -61,7 +65,8 @@ export const getSourceChipProps = (sourceType: ApprovalDocument["sourceType"]) =
       };
     default:
       return {
-        className: "bg-default-100 text-default-600 border border-divider font-bold",
+        className:
+          "bg-default-100 text-default-600 border border-divider font-bold",
         variant: "soft" as const,
       };
   }

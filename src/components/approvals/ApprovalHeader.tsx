@@ -1,6 +1,7 @@
-import { ThemeSwitch } from "@/components/common/theme-switch";
 import { ClipboardCheck } from "lucide-react";
 import { FC } from "react";
+
+import { ThemeSwitch } from "@/components/common/theme-switch";
 
 export const ApprovalHeader: FC = () => (
   <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
