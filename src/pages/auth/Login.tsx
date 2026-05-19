@@ -46,6 +46,7 @@ export default function LoginPage() {
     const playAudio = () => {
       audio
         .play()
+        // eslint-disable-next-line no-console
         .catch((e) => console.log("Background music autoplay blocked:", e));
     };
 
@@ -74,6 +75,7 @@ export default function LoginPage() {
     const audio = new Audio(loginButtonSound);
 
     audio.volume = 0.5;
+    // eslint-disable-next-line no-console
     audio.play().catch((e) => console.log("Button sound failed:", e));
 
     setError("");

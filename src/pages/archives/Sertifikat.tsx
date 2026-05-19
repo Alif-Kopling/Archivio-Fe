@@ -135,12 +135,12 @@ export default function SertifikatPage() {
           <Card className="border-none bg-content1 shadow-sm">
             <Card.Content className="px-4 py-3">
               <StorageIndicator
+                // @ts-ignore - custom color prop
+                className="[&_.bg-primary]:bg-warning"
                 count={stats.total}
                 label="Storage Usage"
                 showGb={true}
                 total={100}
-                // @ts-ignore - custom color prop
-                className="[&_.bg-primary]:bg-warning"
               />
             </Card.Content>
           </Card>
