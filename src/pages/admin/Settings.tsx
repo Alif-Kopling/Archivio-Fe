@@ -3,12 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "next-themes";
 import { useSearchParams } from "react-router-dom";
-import {
-  Alert,
-  AlertDialog,
-  Button,
-  Card,
-} from "@heroui/react";
+import { Alert, AlertDialog, Button, Card } from "@heroui/react";
 import {
   Building2,
   FileText,
@@ -27,8 +22,6 @@ import {
   getTrashStats,
   updateSetting,
 } from "../../services/setting.service";
-
-import alarmDanger from "@/assets/alarm-danger-danger.mp3";
 import {
   CategorySidebar,
   DisplaySettings,
@@ -41,6 +34,8 @@ import {
   TrashSettings,
   type SettingCategory,
 } from "../../components/settings";
+
+import alarmDanger from "@/assets/alarm-danger-danger.mp3";
 
 const categories: SettingCategory[] = [
   {

@@ -1,4 +1,11 @@
-import { Button, Input, Label, ListBox, Select, TextField } from "@heroui/react";
+import {
+  Button,
+  Input,
+  Label,
+  ListBox,
+  Select,
+  TextField,
+} from "@heroui/react";
 import { FC } from "react";
 
 interface DocumentSettingsProps {
