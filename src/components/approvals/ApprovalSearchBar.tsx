@@ -25,7 +25,7 @@ export const ApprovalSearchBar: FC<ApprovalSearchBarProps> = memo(
         <Input
           aria-label="Search pending documents"
           className="w-full pl-10 pr-10"
-          placeholder="Search documents or use /bulk commands..."
+          placeholder="Search documents u need for approval"
           value={searchQuery}
           onChange={(event) => onSearchChange(event.target.value)}
         />

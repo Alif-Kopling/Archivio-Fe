@@ -22,7 +22,7 @@ export const DocumentRow: FC<DocumentRowProps> = ({
   onSendEmail,
   type = "document",
 }) => {
-  const { isFinal, label, color } = getStatusInfo(file.status);
+  const { isFinal, label, color } = getStatusInfo(file.status, file.approverIds, file.approvedByIds);
   const isPdf = file.filePath?.toUpperCase().endsWith(".PDF");
 
   return (

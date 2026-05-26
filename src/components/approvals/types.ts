@@ -6,6 +6,8 @@ export interface ApprovalDocument {
   createdAt: string;
   type: "masuk" | "keluar" | "sertifikat";
   sourceType: "incoming" | "outgoing" | "certificate";
+  approverIds?: string;
+  approvedByIds?: string;
 }
 
 export const getFileExt = (filePath?: string) => {

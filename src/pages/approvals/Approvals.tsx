@@ -249,6 +249,9 @@ export default function ApprovalsPage() {
                       SOURCE
                     </Table.Column>
                     <Table.Column className="bg-transparent border-b border-divider text-default-500 font-semibold uppercase text-xs">
+                      STATUS
+                    </Table.Column>
+                    <Table.Column className="bg-transparent border-b border-divider text-default-500 font-semibold uppercase text-xs">
                       UPLOAD DATE
                     </Table.Column>
                     <Table.Column className="bg-transparent border-b border-divider text-default-500 font-semibold uppercase text-xs text-center">
@@ -261,6 +264,7 @@ export default function ApprovalsPage() {
                         <Table.Cell className="py-4 text-default-400 italic">
                           No pending documents found.
                         </Table.Cell>
+                        <Table.Cell> </Table.Cell>
                         <Table.Cell> </Table.Cell>
                         <Table.Cell> </Table.Cell>
                         <Table.Cell> </Table.Cell>

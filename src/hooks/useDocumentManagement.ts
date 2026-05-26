@@ -115,7 +115,7 @@ export function useDocumentManagement({
 
   const handleUploadFieldChange = (
     field: keyof Omit<DocumentUploadFormState, "file">,
-    value: string,
+    value: string | string[],
   ) => {
     setUploadForm((current) => ({ ...current, [field]: value }));
   };
@@ -144,9 +144,7 @@ export function useDocumentManagement({
       formData.append("documentDate", uploadForm.documentDate);
       formData.append("sender", uploadForm.sender.trim());
       formData.append("status", "draft");
-      if (uploadForm.approverIds && uploadForm.approverIds.length > 0) {
-        formData.append("approverIds", JSON.stringify(uploadForm.approverIds));
-      }
+      formData.append("approverIds", JSON.stringify(uploadForm.approverIds || []));
 
       await documentService.uploadDocument(endpoint, formData);
       setUploadOpen(false);
@@ -302,6 +300,8 @@ export function useDocumentManagement({
           item.documentDate,
         );
       });
+
+      formData.append("approverIds", JSON.stringify(uploadForm.approverIds || []));
 
       await documentService.bulkUploadDocuments(endpoint, formData);
       notify({

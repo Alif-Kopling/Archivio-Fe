@@ -46,7 +46,7 @@ interface DocumentUploadDialogProps {
   onClose: () => void;
   onFieldChange: (
     field: keyof Omit<DocumentUploadFormState, "file">,
-    value: string,
+    value: string | string[],
   ) => void;
   onFileChange: (file: File | null) => void;
   onBulkFileChange: (files: FileList | null) => void;
@@ -321,12 +321,13 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                     Pilih Approver
                   </Label>
                   <Select
+                    key={`single-${open}`}
                     placeholder="Pilih user untuk approve"
                     selectionMode="multiple"
-                    selectedKeys={form.approverIds ? new Set(form.approverIds) : new Set()}
-                    onSelectionChange={(keys) => {
-                      const selectedKeys = Array.from(keys) as string[];
-                      onFieldChange("approverIds", selectedKeys as any);
+                    onChange={(value: any) => {
+                      if (Array.isArray(value)) {
+                        onFieldChange("approverIds", value.map(String));
+                      }
                     }}
                   >
                     <Select.Trigger>
@@ -336,7 +337,7 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                     <Select.Popover>
                       <ListBox selectionMode="multiple">
                         {users.map((user) => (
-                          <ListBox.Item key={user.id} id={String(user.id)} textValue={user.name}>
+                          <ListBox.Item key={String(user.id)} id={String(user.id)} textValue={user.name}>
                             {user.name}
                           </ListBox.Item>
                         ))}
@@ -382,6 +383,36 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
             </Tabs.Panel>
 
             <Tabs.Panel className="flex-1 space-y-4" id="bulk">
+              <TextField name="approver">
+                <Label className="text-xs font-bold text-foreground">
+                  Pilih Approver
+                </Label>
+                  <Select
+                    key={`bulk-${open}`}
+                    placeholder="Pilih user untuk approve"
+                    selectionMode="multiple"
+                    onChange={(value: any) => {
+                      if (Array.isArray(value)) {
+                        onFieldChange("approverIds", value.map(String));
+                      }
+                    }}
+                  >
+                    <Select.Trigger>
+                      <Select.Value />
+                      <Select.Indicator />
+                    </Select.Trigger>
+                    <Select.Popover>
+                      <ListBox selectionMode="multiple">
+                        {users.map((user) => (
+                          <ListBox.Item key={String(user.id)} id={String(user.id)} textValue={user.name}>
+                            {user.name}
+                          </ListBox.Item>
+                        ))}
+                      </ListBox>
+                    </Select.Popover>
+                  </Select>
+              </TextField>
+
               <div className="space-y-1.5">
                 <Label className="text-xs font-bold text-foreground">
                   Upload Multiple Files

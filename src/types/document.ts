@@ -9,6 +9,8 @@ export interface Document {
   createdAt: string;
   recipient?: string;
   size?: string;
+  approverIds?: string;
+  approvedByIds?: string;
 }
 
 export interface DocumentStats {
