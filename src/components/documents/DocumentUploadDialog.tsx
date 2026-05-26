@@ -2,7 +2,7 @@
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 import type { DateValue } from "@internationalized/date";
 
-import { FC, ReactNode, useRef, useState } from "react";
+import { FC, ReactNode, useRef, useState, useEffect } from "react";
 import { Upload, X, FileText, Trash2 } from "lucide-react";
 import { parseDate } from "@internationalized/date";
 import {
@@ -15,6 +15,8 @@ import {
   Label,
   TextField,
   Tabs,
+  Select,
+  ListBox,
 } from "@heroui/react";
 
 import {
@@ -22,6 +24,13 @@ import {
   BulkFileItem,
   UploadMode,
 } from "@/types/document";
+import { userService } from "@/services/user.service";
+
+interface User {
+  id: number;
+  name: string;
+  role: string;
+}
 
 interface DocumentUploadDialogProps {
   open: boolean;
@@ -102,6 +111,13 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bulkFileInputRef = useRef<HTMLInputElement>(null);
   const [bulkSenderTemplate, setBulkSenderTemplate] = useState("");
+  const [users, setUsers] = useState<User[]>([]);
+
+  useEffect(() => {
+    if (open) {
+      userService.getAll().then((data) => setUsers(data.filter((u: User) => u.role === 'staff')));
+    }
+  }, [open]);
 
   const canSubmitSingle =
     Boolean(form.title.trim()) &&
@@ -300,6 +316,35 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                   </TextField>
                 </div>
 
+                <TextField name="approver">
+                  <Label className="text-xs font-bold text-foreground">
+                    Pilih Approver
+                  </Label>
+                  <Select
+                    placeholder="Pilih user untuk approve"
+                    selectionMode="multiple"
+                    selectedKeys={form.approverIds ? new Set(form.approverIds) : new Set()}
+                    onSelectionChange={(keys) => {
+                      const selectedKeys = Array.from(keys) as string[];
+                      onFieldChange("approverIds", selectedKeys as any);
+                    }}
+                  >
+                    <Select.Trigger>
+                      <Select.Value />
+                      <Select.Indicator />
+                    </Select.Trigger>
+                    <Select.Popover>
+                      <ListBox selectionMode="multiple">
+                        {users.map((user) => (
+                          <ListBox.Item key={user.id} id={String(user.id)} textValue={user.name}>
+                            {user.name}
+                          </ListBox.Item>
+                        ))}
+                      </ListBox>
+                    </Select.Popover>
+                  </Select>
+                </TextField>
+
                 <div className="space-y-1.5">
                   <Label className="text-xs font-bold text-foreground">
                     Upload File
@@ -449,15 +494,6 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                                 </DatePicker.Trigger>
                               </DateField.Suffix>
                             </DateField.Group>
-                            <DatePicker.Popover>
-                              <Calendar aria-label="Pilih tanggal">
-                                <Calendar.Grid>
-                                  <Calendar.GridBody>
-                                    {(date) => <Calendar.Cell date={date} />}
-                                  </Calendar.GridBody>
-                                </Calendar.Grid>
-                              </Calendar>
-                            </DatePicker.Popover>
                           </DatePicker>
                         </div>
                         {!item.isValid && (

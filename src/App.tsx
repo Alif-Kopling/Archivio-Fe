@@ -2,7 +2,7 @@
 import { Route, Routes, Navigate } from "react-router-dom";
 
 import AdminPage from "@/pages/admin/Dashboard";
-import ApprovalsPage from "@/pages/admin/Approvals";
+import ApprovalsPage from "@/pages/approvals/Approvals";
 import UsersPage from "@/pages/admin/Users";
 import SettingsPage from "@/pages/admin/Settings";
 import LoginPage from "@/pages/auth/Login";
@@ -29,20 +29,15 @@ function App() {
         <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
           <Route element={<AdminLayout />}>
             <Route element={<AdminPage />} path="/admin" />
-            <Route element={<ApprovalsPage />} path="/admin/approvals" />
             <Route element={<UsersPage />} path="/admin/users" />
             <Route element={<SettingsPage />} path="/admin/settings" />
           </Route>
         </Route>
 
-        {/* Staff Specific Routes */}
-        <Route element={<ProtectedRoute allowedRoles={["STAFF"]} />}>
-          <Route element={<Navigate replace to="/archives" />} path="/staff" />
-        </Route>
-
         {/* Shared Protected Routes (Admin & Staff) */}
         <Route element={<ProtectedRoute allowedRoles={["ADMIN", "STAFF"]} />}>
           <Route element={<AdminLayout />}>
+            <Route element={<ApprovalsPage />} path="/approvals" />
             <Route element={<ArchiveLayout />} path="/archives">
               <Route element={<Navigate replace to="surat-masuk" />} index />
               <Route element={<SuratMasukPage />} path="surat-masuk" />

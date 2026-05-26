@@ -48,6 +48,7 @@ export function useDocumentManagement({
     documentDate: getTodayDateString(),
     sender: "",
     file: null,
+    approverIds: [],
   });
   const [bulkFiles, setBulkFiles] = useState<BulkFileItem[]>([]);
   const [uploadMode, setUploadMode] = useState<UploadMode>("single");
@@ -102,6 +103,7 @@ export function useDocumentManagement({
       documentDate: getTodayDateString(),
       sender: "",
       file: null,
+      approverIds: [],
     });
     setUploadOpen(true);
   };
@@ -142,6 +144,9 @@ export function useDocumentManagement({
       formData.append("documentDate", uploadForm.documentDate);
       formData.append("sender", uploadForm.sender.trim());
       formData.append("status", "draft");
+      if (uploadForm.approverIds && uploadForm.approverIds.length > 0) {
+        formData.append("approverIds", JSON.stringify(uploadForm.approverIds));
+      }
 
       await documentService.uploadDocument(endpoint, formData);
       setUploadOpen(false);

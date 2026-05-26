@@ -22,6 +22,7 @@ export interface DocumentUploadFormState {
   documentDate: string;
   sender: string;
   file: File | null;
+  approverIds?: string[];
 }
 
 export interface BulkFileItem {

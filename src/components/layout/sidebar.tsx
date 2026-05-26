@@ -32,8 +32,8 @@ export const Sidebar: FC = () => {
     {
       icon: ClipboardCheck,
       label: "Approvals",
-      href: "/admin/approvals",
-      roles: ["ADMIN"],
+      href: "/approvals",
+      roles: ["ADMIN", "STAFF"],
     },
     {
       icon: FileText,
