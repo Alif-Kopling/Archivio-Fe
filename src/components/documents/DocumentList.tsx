@@ -1,4 +1,4 @@
-import { FC, ReactNode } from "react";
+import { FC, ReactNode, useState } from "react";
 import { ArrowUpDown, X, Trash2 } from "lucide-react";
 import {
   Card,
@@ -9,6 +9,7 @@ import {
   ListLayout,
   SearchField,
   Select,
+  AlertDialog,
 } from "@heroui/react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -79,6 +80,8 @@ export const DocumentList: FC<DocumentListProps> = ({
   onClearSelection,
   onBulkDelete,
 }) => {
+  const [isDeleteDialogOpen, setIsDeleteOpen] = useState(false);
+
   return (
     <Card className="border-none bg-content1 shadow-sm w-full h-full flex flex-col overflow-hidden">
       <Card.Header className="px-5 py-3 min-h-[56px] relative overflow-hidden">
@@ -194,15 +197,52 @@ export const DocumentList: FC<DocumentListProps> = ({
               </div>
               <div className="flex items-center gap-2">
                 {onBulkDelete && (
-                  <Button
-                    className="bg-danger/10 text-danger font-bold text-xs h-9"
-                    size="sm"
-                    startContent={<Trash2 size={16} />}
-                    variant="flat"
-                    onPress={onBulkDelete}
-                  >
-                    Delete Selected
-                  </Button>
+                  <AlertDialog isOpen={isDeleteDialogOpen} onOpenChange={setIsDeleteOpen}>
+                    <AlertDialog.Trigger>
+                      <Button
+                        className="bg-danger/10 text-danger font-bold text-xs h-9"
+                        size="sm"
+                        startContent={<Trash2 size={16} />}
+                        variant="flat"
+                      >
+                        Delete Selected
+                      </Button>
+                    </AlertDialog.Trigger>
+                    <AlertDialog.Backdrop>
+                      <AlertDialog.Container>
+                        <AlertDialog.Dialog className="sm:max-w-[400px]">
+                          <AlertDialog.CloseTrigger />
+                          <AlertDialog.Header>
+                            <AlertDialog.Icon status="danger" />
+                            <AlertDialog.Heading>
+                              Confirm Batch Deletion
+                            </AlertDialog.Heading>
+                          </AlertDialog.Header>
+                          <AlertDialog.Body>
+                            <p className="text-sm text-default-500">
+                              Are you sure you want to permanently delete{" "}
+                              <strong className="text-foreground">{selectedCount}</strong> selected documents?
+                            </p>
+                            <p className="text-[11px] text-danger mt-2 font-medium">
+                              This action cannot be undone.
+                            </p>
+                          </AlertDialog.Body>
+                          <AlertDialog.Footer>
+                            <Button slot="close" variant="tertiary">
+                              Cancel
+                            </Button>
+                            <Button
+                              className="bg-danger text-white font-bold"
+                              slot="close"
+                              onClick={onBulkDelete}
+                            >
+                              Confirm Deletion
+                            </Button>
+                          </AlertDialog.Footer>
+                        </AlertDialog.Dialog>
+                      </AlertDialog.Container>
+                    </AlertDialog.Backdrop>
+                  </AlertDialog>
                 )}
                 <Button
                   className="text-default-500 font-bold text-xs h-9"

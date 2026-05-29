@@ -344,9 +344,6 @@ export function useDocumentManagement({
 
   const handleBulkDelete = async () => {
     if (selectedIds.size === 0) return;
-    
-    const confirmDelete = window.confirm(`Are you sure you want to delete ${selectedIds.size} documents?`);
-    if (!confirmDelete) return;
 
     try {
       setLoading(true);
