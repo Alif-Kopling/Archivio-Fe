@@ -15,7 +15,7 @@ export const QuickActions: FC = () => {
     {
       label: "Approval System",
       icon: ClipboardCheck,
-      href: "/admin/approvals",
+      href: "/approvals",
       color: "text-amber-500",
       bg: "bg-amber-500/10",
     },

@@ -41,12 +41,10 @@ export default function SuratMasukPage() {
   const {
     files,
     loading,
-    searchLoading,
     previewFile,
     previewUrl,
     previewLoading,
     stats,
-    searchQuery,
     setSearchQuery,
     statusFilter,
     setStatusFilter,
@@ -150,17 +148,12 @@ export default function SuratMasukPage() {
                 onView={handleView}
               />
             )}
-            searchLoading={searchLoading}
-            searchQuery={searchQuery}
-            selectedCount={selectedIds.size}
             selectedIds={selectedIds}
             sortBy={sortBy}
             sortOrder={sortOrder}
             statusFilter={statusFilter}
             total={total}
             totalPages={totalPages}
-            onBulkDelete={handleBulkDelete}
-            onClearSelection={clearSelection}
             onDelete={handleDelete}
             onDownload={handleDownload}
             onPageChange={setPage}

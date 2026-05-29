@@ -25,7 +25,7 @@ export const DocumentPreviewDialog: FC<PreviewDialogProps> = ({
   previewLoading,
 }) => (
   <div
-    className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+    className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 sm:p-4"
     role="presentation"
     tabIndex={-1}
     onClick={onClose}
@@ -34,7 +34,7 @@ export const DocumentPreviewDialog: FC<PreviewDialogProps> = ({
     }}
   >
     <div
-      className="w-full max-w-5xl overflow-hidden rounded-2xl bg-content1 shadow-2xl"
+      className="w-full max-w-5xl overflow-hidden sm:rounded-2xl sm:max-h-[90vh] bg-content1 shadow-2xl h-full sm:h-auto flex flex-col"
       role="document"
       onClick={(e) => e.stopPropagation()}
       onKeyDown={(e) => {
@@ -62,7 +62,7 @@ export const DocumentPreviewDialog: FC<PreviewDialogProps> = ({
           </Button>
         </div>
       </div>
-      <div className="min-h-[60vh] bg-black/5 p-4">
+      <div className="flex-1 overflow-y-auto bg-black/5 p-4">
         {previewLoading ? (
           <div className="flex min-h-[60vh] items-center justify-center">
             <Spinner size="md" />
@@ -75,7 +75,7 @@ export const DocumentPreviewDialog: FC<PreviewDialogProps> = ({
           />
         ) : isPdfFile(file.filePath) ? (
           <iframe
-            className="h-[70vh] w-full rounded-lg bg-white"
+            className="h-full min-h-[60vh] w-full rounded-lg bg-white"
             src={previewUrl}
             title={file.title}
           />

@@ -27,8 +27,8 @@ export const SendEmailDialog: FC<SendEmailDialogProps> = ({
   if (!document) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 p-4 backdrop-blur-[2px]">
-      <Card className="w-full max-w-lg border-none bg-content1 shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 sm:p-4 backdrop-blur-[2px]" onClick={onClose}>
+      <Card className="w-full max-w-lg border-none bg-content1 shadow-2xl h-full sm:h-auto sm:max-h-[90vh] overflow-y-auto rounded-none sm:rounded-2xl" onClick={(e) => e.stopPropagation()}>
         <Card.Header className="flex items-start justify-between gap-4 px-6 pt-6 pb-2">
           <div>
             <h3 className="text-lg font-bold text-foreground">

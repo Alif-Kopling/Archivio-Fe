@@ -25,8 +25,8 @@ export const siteConfig = {
       href: "/admin",
     },
     {
-      label: "Staff",
-      href: "/staff",
+      label: "Login",
+      href: "/login",
     },
   ],
   navMenuItems: [

@@ -20,8 +20,8 @@ interface DocumentListProps {
   total: number;
   totalPages: number;
   page: number;
-  searchQuery: string;
-  searchLoading: boolean;
+  searchQuery?: string;
+  searchLoading?: boolean;
   statusFilter: string;
   sortBy: string;
   sortOrder: "asc" | "desc";
@@ -51,8 +51,8 @@ export const DocumentList: FC<DocumentListProps> = ({
   total,
   totalPages,
   page,
-  searchQuery,
-  searchLoading,
+  searchQuery = "",
+  searchLoading = false,
   statusFilter,
   sortBy,
   sortOrder,
@@ -202,9 +202,9 @@ export const DocumentList: FC<DocumentListProps> = ({
                       <Button
                         className="bg-danger/10 text-danger font-bold text-xs h-9"
                         size="sm"
-                        startContent={<Trash2 size={16} />}
-                        variant="flat"
+                        variant="ghost"
                       >
+                        <Trash2 size={16} />
                         Delete Selected
                       </Button>
                     </AlertDialog.Trigger>

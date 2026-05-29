@@ -172,12 +172,12 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
   return (
     <div
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 sm:p-4 backdrop-blur-sm"
       role="dialog"
       onClick={onClose}
     >
       <Card
-        className="w-full max-w-3xl border-none bg-content1 shadow-2xl max-h-[90vh] overflow-y-auto"
+        className="w-full max-w-3xl border-none bg-content1 shadow-2xl h-full sm:h-auto sm:max-h-[90vh] overflow-y-auto rounded-none sm:rounded-2xl"
         onClick={(event) => event.stopPropagation()}
       >
         <Card.Header className="flex items-start justify-between gap-4 px-6 pt-6 pb-2">

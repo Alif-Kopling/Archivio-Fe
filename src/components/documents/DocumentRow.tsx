@@ -132,7 +132,7 @@ export const DocumentRow: FC<DocumentRowProps> = ({
                 {formatDate(file.documentDate ?? file.createdAt)}
               </span>
               {file.sender && (
-                <span className="text-[10px] text-default-400 font-medium">
+                <span className="text-[10px] text-default-400 font-medium hidden md:inline">
                   {file.sender}
                 </span>
               )}
@@ -150,7 +150,7 @@ export const DocumentRow: FC<DocumentRowProps> = ({
                 initial={{ opacity: 0, x: 20 }}
               >
                 <Chip
-                  className="font-black border-none h-5 px-2 text-[9px] tracking-tighter"
+                  className="font-black border-none h-5 px-2 text-[9px] tracking-tighter hidden md:inline-flex"
                   color={color as any}
                   size="sm"
                   variant="soft"

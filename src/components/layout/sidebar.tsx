@@ -11,6 +11,7 @@ import {
   Bell,
   CheckCheck,
   History,
+  Menu,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Button, Avatar, Tooltip, Drawer, useOverlayState } from "@heroui/react";
@@ -30,6 +31,7 @@ export const Sidebar: FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const drawerState = useOverlayState();
+  const menuDrawerState = useOverlayState();
 
   const fetchNotifications = useCallback(async () => {
     try {
@@ -134,7 +136,124 @@ export const Sidebar: FC = () => {
   };
 
   return (
-    <aside className="w-64 border-r border-divider p-6 hidden md:flex flex-col gap-8 bg-content1/50 backdrop-blur-sm h-screen sticky top-0">
+    <>
+      {/* Mobile Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 flex md:hidden items-center justify-between px-4 h-14 bg-content1/95 backdrop-blur-md border-b border-divider">
+        <button
+          className="flex items-center justify-center w-9 h-9 rounded-xl text-default-500 hover:bg-default-100"
+          onClick={() => menuDrawerState.open()}
+        >
+          <Menu size={20} />
+        </button>
+
+        <div className="flex items-center gap-2">
+          <Logo className="text-primary" size={24} />
+          <span className="font-bold text-sm text-foreground">Archivio</span>
+        </div>
+
+        <div className="flex items-center gap-1">
+          <button
+            className="relative flex items-center justify-center w-9 h-9 rounded-xl text-default-400 hover:bg-default-100 transition-colors"
+            onClick={() => drawerState.toggle()}
+          >
+            <Bell size={18} />
+            {unreadCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 bg-danger text-white text-[10px] font-bold rounded-full min-w-[15px] h-[15px] flex items-center justify-center px-1">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
+          </button>
+
+          <button
+            className="flex items-center justify-center w-9 h-9 rounded-xl text-default-400 hover:text-danger hover:bg-danger/10 transition-colors"
+            onClick={handleLogout}
+          >
+            <LogOut size={18} />
+          </button>
+        </div>
+      </header>
+
+      {/* Mobile Navigation Drawer */}
+      <Drawer state={menuDrawerState}>
+        <Drawer.Backdrop isDismissable>
+          <Drawer.Content placement="left">
+            <Drawer.Dialog>
+              <Drawer.Header>
+                <div className="flex items-center gap-3">
+                  <Logo className="text-primary" size={28} />
+                  <div>
+                    <p className="text-foreground font-bold text-sm">Archivio</p>
+                    <p className="text-default-500 text-xs">Management System</p>
+                  </div>
+                </div>
+                <Drawer.CloseTrigger />
+              </Drawer.Header>
+              <Drawer.Body>
+                <p className="text-[10px] font-semibold text-default-400 uppercase px-2 mb-2">
+                  Main Menu
+                </p>
+                <div className="flex flex-col gap-1">
+                  {filteredItems.map((item) => (
+                    <NavLink
+                      key={item.href}
+                      className={({ isActive }) =>
+                        `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium ${
+                          isActive
+                            ? "bg-primary/15 text-primary shadow-sm shadow-primary/10"
+                            : "text-default-500 hover:bg-default-100 hover:text-foreground"
+                        }`
+                      }
+                      end={item.href === "/admin"}
+                      to={item.href}
+                      onClick={() => menuDrawerState.close()}
+                    >
+                      <item.icon size={18} />
+                      {item.label}
+                    </NavLink>
+                  ))}
+                </div>
+              </Drawer.Body>
+              <Drawer.Footer className="border-t border-divider">
+                <div className="flex items-center justify-between w-full">
+                  <div className="flex items-center gap-3 overflow-hidden">
+                    <Avatar
+                      className={`${isAdmin ? "bg-amber-500/10 text-amber-600" : "bg-primary/10 text-primary"} font-bold text-xs shrink-0`}
+                      size="sm"
+                    >
+                      <Avatar.Fallback>
+                        {isAdmin ? (
+                          <Crown size={16} strokeWidth={2.5} />
+                        ) : (
+                          <User size={16} strokeWidth={2.5} />
+                        )}
+                      </Avatar.Fallback>
+                    </Avatar>
+                    <div className="flex flex-col min-w-0">
+                      <p className="text-xs font-bold text-foreground truncate">
+                        {user?.name || "User"}
+                      </p>
+                      <p className="text-[10px] text-default-400 font-medium truncate">
+                        {role}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    isIconOnly
+                    className="text-default-400 hover:text-danger hover:bg-danger/10 rounded-xl"
+                    variant="ghost"
+                    onPress={handleLogout}
+                  >
+                    <LogOut size={18} />
+                  </Button>
+                </div>
+              </Drawer.Footer>
+            </Drawer.Dialog>
+          </Drawer.Content>
+        </Drawer.Backdrop>
+      </Drawer>
+
+      {/* Sidebar Desktop */}
+      <aside className="w-64 border-r border-divider p-6 hidden md:flex flex-col gap-8 bg-content1/50 backdrop-blur-sm h-screen sticky top-0">
       <div className="flex items-center gap-3 px-2">
         <Logo className="text-primary" size={32} />
         <div>
@@ -302,5 +421,6 @@ export const Sidebar: FC = () => {
         </Drawer.Backdrop>
       </Drawer>
     </aside>
+    </>
   );
 };

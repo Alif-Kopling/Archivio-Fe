@@ -21,7 +21,7 @@ import {
   getSettings,
   getTrashStats,
   updateSetting,
-} from "../../services/setting.service";
+} from "@/services/setting.service";
 import {
   CategorySidebar,
   DisplaySettings,
@@ -33,7 +33,7 @@ import {
   StorageSettings,
   TrashSettings,
   type SettingCategory,
-} from "../../components/settings";
+} from "@/components/settings";
 
 import alarmDanger from "@/assets/alarm-danger-danger.mp3";
 
