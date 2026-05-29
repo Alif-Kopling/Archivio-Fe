@@ -188,7 +188,7 @@ export const DocumentList: FC<DocumentListProps> = ({
                     {selectedCount} Selected
                   </span>
                   <span className="text-[10px] text-default-400 font-medium">
-                    WhatsApp-style multi selection
+                    Batch management mode
                   </span>
                 </div>
               </div>
