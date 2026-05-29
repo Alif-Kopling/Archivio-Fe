@@ -91,15 +91,15 @@ export const Sidebar: FC = () => {
       roles: ["ADMIN"],
     },
     {
-      icon: ClipboardCheck,
-      label: "Approvals",
-      href: "/approvals",
-      roles: ["ADMIN", "STAFF"],
-    },
-    {
       icon: FileText,
       label: "Document Archive",
       href: "/archives",
+      roles: ["ADMIN", "STAFF"],
+    },
+    {
+      icon: ClipboardCheck,
+      label: "Approvals",
+      href: "/approvals",
       roles: ["ADMIN", "STAFF"],
     },
     {
@@ -109,15 +109,15 @@ export const Sidebar: FC = () => {
       roles: ["ADMIN"],
     },
     {
-      icon: Settings,
-      label: "Settings",
-      href: "/admin/settings",
-      roles: ["ADMIN"],
-    },
-    {
       icon: History,
       label: "Log Activity",
       href: "/admin/audit",
+      roles: ["ADMIN"],
+    },
+    {
+      icon: Settings,
+      label: "Settings",
+      href: "/admin/settings",
       roles: ["ADMIN"],
     },
   ];
@@ -179,19 +179,6 @@ export const Sidebar: FC = () => {
           );
         })}
 
-        {/* Notification Bell */}
-        <button
-          className="group relative flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium w-full text-default-500 hover:bg-default-100 hover:text-foreground"
-          onClick={() => drawerState.toggle()}
-        >
-          <Bell size={18} />
-          Notifications
-          {unreadCount > 0 && (
-            <span className="ml-auto bg-danger text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
-              {unreadCount > 99 ? "99+" : unreadCount}
-            </span>
-          )}
-        </button>
       </nav>
 
       {/* Footer Section with User Info & Logout */}
@@ -219,19 +206,34 @@ export const Sidebar: FC = () => {
           </div>
         </div>
 
-        <Tooltip delay={0}>
-          <Tooltip.Trigger>
-            <Button
-              isIconOnly
-              className="text-default-400 hover:text-danger hover:bg-danger/10 rounded-xl"
-              variant="ghost"
-              onPress={handleLogout}
-            >
-              <LogOut size={18} />
-            </Button>
-          </Tooltip.Trigger>
-          <Tooltip.Content>Sign Out</Tooltip.Content>
-        </Tooltip>
+        <div className="flex items-center gap-1">
+          {/* Notification Bell */}
+          <button
+            className="relative flex items-center justify-center w-9 h-9 rounded-xl transition-all duration-200 text-default-400 hover:bg-default-100 hover:text-foreground"
+            onClick={() => drawerState.toggle()}
+          >
+            <Bell size={18} />
+            {unreadCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 bg-danger text-white text-[10px] font-bold rounded-full min-w-[15px] h-[15px] flex items-center justify-center px-1">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
+          </button>
+
+          <Tooltip delay={0}>
+            <Tooltip.Trigger>
+              <Button
+                isIconOnly
+                className="text-default-400 hover:text-danger hover:bg-danger/10 rounded-xl"
+                variant="ghost"
+                onPress={handleLogout}
+              >
+                <LogOut size={18} />
+              </Button>
+            </Tooltip.Trigger>
+            <Tooltip.Content>Sign Out</Tooltip.Content>
+          </Tooltip>
+        </div>
       </div>
 
       <Drawer state={drawerState}>
