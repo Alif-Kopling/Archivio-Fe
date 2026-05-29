@@ -5,6 +5,7 @@ import AdminPage from "@/pages/admin/Dashboard";
 import ApprovalsPage from "@/pages/approvals/Approvals";
 import UsersPage from "@/pages/admin/Users";
 import SettingsPage from "@/pages/admin/Settings";
+import AuditLogPage from "@/pages/admin/AuditLog";
 import LoginPage from "@/pages/auth/Login";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import IndexPage from "@/pages/Home";
@@ -31,6 +32,7 @@ function App() {
             <Route element={<AdminPage />} path="/admin" />
             <Route element={<UsersPage />} path="/admin/users" />
             <Route element={<SettingsPage />} path="/admin/settings" />
+            <Route element={<AuditLogPage />} path="/admin/audit" />
           </Route>
         </Route>
 

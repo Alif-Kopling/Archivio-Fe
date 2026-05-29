@@ -76,6 +76,11 @@ export default function SuratMasukPage() {
     handleBulkItemRemove,
     handleBulkSubmit,
     setUploadMode,
+    selectedIds,
+    isSelectionMode,
+    toggleSelection,
+    clearSelection,
+    handleBulkDelete,
   } = useDocumentManagement({ endpoint: "/surat-masuk" });
 
   return (
@@ -128,23 +133,34 @@ export default function SuratMasukPage() {
         <div className="lg:col-span-9 xl:col-span-10 w-full h-full">
           <DocumentList
             files={files}
+            isSelectionMode={isSelectionMode}
             page={page}
+            selectedCount={selectedIds.size}
+            onBulkDelete={handleBulkDelete}
+            onClearSelection={clearSelection}
             renderRow={(file) => (
               <DocumentRow
                 key={file.id}
                 file={file}
+                isSelectionMode={isSelectionMode}
+                isSelected={selectedIds.has(file.id)}
                 onDelete={handleDelete}
                 onDownload={handleDownload}
+                onSelect={toggleSelection}
                 onView={handleView}
               />
             )}
             searchLoading={searchLoading}
             searchQuery={searchQuery}
+            selectedCount={selectedIds.size}
+            selectedIds={selectedIds}
             sortBy={sortBy}
             sortOrder={sortOrder}
             statusFilter={statusFilter}
             total={total}
             totalPages={totalPages}
+            onBulkDelete={handleBulkDelete}
+            onClearSelection={clearSelection}
             onDelete={handleDelete}
             onDownload={handleDownload}
             onPageChange={setPage}

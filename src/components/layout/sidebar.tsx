@@ -10,6 +10,7 @@ import {
   User,
   Bell,
   CheckCheck,
+  History,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Button, Avatar, Tooltip, Drawer, useOverlayState } from "@heroui/react";
@@ -111,6 +112,12 @@ export const Sidebar: FC = () => {
       icon: Settings,
       label: "Settings",
       href: "/admin/settings",
+      roles: ["ADMIN"],
+    },
+    {
+      icon: History,
+      label: "Log Activity",
+      href: "/admin/audit",
       roles: ["ADMIN"],
     },
   ];

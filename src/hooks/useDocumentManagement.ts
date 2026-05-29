@@ -55,8 +55,27 @@ export function useDocumentManagement({
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
+  const [selectedIds, setSelectedIds] = useState<Set<number | string>>(new Set());
   const limit = 10;
   const notify = useNotify();
+
+  const isSelectionMode = selectedIds.size > 0;
+
+  const toggleSelection = useCallback((id: number | string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }, []);
+
+  const clearSelection = useCallback(() => {
+    setSelectedIds(new Set());
+  }, []);
 
   const fetchDocuments = useCallback(async () => {
     try {
@@ -323,6 +342,35 @@ export function useDocumentManagement({
     }
   };
 
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+    
+    const confirmDelete = window.confirm(`Are you sure you want to delete ${selectedIds.size} documents?`);
+    if (!confirmDelete) return;
+
+    try {
+      setLoading(true);
+      for (const id of selectedIds) {
+        await documentService.deleteDocument(endpoint, id);
+      }
+      notify({
+        title: "Bulk Delete Success",
+        description: `${selectedIds.size} documents deleted successfully.`,
+        status: "success",
+      });
+      clearSelection();
+      fetchDocuments();
+    } catch (error: any) {
+      notify({
+        title: "Bulk Delete Failed",
+        description: error.response?.data?.error ?? error.message,
+        status: "danger",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     files,
     loading,
@@ -365,5 +413,10 @@ export function useDocumentManagement({
     handleBulkItemRemove,
     handleBulkSubmit,
     fetchDocuments,
+    selectedIds,
+    isSelectionMode,
+    toggleSelection,
+    clearSelection,
+    handleBulkDelete,
   };
 }

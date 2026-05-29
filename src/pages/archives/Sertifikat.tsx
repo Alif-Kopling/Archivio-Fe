@@ -68,6 +68,11 @@ export default function SertifikatPage() {
     handleView,
     handleClosePreview,
     fetchDocuments,
+    selectedIds,
+    isSelectionMode,
+    toggleSelection,
+    clearSelection,
+    handleBulkDelete,
   } = useDocumentManagement({ endpoint: "/sertifikat" });
 
   const handleUploadClick = () => fileInputRef.current?.click();
@@ -148,24 +153,35 @@ export default function SertifikatPage() {
         <div className="lg:col-span-9 xl:col-span-10 w-full h-full">
           <DocumentList
             files={files}
+            isSelectionMode={isSelectionMode}
             page={page}
+            selectedCount={selectedIds.size}
+            onBulkDelete={handleBulkDelete}
+            onClearSelection={clearSelection}
             renderRow={(file) => (
               <DocumentRow
                 key={file.id}
                 file={file}
+                isSelectionMode={isSelectionMode}
+                isSelected={selectedIds.has(file.id)}
                 type="certificate"
                 onDelete={handleDelete}
                 onDownload={handleDownload}
+                onSelect={toggleSelection}
                 onView={handleView}
               />
             )}
             searchLoading={searchLoading}
             searchQuery={searchQuery}
+            selectedCount={selectedIds.size}
+            selectedIds={selectedIds}
             sortBy={sortBy}
             sortOrder={sortOrder}
             statusFilter={statusFilter}
             total={total}
             totalPages={totalPages}
+            onBulkDelete={handleBulkDelete}
+            onClearSelection={clearSelection}
             onDelete={handleDelete}
             onDownload={handleDownload}
             onPageChange={setPage}
