@@ -267,18 +267,25 @@ export const DocumentList: FC<DocumentListProps> = ({
             </span>
           </div>
         ) : null}
-        <Virtualizer layout={LIST_LAYOUT}>
-          <ListBox
-            aria-label="Document List"
-            className="h-[380px] overflow-y-auto scrollbar-hide"
-            // Trik biar checkbox nyala: buat array baru supaya Virtualizer mau gambar ulang
-            items={isSelectionMode ? files.map(f => ({ ...f, _selected: selectedIds?.has(f.id) })) : files}
-            selectedKeys={selectedIds}
-            selectionMode={isSelectionMode ? "multiple" : "none"}
-          >
-            {renderRow}
-          </ListBox>
-        </Virtualizer>
+
+        {!searchLoading && files.length === 0 ? (
+          <div className="flex items-center justify-center h-[380px] text-default-400 text-sm italic">
+            No documents available at the moment
+          </div>
+        ) : (
+          <Virtualizer layout={LIST_LAYOUT}>
+            <ListBox
+              aria-label="Document List"
+              className="h-[380px] overflow-y-auto scrollbar-hide"
+              // Trik biar checkbox nyala: buat array baru supaya Virtualizer mau gambar ulang
+              items={isSelectionMode ? files.map(f => ({ ...f, _selected: selectedIds?.has(f.id) })) : files}
+              selectedKeys={selectedIds}
+              selectionMode={isSelectionMode ? "multiple" : "none"}
+            >
+              {renderRow}
+            </ListBox>
+          </Virtualizer>
+        )}
       </Card.Content>
       {totalPages > 1 ? (
         <Card.Footer className="flex justify-center gap-2 px-5 py-3">
