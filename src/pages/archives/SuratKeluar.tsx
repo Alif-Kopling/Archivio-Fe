@@ -55,6 +55,8 @@ export default function SuratKeluarPage() {
     previewUrl,
     previewLoading,
     stats,
+    searchQuery,
+    searchLoading,
     setSearchQuery,
     statusFilter,
     setStatusFilter,
@@ -210,6 +212,8 @@ export default function SuratKeluarPage() {
             files={files}
             isSelectionMode={isSelectionMode}
             page={page}
+            searchLoading={searchLoading}
+            searchQuery={searchQuery}
             selectedCount={selectedIds.size}
             onBulkDelete={handleBulkDelete}
             onClearSelection={clearSelection}

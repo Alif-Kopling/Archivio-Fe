@@ -77,6 +77,11 @@ export function useDocumentManagement({
     setSelectedIds(new Set());
   }, []);
 
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchQuery(value);
+    setPage(1);
+  }, []);
+
   const fetchDocuments = useCallback(async () => {
     try {
       setLoading(true);
@@ -377,7 +382,7 @@ export function useDocumentManagement({
     previewLoading,
     stats,
     searchQuery,
-    setSearchQuery,
+    setSearchQuery: handleSearchChange,
     statusFilter,
     setStatusFilter,
     sortBy,

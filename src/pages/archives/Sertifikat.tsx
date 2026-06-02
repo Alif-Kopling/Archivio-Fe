@@ -50,6 +50,8 @@ export default function SertifikatPage() {
     previewUrl,
     previewLoading,
     stats,
+    searchQuery,
+    searchLoading,
     setSearchQuery,
     statusFilter,
     setStatusFilter,
@@ -153,6 +155,8 @@ export default function SertifikatPage() {
             files={files}
             isSelectionMode={isSelectionMode}
             page={page}
+            searchLoading={searchLoading}
+            searchQuery={searchQuery}
             selectedCount={selectedIds.size}
             onBulkDelete={handleBulkDelete}
             onClearSelection={clearSelection}

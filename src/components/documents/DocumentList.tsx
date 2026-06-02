@@ -270,7 +270,9 @@ export const DocumentList: FC<DocumentListProps> = ({
 
         {!searchLoading && files.length === 0 ? (
           <div className="flex items-center justify-center h-[380px] text-default-400 text-sm italic">
-            No documents available at the moment
+            {searchQuery.trim()
+              ? `"${searchQuery.trim()}" not found. Try another search.`
+              : "No documents available at the moment"}
           </div>
         ) : (
           <Virtualizer layout={LIST_LAYOUT}>
