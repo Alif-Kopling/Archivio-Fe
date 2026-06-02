@@ -4,15 +4,9 @@
 import { useEffect, useState, useCallback } from "react";
 import {
   Card,
-  Button,
   Table,
   Spinner,
-  Modal,
 } from "@heroui/react";
-import {
-  Terminal,
-  AlertTriangle,
-} from "lucide-react";
 
 import api from "@/lib/axios";
 import { useNotify } from "@/context/NotificationContext";
@@ -20,6 +14,8 @@ import {
   ApprovalHeader,
   ApprovalRow,
   ApprovalSearchBar,
+  BulkActionModal,
+  ApprovalPagination,
   mapSourceType,
   type ApprovalDocument,
 } from "@/components/approvals";
@@ -285,90 +281,22 @@ export default function ApprovalsPage() {
             </Table>
           </div>
           
-          <div className="flex flex-col gap-3 border-t border-divider px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-xs text-default-500">
-              Showing{" "}
-              <span className="font-semibold text-foreground">
-                {approvalTotal === 0 ? 0 : (approvalQuery.page - 1) * APPROVAL_PAGE_SIZE + 1}
-              </span>{" "}
-              to{" "}
-              <span className="font-semibold text-foreground">
-                {Math.min(approvalQuery.page * APPROVAL_PAGE_SIZE, approvalTotal)}
-              </span>{" "}
-              of <span className="font-semibold text-foreground">{approvalTotal}</span> pending documents
-            </p>
-            {approvalTotalPages > 1 ? (
-              <div className="flex items-center gap-2">
-                <Button
-                  isDisabled={approvalQuery.page <= 1}
-                  size="sm"
-                  variant="ghost"
-                  onPress={() => handlePageChange(approvalQuery.page - 1)}
-                >
-                  Previous
-                </Button>
-                <Button
-                  isDisabled={approvalQuery.page >= approvalTotalPages}
-                  size="sm"
-                  variant="ghost"
-                  onPress={() => handlePageChange(approvalQuery.page + 1)}
-                >
-                  Next
-                </Button>
-              </div>
-            ) : null}
-          </div>
+          <ApprovalPagination
+            currentPage={approvalQuery.page}
+            totalPages={approvalTotalPages}
+            total={approvalTotal}
+            pageSize={APPROVAL_PAGE_SIZE}
+            onPageChange={handlePageChange}
+          />
         </Card>
       </div>
 
-      <Modal>
-        <Modal.Backdrop 
-          className="bg-gradient-to-t from-primary/20 to-black/40 z-[9999]"
-          isOpen={isMagicModalOpen} 
-          variant="blur"
-          onOpenChange={setIsMagicModalOpen}
-        >
-          <Modal.Container placement="center">
-            <Modal.Dialog>
-              {({}) => (
-                <>
-                  <Modal.Header>
-                    <Modal.Icon>
-                      {magicAction === "approve" ? (
-                        <Terminal className="text-primary" size={20} />
-                      ) : (
-                        <AlertTriangle className="text-danger" size={20} />
-                      )}
-                    </Modal.Icon>
-                    <Modal.Heading className={magicAction === "approve" ? "text-primary" : "text-danger"}>
-                      {magicAction === "approve" ? "Confirm Bulk Authorization" : "Confirm Bulk Rejection"}
-                    </Modal.Heading>
-                  </Modal.Header>
-                  <Modal.Body>
-                    <p className="font-medium">
-                      Initializing batch command: <code className="bg-default-100 px-1 rounded">/bulk {magicAction}</code>
-                    </p>
-                    <p className="text-default-500 text-sm">
-                      Apply {magicAction === "approve" ? "authorization" : "rejection"} to all selected documents.
-                    </p>
-                  </Modal.Body>
-                  <Modal.Footer>
-                    <Button variant="tertiary" onPress={() => setIsMagicModalOpen(false)}>
-                      Cancel
-                    </Button>
-                    <Button 
-                      variant={magicAction === "approve" ? "primary" : "danger"} 
-                      onPress={magicAction === "approve" ? handleBulkApprove : handleBulkReject}
-                    >
-                      {magicAction === "approve" ? "Authorize Batch" : "Execute Rejection"}
-                    </Button>
-                  </Modal.Footer>
-                </>
-              )}
-            </Modal.Dialog>
-          </Modal.Container>
-        </Modal.Backdrop>
-      </Modal>
+      <BulkActionModal
+        isOpen={isMagicModalOpen}
+        onOpenChange={setIsMagicModalOpen}
+        magicAction={magicAction}
+        onConfirm={magicAction === "approve" ? handleBulkApprove : handleBulkReject}
+      />
     </div>
   );
 }
