@@ -3,7 +3,11 @@ import { Award, Clock, CheckCircle2 } from "lucide-react";
 
 import { DocumentPreviewDialog } from "@/components/documents/DocumentPreviewDialog";
 import { StorageIndicator } from "@/components/dashboard/StorageIndicator";
-import { ArchiveStats, type StatConfigItem } from "@/components/archives";
+import {
+  ArchiveStats,
+  TabsNavigation,
+  type StatConfigItem,
+} from "@/components/archives";
 import { DocumentRow } from "@/components/documents/DocumentRow";
 import { DocumentList } from "@/components/documents/DocumentList";
 import { useDocumentManagement } from "@/hooks/useDocumentManagement";
@@ -109,7 +113,7 @@ export default function SertifikatPage() {
   };
 
   return (
-    <div className="flex flex-col gap-4 w-full h-full pb-2 animate-in fade-in duration-500">
+    <div className="flex flex-col gap-4 w-full h-full pb-2 ">
       <input
         ref={fileInputRef}
         accept={ACCEPTED_FORMATS}
@@ -118,51 +122,52 @@ export default function SertifikatPage() {
         onChange={handleFileChange}
       />
       <ArchiveStats configs={STAT_CONFIG} stats={stats as any} />
+      <TabsNavigation />
       <div className="flex-1 min-h-0">
-      <DocumentList
-        files={files}
-        isSelectionMode={isSelectionMode}
-        page={page}
-        renderRow={(file) => (
-          <DocumentRow
-            key={file.id}
-            file={file}
-            isSelected={selectedIds.has(file.id)}
-            isSelectionMode={isSelectionMode}
-            type="certificate"
-            onDelete={handleDelete}
-            onDownload={handleDownload}
-            onSelect={toggleSelection}
-            onView={handleView}
-          />
-        )}
-        searchLoading={searchLoading}
-        searchQuery={searchQuery}
-        selectedCount={selectedIds.size}
-        sortBy={sortBy}
-        sortOrder={sortOrder}
-        statusFilter={statusFilter}
-        total={total}
-        totalPages={totalPages}
-        uploadLabel="Upload Certificate"
-        onBulkDelete={handleBulkDelete}
-        onClearSelection={clearSelection}
-        onPageChange={setPage}
-        onSearchChange={setSearchQuery}
-        onSortByChange={(v) => {
-          setSortBy(v);
-          setPage(1);
-        }}
-        onSortOrderChange={() => {
-          setSortOrder((p) => (p === "desc" ? "asc" : "desc"));
-          setPage(1);
-        }}
-        onStatusFilterChange={(v) => {
-          setStatusFilter(v);
-          setPage(1);
-        }}
-        onUploadClick={handleUploadClick}
-      />
+        <DocumentList
+          files={files}
+          isSelectionMode={isSelectionMode}
+          page={page}
+          renderRow={(file) => (
+            <DocumentRow
+              key={file.id}
+              file={file}
+              isSelected={selectedIds.has(file.id)}
+              isSelectionMode={isSelectionMode}
+              type="certificate"
+              onDelete={handleDelete}
+              onDownload={handleDownload}
+              onSelect={toggleSelection}
+              onView={handleView}
+            />
+          )}
+          searchLoading={searchLoading}
+          searchQuery={searchQuery}
+          selectedCount={selectedIds.size}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          statusFilter={statusFilter}
+          total={total}
+          totalPages={totalPages}
+          uploadLabel="Upload Certificate"
+          onBulkDelete={handleBulkDelete}
+          onClearSelection={clearSelection}
+          onPageChange={setPage}
+          onSearchChange={setSearchQuery}
+          onSortByChange={(v) => {
+            setSortBy(v);
+            setPage(1);
+          }}
+          onSortOrderChange={() => {
+            setSortOrder((p) => (p === "desc" ? "asc" : "desc"));
+            setPage(1);
+          }}
+          onStatusFilterChange={(v) => {
+            setStatusFilter(v);
+            setPage(1);
+          }}
+          onUploadClick={handleUploadClick}
+        />
       </div>
       <div className="flex items-center justify-between px-1 py-1">
         <div className="flex-1 max-w-xs">

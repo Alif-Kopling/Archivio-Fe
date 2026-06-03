@@ -2,7 +2,11 @@ import { FileDown, Inbox, Clock, CheckCircle2 } from "lucide-react";
 
 import { DocumentUploadDialog } from "@/components/documents/DocumentUploadDialog";
 import { StorageIndicator } from "@/components/dashboard/StorageIndicator";
-import { ArchiveStats, type StatConfigItem } from "@/components/archives";
+import {
+  ArchiveStats,
+  TabsNavigation,
+  type StatConfigItem,
+} from "@/components/archives";
 import { DocumentRow } from "@/components/documents/DocumentRow";
 import { DocumentList } from "@/components/documents/DocumentList";
 import { DocumentPreviewDialog } from "@/components/documents/DocumentPreviewDialog";
@@ -79,7 +83,7 @@ export default function SuratMasukPage() {
   } = useDocumentManagement({ endpoint: "/surat-masuk" });
 
   return (
-    <div className="flex flex-col gap-4 w-full h-full pb-2 animate-in fade-in duration-500">
+    <div className="flex flex-col gap-4 w-full h-full pb-2">
       <DocumentUploadDialog
         acceptedFormats={ACCEPTED_UPLOAD_FORMATS}
         acceptedFormatsLabel={ACCEPTED_UPLOAD_FORMATS_LABEL}
@@ -104,50 +108,51 @@ export default function SuratMasukPage() {
         onSubmit={handleSubmitUpload}
       />
       <ArchiveStats configs={STAT_CONFIG} stats={stats as any} />
+      <TabsNavigation />
       <div className="flex-1 min-h-0">
         <DocumentList
-        files={files}
-        isSelectionMode={isSelectionMode}
-        page={page}
-        renderRow={(file) => (
-          <DocumentRow
-            key={file.id}
-            file={file}
-            isSelected={selectedIds.has(file.id)}
-            isSelectionMode={isSelectionMode}
-            onDelete={handleDelete}
-            onDownload={handleDownload}
-            onSelect={toggleSelection}
-            onView={handleView}
-          />
-        )}
-        searchLoading={searchLoading}
-        searchQuery={searchQuery}
-        selectedCount={selectedIds.size}
-        sortBy={sortBy}
-        sortOrder={sortOrder}
-        statusFilter={statusFilter}
-        total={total}
-        totalPages={totalPages}
-        uploadLabel="Upload"
-        onBulkDelete={handleBulkDelete}
-        onClearSelection={clearSelection}
-        onPageChange={setPage}
-        onSearchChange={setSearchQuery}
-        onSortByChange={(v) => {
-          setSortBy(v);
-          setPage(1);
-        }}
-        onSortOrderChange={() => {
-          setSortOrder((p) => (p === "desc" ? "asc" : "desc"));
-          setPage(1);
-        }}
-        onStatusFilterChange={(v) => {
-          setStatusFilter(v);
-          setPage(1);
-        }}
-        onUploadClick={openUploadDialog}
-      />
+          files={files}
+          isSelectionMode={isSelectionMode}
+          page={page}
+          renderRow={(file) => (
+            <DocumentRow
+              key={file.id}
+              file={file}
+              isSelected={selectedIds.has(file.id)}
+              isSelectionMode={isSelectionMode}
+              onDelete={handleDelete}
+              onDownload={handleDownload}
+              onSelect={toggleSelection}
+              onView={handleView}
+            />
+          )}
+          searchLoading={searchLoading}
+          searchQuery={searchQuery}
+          selectedCount={selectedIds.size}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          statusFilter={statusFilter}
+          total={total}
+          totalPages={totalPages}
+          uploadLabel="Upload"
+          onBulkDelete={handleBulkDelete}
+          onClearSelection={clearSelection}
+          onPageChange={setPage}
+          onSearchChange={setSearchQuery}
+          onSortByChange={(v) => {
+            setSortBy(v);
+            setPage(1);
+          }}
+          onSortOrderChange={() => {
+            setSortOrder((p) => (p === "desc" ? "asc" : "desc"));
+            setPage(1);
+          }}
+          onStatusFilterChange={(v) => {
+            setStatusFilter(v);
+            setPage(1);
+          }}
+          onUploadClick={openUploadDialog}
+        />
       </div>
       <div className="flex items-center justify-between px-1 py-1">
         <div className="flex-1 max-w-xs">
