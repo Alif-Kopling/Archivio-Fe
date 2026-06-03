@@ -397,14 +397,9 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                   key={`bulk-${open}`}
                   placeholder="Pilih user untuk approve"
                   selectionMode="multiple"
-                  onSelectionChange={(keys: any) => {
-                    const selected =
-                      keys instanceof Set ? Array.from(keys) : [];
-
-                    if (selected.length) {
-                      onFieldChange("approverIds", selected.map(String));
-                    } else {
-                      onFieldChange("approverIds", []);
+                  onChange={(value: any) => {
+                    if (Array.isArray(value)) {
+                      onFieldChange("approverIds", value.map(String));
                     }
                   }}
                 >

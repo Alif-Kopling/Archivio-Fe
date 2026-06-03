@@ -86,6 +86,7 @@ export function getStatusInfo(
   status: string,
   approverIds?: string | null,
   approvedByIds?: string | null,
+  type?: string,
 ) {
   const normalizedStatus = status?.toLowerCase();
   const isFinal = [
@@ -112,6 +113,15 @@ export function getStatusInfo(
       isRejected: true,
       label: "REJECTED",
       color: "danger" as const,
+    };
+  }
+
+  if (type === "certificate") {
+    return {
+      isFinal: false,
+      isRejected: false,
+      label: "PENDING",
+      color: "warning" as const,
     };
   }
 

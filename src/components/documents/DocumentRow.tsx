@@ -33,6 +33,7 @@ export const DocumentRow: FC<DocumentRowProps> = ({
     file.status,
     file.approverIds,
     file.approvedByIds,
+    type,
   );
   const isPdf = file.filePath?.toUpperCase().endsWith(".PDF");
 
