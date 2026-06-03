@@ -32,35 +32,35 @@ export const ApprovalRow: FC<ApprovalRowProps> = memo(
     return (
       <Table.Row
         key={`${doc.sourceType}-${doc.id}`}
-        className="border-b border-divider/50 hover:bg-default-100/50 transition-colors"
+        className="group border-b border-white/10 hover:bg-white/5 transition-all duration-300"
       >
         <Table.Cell>
           <div className="flex items-center gap-3 py-1">
-            <Avatar className="bg-primary/10 text-primary" size="sm">
+            <Avatar className="bg-primary/20 text-primary backdrop-blur-sm" size="sm">
               <Avatar.Fallback className="text-[10px] font-bold">
                 {getFileExt(doc.filePath)}
               </Avatar.Fallback>
             </Avatar>
-            <span className="font-medium text-sm text-foreground">
+            <span className="font-medium text-sm text-foreground group-hover:text-primary transition-colors">
               {doc.title}
             </span>
           </div>
         </Table.Cell>
         <Table.Cell>
           <Chip
-            className={`capitalize ${getSourceChipProps(doc.sourceType).className}`}
+            className={`capitalize border-none ${getSourceChipProps(doc.sourceType).className}`}
             size="sm"
-            variant={getSourceChipProps(doc.sourceType).variant}
+            variant="flat"
           >
             {getSourceLabel(doc.sourceType)}
           </Chip>
         </Table.Cell>
         <Table.Cell>
           <Chip
-            className="font-black border-none h-5 px-2 text-[9px] tracking-tighter"
+            className="font-bold border-none h-6 px-3 text-[10px] shadow-sm backdrop-blur-md"
             color={color as any}
             size="sm"
-            variant="soft"
+            variant="solid"
           >
             {label}
           </Chip>
@@ -69,15 +69,15 @@ export const ApprovalRow: FC<ApprovalRowProps> = memo(
           {new Date(doc.createdAt).toLocaleDateString()}
         </Table.Cell>
         <Table.Cell>
-          <div className="flex gap-2 justify-center">
+          <div className="flex gap-2 justify-center opacity-60 group-hover:opacity-100 transition-opacity">
             <Tooltip>
               <Tooltip.Trigger>
                 <Button
                   isIconOnly
-                  className="text-success hover:bg-success/10"
+                  className="text-success bg-success/10 hover:bg-success/20 backdrop-blur-sm"
                   isDisabled={approvedCount >= totalCount && totalCount > 0}
                   size="sm"
-                  variant="ghost"
+                  variant="flat"
                   onClick={() => onApprove(doc)}
                 >
                   <CheckCircle2 size={16} />
@@ -89,9 +89,9 @@ export const ApprovalRow: FC<ApprovalRowProps> = memo(
               <Tooltip.Trigger>
                 <Button
                   isIconOnly
-                  className="text-danger hover:bg-danger/10"
+                  className="text-danger bg-danger/10 hover:bg-danger/20 backdrop-blur-sm"
                   size="sm"
-                  variant="ghost"
+                  variant="flat"
                   onClick={() => onReject(doc)}
                 >
                   <XCircle size={16} />
