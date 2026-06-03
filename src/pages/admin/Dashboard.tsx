@@ -1,18 +1,19 @@
 /* eslint-disable prettier/prettier */
- 
 /* eslint-disable no-console */
 import { FC, memo, useEffect, useMemo, useState, useCallback } from "react";
 import {
   Card,
   Button,
   Chip,
-  Spinner,
 } from "@heroui/react";
 import {
   Bell,
   ArrowUpRight,
   ArrowDownRight,
-  LayoutDashboard,
+  Files,
+  Hourglass,
+  ShieldCheck,
+  Activity,
 } from "lucide-react";
 import {
   BarChart,
@@ -25,37 +26,36 @@ import {
   Line,
   Cell,
 } from "recharts";
+import { motion } from "framer-motion";
 
 import api from "@/lib/axios";
 import { ThemeSwitch } from "@/components/common/theme-switch";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 
-// types
 interface Stats {
   total: number;
   pending: number;
   verified: number;
 }
 
-// sub-components
+interface StatItem {
+  label: string;
+  value: number | string;
+  Icon: typeof Files;
+  color: string;
+  trend: string;
+  isUp: boolean;
+  isTextValue?: boolean;
+}
 
 const Header: FC = () => (
-  <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-    <div className="flex items-center gap-3">
-      <div className="p-2 rounded-xl bg-primary/10 text-primary">
-        <LayoutDashboard size={24} />
-      </div>
-      <div>
-        <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-        <p className="text-default-500 text-sm">
-          Welcome back! Monitor and manage your archive statistics.
-        </p>
-      </div>
-    </div>
-    <div className="flex items-center gap-3">
+  <header className="flex flex-row justify-between items-center gap-4">
+    <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+    <div className="flex items-center gap-1">
       <Button
         isIconOnly
-        className="bg-default-100 text-default-500 rounded-full"
+        aria-label="Notifications"
+        className="text-default-500"
         variant="ghost"
       >
         <Bell size={18} />
@@ -66,48 +66,61 @@ const Header: FC = () => (
 );
 
 const StatsGrid: FC<{ stats: Stats }> = memo(({ stats }) => {
-  const data = useMemo(
+  const items = useMemo<StatItem[]>(
     () => [
-      {
-        title: "Total Documents",
-        value: stats.total.toString(),
-        trend: "+5.2%",
-        isUp: true,
-      },
-      {
-        title: "Pending Approval",
-        value: stats.pending.toString(),
-        trend: "+2.1%",
-        isUp: true,
-      },
-      {
-        title: "Verified Archives",
-        value: stats.verified.toString(),
-        trend: "+12.5%",
-        isUp: true,
-      },
-      { title: "System Active", value: "Online", trend: "Stable", isUp: true },
+      { label: "Total Documents", value: stats.total, Icon: Files, color: "text-primary", trend: "+5.2%", isUp: true },
+      { label: "Pending Approval", value: stats.pending, Icon: Hourglass, color: "text-warning", trend: "+2.1%", isUp: true },
+      { label: "Verified Archives", value: stats.verified, Icon: ShieldCheck, color: "text-success", trend: "+12.5%", isUp: true },
+      { label: "System Status", value: "Online", Icon: Activity, color: "text-secondary", trend: "Stable", isUp: true, isTextValue: true },
     ],
-    [stats.pending, stats.total, stats.verified],
+    [stats],
   );
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-      {data.map((stat, idx) => (
-        <Card key={idx} className="bg-content1 border-divider">
-          <Card.Content className="p-4">
-            <p className="text-default-500 text-xs mb-1">{stat.title}</p>
-            <div className="flex items-end justify-between">
-              <h3 className="text-2xl font-bold">{stat.value}</h3>
-              <div
-                className={`flex items-center text-xs ${stat.isUp ? "text-success" : "text-danger"} bg-default-100 px-2 py-0.5 rounded-full`}
-              >
-                {stat.isUp ? (
-                  <ArrowUpRight className="mr-1" size={12} />
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      {items.map(({ label, value, Icon, color, trend, isUp, isTextValue }) => (
+        <Card
+          key={label}
+          className="border-none shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden group"
+        >
+          <div
+            className={`absolute inset-0 opacity-[0.07] ${color.replace("text-", "bg-")} group-hover:opacity-[0.12] transition-opacity`}
+          />
+          <Card.Content className="px-5 py-4 flex items-center gap-4 relative z-10">
+            <div
+              className={`p-3 rounded-xl ${color.replace("text-", "bg-")}/10 ${color} shrink-0`}
+            >
+              <Icon size={22} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-medium text-default-500 uppercase tracking-wider">
+                {label}
+              </p>
+              <div className="flex items-center gap-2 mt-0.5">
+                {isTextValue ? (
+                  <span className="text-2xl font-extrabold text-foreground">
+                    {value as string}
+                  </span>
                 ) : (
-                  <ArrowDownRight className="mr-1" size={12} />
+                  <motion.h3
+                    key={value as number}
+                    animate={{ scale: [1, 1.1, 1] }}
+                    className="text-2xl font-extrabold text-foreground tabular-nums"
+                    initial={false}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {value}
+                  </motion.h3>
                 )}
-                {stat.trend}
+                <Chip
+                  className="text-[11px] font-semibold gap-0.5"
+                  color={trend === "Stable" ? "default" : isUp ? "success" : "danger"}
+                  size="sm"
+                  variant="soft"
+                >
+                  {isUp ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
+                  {trend}
+                </Chip>
               </div>
             </div>
           </Card.Content>
@@ -119,6 +132,21 @@ const StatsGrid: FC<{ stats: Stats }> = memo(({ stats }) => {
 
 StatsGrid.displayName = "StatsGrid";
 
+const ChartTooltip: FC<{
+  active?: boolean;
+  payload?: { value: number; name: string }[];
+  label?: string;
+}> = ({ active, payload, label }) => {
+  if (!active || !payload?.length) return null;
+
+  return (
+    <div className="bg-content1 shadow-sm border border-divider rounded-xl py-2 px-3">
+      <p className="text-xs text-default-500 mb-0.5">{label}</p>
+      <p className="text-sm font-bold text-foreground">{payload[0].value}</p>
+    </div>
+  );
+};
+
 const ChartsSection: FC<{ stats: Stats }> = memo(({ stats }) => {
   const barData = useMemo(
     () => [
@@ -126,7 +154,7 @@ const ChartsSection: FC<{ stats: Stats }> = memo(({ stats }) => {
       { name: "Verified", count: stats.verified, fill: "#17c964" },
       { name: "Total", count: stats.total, fill: "#006fee" },
     ],
-    [stats.pending, stats.total, stats.verified],
+    [stats],
   );
 
   const lineData = useMemo(
@@ -141,9 +169,8 @@ const ChartsSection: FC<{ stats: Stats }> = memo(({ stats }) => {
   );
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-      {/* Bar Chart */}
-      <Card className="bg-content1 border-divider shadow-sm rounded-3xl">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <Card className="border-divider shadow-sm">
         <Card.Content className="p-6">
           <div className="flex justify-between items-center mb-6">
             <div>
@@ -152,9 +179,7 @@ const ChartsSection: FC<{ stats: Stats }> = memo(({ stats }) => {
                 Status document distribution
               </p>
             </div>
-            <Chip color="default" variant="soft">
-              Overview
-            </Chip>
+            <Chip color="default" variant="soft">Overview</Chip>
           </div>
           <div className="h-64 w-full">
             <ResponsiveContainer height="100%" width="100%">
@@ -171,14 +196,10 @@ const ChartsSection: FC<{ stats: Stats }> = memo(({ stats }) => {
                   tickLine={false}
                 />
                 <RechartsTooltip
-                  contentStyle={{
-                    borderRadius: "12px",
-                    border: "none",
-                    boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
-                  }}
+                  content={<ChartTooltip />}
                   cursor={{ fill: "transparent" }}
                 />
-                <Bar barSize={50} dataKey="count" radius={[12, 12, 0, 0]}>
+                <Bar barSize={50} dataKey="count" radius={[8, 8, 0, 0]}>
                   {barData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.fill} />
                   ))}
@@ -189,23 +210,20 @@ const ChartsSection: FC<{ stats: Stats }> = memo(({ stats }) => {
         </Card.Content>
       </Card>
 
-      {/* Line Chart */}
-      <Card className="bg-content1 border-divider shadow-sm rounded-3xl">
+      <Card className="border-divider shadow-sm">
         <Card.Content className="p-6">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h4 className="font-bold text-lg">System Traffic</h4>
-              <p className="text-default-500 text-sm">Weekly system activity</p>
+              <h4 className="font-bold text-lg">Weekly Activity</h4>
+              <p className="text-default-500 text-sm">
+                Document upload trend
+              </p>
             </div>
-            <Chip color="default" variant="soft">
-              Live
-            </Chip>
+            <Chip color="accent" variant="soft">Live</Chip>
           </div>
           <div className="h-64 w-full">
             <ResponsiveContainer height="100%" width="100%">
-              <LineChart
-                data={lineData}
-              >
+              <LineChart data={lineData}>
                 <CartesianGrid
                   className="stroke-default-200"
                   strokeDasharray="3 3"
@@ -217,18 +235,13 @@ const ChartsSection: FC<{ stats: Stats }> = memo(({ stats }) => {
                   dataKey="name"
                   tickLine={false}
                 />
-                <RechartsTooltip
-                  contentStyle={{
-                    borderRadius: "12px",
-                    border: "none",
-                    boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
-                  }}
-                />
+                <RechartsTooltip content={<ChartTooltip />} />
                 <Line
+                  activeDot={{ r: 6, fill: "#006fee" }}
                   dataKey="v"
-                  dot={{ r: 6, fill: "#7828c8" }}
-                  stroke="#7828c8"
-                  strokeWidth={4}
+                  dot={{ r: 4, fill: "#006fee" }}
+                  stroke="#006fee"
+                  strokeWidth={3}
                   type="monotone"
                 />
               </LineChart>
@@ -242,6 +255,34 @@ const ChartsSection: FC<{ stats: Stats }> = memo(({ stats }) => {
 
 ChartsSection.displayName = "ChartsSection";
 
+const DashboardSkeleton: FC = () => (
+  <div className="space-y-6">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <Card key={i} className="border-none shadow-sm">
+          <Card.Content className="px-5 py-4 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-default-200 animate-pulse" />
+            <div className="flex-1 space-y-2">
+              <div className="h-3 w-20 bg-default-200 animate-pulse rounded" />
+              <div className="h-7 w-16 bg-default-200 animate-pulse rounded" />
+            </div>
+          </Card.Content>
+        </Card>
+      ))}
+    </div>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {Array.from({ length: 2 }).map((_, i) => (
+        <Card key={i} className="border-divider shadow-sm">
+          <Card.Content className="p-6">
+            <div className="h-5 w-36 bg-default-200 animate-pulse rounded mb-4" />
+            <div className="h-64 bg-default-200 animate-pulse rounded-lg" />
+          </Card.Content>
+        </Card>
+      ))}
+    </div>
+  </div>
+);
+
 export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats>({
     total: 0,
@@ -249,13 +290,11 @@ export default function AdminDashboard() {
     verified: 0,
   });
   const [loading, setLoading] = useState(true);
-  
 
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const response = await api.get("/dashboard");
-
       const payload = response.data ?? {};
 
       setStats({
@@ -278,9 +317,7 @@ export default function AdminDashboard() {
     <div className="p-6 overflow-y-auto h-full space-y-6">
       <Header />
       {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <Spinner size="lg" />
-        </div>
+        <DashboardSkeleton />
       ) : (
         <>
           <StatsGrid stats={stats} />

@@ -9,22 +9,22 @@ export const QuickActions: FC = () => {
       label: "Manage Users",
       icon: Users,
       href: "/admin/users",
-      color: "text-blue-500",
-      bg: "bg-blue-500/10",
+      color: "text-primary",
+      bg: "bg-primary/10",
     },
     {
       label: "Approval System",
       icon: ClipboardCheck,
       href: "/approvals",
-      color: "text-amber-500",
-      bg: "bg-amber-500/10",
+      color: "text-warning",
+      bg: "bg-warning/10",
     },
     {
       label: "System Settings",
       icon: Settings,
       href: "/admin/settings",
-      color: "text-violet-500",
-      bg: "bg-violet-500/10",
+      color: "text-secondary",
+      bg: "bg-secondary/10",
     },
     {
       label: "Trash Bin",
@@ -36,18 +36,18 @@ export const QuickActions: FC = () => {
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-      {actions.map((action, idx) => (
-        <Link key={idx} to={action.href}>
-          <Card className="bg-content1/50 border-divider hover:bg-default-100 transition-all cursor-pointer group shadow-none border">
-            <Card.Content className="p-3 flex items-center gap-3">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {actions.map(({ label, icon: Icon, href, color, bg }) => (
+        <Link key={label} to={href}>
+          <Card className="border-none shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group hover:-translate-y-0.5">
+            <Card.Content className="p-4 flex items-center gap-3">
               <div
-                className={`p-2 rounded-xl ${action.bg} ${action.color} group-hover:scale-105 transition-transform shrink-0`}
+                className={`p-2.5 rounded-xl ${bg} ${color} group-hover:scale-105 transition-transform shrink-0`}
               >
-                <action.icon size={18} />
+                <Icon size={20} />
               </div>
-              <span className="text-[11px] font-bold text-foreground/80 group-hover:text-primary transition-colors truncate">
-                {action.label}
+              <span className="text-sm font-semibold text-default-700 group-hover:text-foreground transition-colors truncate">
+                {label}
               </span>
             </Card.Content>
           </Card>
