@@ -339,7 +339,11 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                     <Select.Popover>
                       <ListBox selectionMode="multiple">
                         {users.map((user) => (
-                          <ListBox.Item key={String(user.id)} id={String(user.id)} textValue={user.name}>
+                          <ListBox.Item
+                            key={String(user.id)}
+                            id={String(user.id)}
+                            textValue={user.name}
+                          >
                             {user.name}
                           </ListBox.Item>
                         ))}

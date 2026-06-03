@@ -58,7 +58,7 @@ export function useDocumentManagement({
   const [selectedIds, setSelectedIds] = useState<Set<number | string>>(
     new Set(),
   );
-  const limit = 10;
+  const limit = 4;
   const notify = useNotify();
 
   const isSelectionMode = selectedIds.size > 0;

@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { FileUp, SendHorizonal, Clock, CheckCircle2 } from "lucide-react";
-import { Card } from "@heroui/react";
 
-import { SidebarUploadPanel } from "@/components/dashboard/SidebarUploadPanel";
 import { DocumentPreviewDialog } from "@/components/documents/DocumentPreviewDialog";
 import { DocumentUploadDialog } from "@/components/documents/DocumentUploadDialog";
 import { StorageIndicator } from "@/components/dashboard/StorageIndicator";
@@ -28,21 +26,18 @@ const STAT_CONFIG: readonly StatConfigItem[] = [
     label: "Total Documents",
     Icon: SendHorizonal,
     color: "text-violet-500",
-    bg: "bg-violet-500/10",
   },
   {
     key: "pending",
     label: "Pending / Draft",
     Icon: Clock,
     color: "text-warning",
-    bg: "bg-warning/10",
   },
   {
     key: "verified",
     label: "Verified / Final",
     Icon: CheckCircle2,
     color: "text-success",
-    bg: "bg-success/10",
   },
 ] as const;
 
@@ -150,7 +145,7 @@ export default function SuratKeluarPage() {
   };
 
   return (
-    <div className="flex flex-col gap-3 w-full h-full pb-2 animate-in fade-in duration-500">
+    <div className="flex flex-col gap-4 w-full h-full pb-2 animate-in fade-in duration-500">
       <SendEmailDialog
         document={selectedDocument}
         form={emailForm}
@@ -183,78 +178,62 @@ export default function SuratKeluarPage() {
         onSubmit={handleSubmitUpload}
       />
       <ArchiveStats configs={STAT_CONFIG} stats={stats as any} />
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch w-full flex-1 min-h-0">
-        <div className="lg:col-span-3 xl:col-span-2 flex flex-col gap-4">
-          <SidebarUploadPanel
-            acceptedFormats={ACCEPTED_UPLOAD_FORMATS_LABEL}
-            badgeColor="bg-violet-500/10 text-violet-500"
-            buttonColor="bg-violet-500 text-white"
-            buttonShadow="shadow-violet-500/20"
-            description="Manage outgoing digital archives."
-            icon={<FileUp size={22} />}
-            loading={loading}
-            title="Outgoing Mail"
-            onUploadClick={openUploadDialog}
-          />
-          <Card className="border-none bg-content1 shadow-sm">
-            <Card.Content className="px-4 py-3">
-              <StorageIndicator
-                count={stats.total}
-                label="Storage Usage"
-                showGb={true}
-                total={100}
-              />
-            </Card.Content>
-          </Card>
-        </div>
-        <div className="lg:col-span-9 xl:col-span-10 w-full h-full">
-          <DocumentList
-            files={files}
+      <DocumentList
+        files={files}
+        isSelectionMode={isSelectionMode}
+        page={page}
+        renderRow={(file) => (
+          <DocumentRow
+            key={file.id}
+            file={file}
+            isSelected={selectedIds.has(file.id)}
             isSelectionMode={isSelectionMode}
-            page={page}
-            renderRow={(file) => (
-              <DocumentRow
-                key={file.id}
-                file={file}
-                isSelected={selectedIds.has(file.id)}
-                isSelectionMode={isSelectionMode}
-                onDelete={handleDelete}
-                onDownload={handleDownload}
-                onSelect={toggleSelection}
-                onSendEmail={handleOpenSendEmail}
-                onView={handleView}
-              />
-            )}
-            searchLoading={searchLoading}
-            searchQuery={searchQuery}
-            selectedCount={selectedIds.size}
-            selectedIds={selectedIds}
-            sortBy={sortBy}
-            sortOrder={sortOrder}
-            statusFilter={statusFilter}
-            total={total}
-            totalPages={totalPages}
-            onBulkDelete={handleBulkDelete}
-            onClearSelection={clearSelection}
             onDelete={handleDelete}
             onDownload={handleDownload}
-            onPageChange={setPage}
-            onSearchChange={setSearchQuery}
-            onSortByChange={(v) => {
-              setSortBy(v);
-              setPage(1);
-            }}
-            onSortOrderChange={() => {
-              setSortOrder((p) => (p === "desc" ? "asc" : "desc"));
-              setPage(1);
-            }}
-            onStatusFilterChange={(v) => {
-              setStatusFilter(v);
-              setPage(1);
-            }}
+            onSelect={toggleSelection}
+            onSendEmail={handleOpenSendEmail}
             onView={handleView}
           />
+        )}
+        searchLoading={searchLoading}
+        searchQuery={searchQuery}
+        selectedCount={selectedIds.size}
+        sortBy={sortBy}
+        sortOrder={sortOrder}
+        statusFilter={statusFilter}
+        total={total}
+        totalPages={totalPages}
+        uploadLabel="Upload"
+        onBulkDelete={handleBulkDelete}
+        onClearSelection={clearSelection}
+        onPageChange={setPage}
+        onSearchChange={setSearchQuery}
+        onSortByChange={(v) => {
+          setSortBy(v);
+          setPage(1);
+        }}
+        onSortOrderChange={() => {
+          setSortOrder((p) => (p === "desc" ? "asc" : "desc"));
+          setPage(1);
+        }}
+        onStatusFilterChange={(v) => {
+          setStatusFilter(v);
+          setPage(1);
+        }}
+        onUploadClick={openUploadDialog}
+      />
+      <div className="flex items-center justify-between px-1 py-1">
+        <div className="flex-1 max-w-xs">
+          <StorageIndicator
+            showGb
+            count={stats.total}
+            label="Storage Usage"
+            total={100}
+          />
         </div>
+        <span className="text-[10px] text-default-300">
+          Archivio &copy; 2026
+        </span>
       </div>
       {previewFile ? (
         <DocumentPreviewDialog

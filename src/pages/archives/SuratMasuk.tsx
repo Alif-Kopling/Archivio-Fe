@@ -1,7 +1,5 @@
 import { FileDown, Inbox, Clock, CheckCircle2 } from "lucide-react";
-import { Card } from "@heroui/react";
 
-import { SidebarUploadPanel } from "@/components/dashboard/SidebarUploadPanel";
 import { DocumentUploadDialog } from "@/components/documents/DocumentUploadDialog";
 import { StorageIndicator } from "@/components/dashboard/StorageIndicator";
 import { ArchiveStats, type StatConfigItem } from "@/components/archives";
@@ -19,21 +17,18 @@ const STAT_CONFIG: readonly StatConfigItem[] = [
     label: "Total Documents",
     Icon: Inbox,
     color: "text-blue-500",
-    bg: "bg-blue-500/10",
   },
   {
     key: "pending",
     label: "Pending / Draft",
     Icon: Clock,
     color: "text-warning",
-    bg: "bg-warning/10",
   },
   {
     key: "verified",
     label: "Verified / Final",
     Icon: CheckCircle2,
     color: "text-success",
-    bg: "bg-success/10",
   },
 ] as const;
 
@@ -84,7 +79,7 @@ export default function SuratMasukPage() {
   } = useDocumentManagement({ endpoint: "/surat-masuk" });
 
   return (
-    <div className="flex flex-col gap-3 w-full h-full pb-2 animate-in fade-in duration-500">
+    <div className="flex flex-col gap-4 w-full h-full pb-2 animate-in fade-in duration-500">
       <DocumentUploadDialog
         acceptedFormats={ACCEPTED_UPLOAD_FORMATS}
         acceptedFormatsLabel={ACCEPTED_UPLOAD_FORMATS_LABEL}
@@ -109,73 +104,61 @@ export default function SuratMasukPage() {
         onSubmit={handleSubmitUpload}
       />
       <ArchiveStats configs={STAT_CONFIG} stats={stats as any} />
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch w-full flex-1 min-h-0">
-        <div className="lg:col-span-3 xl:col-span-2 flex flex-col gap-4">
-          <SidebarUploadPanel
-            acceptedFormats={ACCEPTED_UPLOAD_FORMATS_LABEL}
-            description="Manage incoming digital archives."
-            icon={<FileDown size={22} />}
-            loading={loading}
-            title="Incoming Mail"
-            onUploadClick={openUploadDialog}
-          />
-          <Card className="border-none bg-content1 shadow-sm">
-            <Card.Content className="px-4 py-3">
-              <StorageIndicator
-                count={stats.total}
-                label="Storage Usage"
-                showGb={true}
-                total={100}
-              />
-            </Card.Content>
-          </Card>
-        </div>
-        <div className="lg:col-span-9 xl:col-span-10 w-full h-full">
-          <DocumentList
-            files={files}
+      <DocumentList
+        files={files}
+        isSelectionMode={isSelectionMode}
+        page={page}
+        renderRow={(file) => (
+          <DocumentRow
+            key={file.id}
+            file={file}
+            isSelected={selectedIds.has(file.id)}
             isSelectionMode={isSelectionMode}
-            page={page}
-            renderRow={(file) => (
-              <DocumentRow
-                key={file.id}
-                file={file}
-                isSelected={selectedIds.has(file.id)}
-                isSelectionMode={isSelectionMode}
-                onDelete={handleDelete}
-                onDownload={handleDownload}
-                onSelect={toggleSelection}
-                onView={handleView}
-              />
-            )}
-            searchLoading={searchLoading}
-            searchQuery={searchQuery}
-            selectedCount={selectedIds.size}
-            selectedIds={selectedIds}
-            sortBy={sortBy}
-            sortOrder={sortOrder}
-            statusFilter={statusFilter}
-            total={total}
-            totalPages={totalPages}
-            onBulkDelete={handleBulkDelete}
-            onClearSelection={clearSelection}
             onDelete={handleDelete}
             onDownload={handleDownload}
-            onPageChange={setPage}
-            onSearchChange={setSearchQuery}
-            onSortByChange={(v) => {
-              setSortBy(v);
-              setPage(1);
-            }}
-            onSortOrderChange={() => {
-              setSortOrder((p) => (p === "desc" ? "asc" : "desc"));
-              setPage(1);
-            }}
-            onStatusFilterChange={(v) => {
-              setStatusFilter(v);
-              setPage(1);
-            }}
+            onSelect={toggleSelection}
+            onView={handleView}
+          />
+        )}
+        searchLoading={searchLoading}
+        searchQuery={searchQuery}
+        selectedCount={selectedIds.size}
+        sortBy={sortBy}
+        sortOrder={sortOrder}
+        statusFilter={statusFilter}
+        total={total}
+        totalPages={totalPages}
+        uploadLabel="Upload"
+        onBulkDelete={handleBulkDelete}
+        onClearSelection={clearSelection}
+        onPageChange={setPage}
+        onSearchChange={setSearchQuery}
+        onSortByChange={(v) => {
+          setSortBy(v);
+          setPage(1);
+        }}
+        onSortOrderChange={() => {
+          setSortOrder((p) => (p === "desc" ? "asc" : "desc"));
+          setPage(1);
+        }}
+        onStatusFilterChange={(v) => {
+          setStatusFilter(v);
+          setPage(1);
+        }}
+        onUploadClick={openUploadDialog}
+      />
+      <div className="flex items-center justify-between px-1 py-1">
+        <div className="flex-1 max-w-xs">
+          <StorageIndicator
+            showGb
+            count={stats.total}
+            label="Storage Usage"
+            total={100}
           />
         </div>
+        <span className="text-[10px] text-default-300">
+          Archivio &copy; 2026
+        </span>
       </div>
       {previewFile ? (
         <DocumentPreviewDialog
