@@ -15,7 +15,9 @@ export const StatCard = ({ label, count, Icon, color }: StatCardProps) => (
       className={`absolute inset-0 opacity-[0.07] ${color.replace("text-", "bg-")} group-hover:opacity-[0.12] transition-opacity`}
     />
     <Card.Content className="px-5 py-4 flex items-center gap-4 relative z-10">
-      <div className={`p-3 rounded-xl ${color.replace("text-", "bg-")}/10 ${color} shrink-0`}>
+      <div
+        className={`p-3 rounded-xl ${color.replace("text-", "bg-")}/10 ${color} shrink-0`}
+      >
         <Icon size={22} />
       </div>
       <div className="min-w-0">

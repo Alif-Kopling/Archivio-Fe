@@ -27,7 +27,7 @@ export const DisplaySettings: FC<DisplaySettingsProps> = ({
           Customize your experience with language and themes.
         </p>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="col-span-2 md:col-span-1">
           <Label className="block text-xs font-bold uppercase tracking-wider mb-2 text-default-600 ml-1">
@@ -44,8 +44,12 @@ export const DisplaySettings: FC<DisplaySettingsProps> = ({
             </Select.Trigger>
             <Select.Popover>
               <ListBox>
-                <ListBox.Item id="id" textValue="Indonesian">Indonesian</ListBox.Item>
-                <ListBox.Item id="en" textValue="English">English</ListBox.Item>
+                <ListBox.Item id="id" textValue="Indonesian">
+                  Indonesian
+                </ListBox.Item>
+                <ListBox.Item id="en" textValue="English">
+                  English
+                </ListBox.Item>
               </ListBox>
             </Select.Popover>
           </Select>
@@ -65,9 +69,15 @@ export const DisplaySettings: FC<DisplaySettingsProps> = ({
             </Select.Trigger>
             <Select.Popover>
               <ListBox>
-                <ListBox.Item id="system" textValue="System Default">System Default</ListBox.Item>
-                <ListBox.Item id="light" textValue="Light">Light</ListBox.Item>
-                <ListBox.Item id="dark" textValue="Dark">Dark</ListBox.Item>
+                <ListBox.Item id="system" textValue="System Default">
+                  System Default
+                </ListBox.Item>
+                <ListBox.Item id="light" textValue="Light">
+                  Light
+                </ListBox.Item>
+                <ListBox.Item id="dark" textValue="Dark">
+                  Dark
+                </ListBox.Item>
               </ListBox>
             </Select.Popover>
           </Select>

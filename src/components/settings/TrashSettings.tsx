@@ -15,7 +15,9 @@ export const TrashSettings: FC<TrashSettingsProps> = ({
     <div className="p-8 rounded-[32px] bg-white/5 backdrop-blur-xl border border-white/10 shadow-xl space-y-8">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-xl font-bold text-foreground">Trash & Maintenance</h2>
+          <h2 className="text-xl font-bold text-foreground">
+            Trash & Maintenance
+          </h2>
           <p className="text-sm text-default-500">
             Manage permanently deleted or rejected documents.
           </p>
@@ -35,7 +37,8 @@ export const TrashSettings: FC<TrashSettingsProps> = ({
               Trash bin for rejected files
             </h3>
             <p className="text-sm text-default-600 max-w-lg leading-relaxed">
-              Rejected documents are kept here until you permanently remove them. Deleting them will also remove the stored file from disk.
+              Rejected documents are kept here until you permanently remove
+              them. Deleting them will also remove the stored file from disk.
             </p>
           </div>
 
@@ -46,7 +49,9 @@ export const TrashSettings: FC<TrashSettingsProps> = ({
             <p className="mt-2 text-5xl font-black text-danger">
               {trashRejectedCount}
             </p>
-            <p className="text-xs font-medium text-default-500 mt-1">rejected files</p>
+            <p className="text-xs font-medium text-default-500 mt-1">
+              rejected files
+            </p>
           </div>
         </div>
 

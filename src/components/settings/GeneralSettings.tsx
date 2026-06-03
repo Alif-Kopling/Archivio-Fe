@@ -27,9 +27,9 @@ export const GeneralSettings: FC<GeneralSettingsProps> = ({
           Configure your agency identity and branding.
         </p>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <TextField name="instansi_name" className="col-span-2 md:col-span-1">
+        <TextField className="col-span-2 md:col-span-1" name="instansi_name">
           <Label className="block text-xs font-bold uppercase tracking-wider mb-2 text-default-600 ml-1">
             Agency Name
           </Label>
@@ -40,7 +40,7 @@ export const GeneralSettings: FC<GeneralSettingsProps> = ({
             onChange={(e) => onChange("instansi_name", e.target.value)}
           />
         </TextField>
-        <TextField name="logo_url" className="col-span-2 md:col-span-1">
+        <TextField className="col-span-2 md:col-span-1" name="logo_url">
           <Label className="block text-xs font-bold uppercase tracking-wider mb-2 text-default-600 ml-1">
             Logo URL
           </Label>

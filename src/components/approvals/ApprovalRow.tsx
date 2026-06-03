@@ -36,7 +36,10 @@ export const ApprovalRow: FC<ApprovalRowProps> = memo(
       >
         <Table.Cell>
           <div className="flex items-center gap-3 py-1">
-            <Avatar className="bg-primary/20 text-primary backdrop-blur-sm" size="sm">
+            <Avatar
+              className="bg-primary/20 text-primary backdrop-blur-sm"
+              size="sm"
+            >
               <Avatar.Fallback className="text-[10px] font-bold">
                 {getFileExt(doc.filePath)}
               </Avatar.Fallback>

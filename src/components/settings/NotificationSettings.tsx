@@ -1,4 +1,4 @@
-import { Switch, Label } from "@heroui/react";
+import { Switch } from "@heroui/react";
 import { FC } from "react";
 
 interface NotificationSettingsProps {
@@ -33,13 +33,13 @@ export const NotificationSettings: FC<NotificationSettingsProps> = ({
             </p>
           </div>
           <Switch
+            color="primary"
             isSelected={settings.email_notification}
+            size="md"
             onValueChange={(checked) => {
               onChange("email_notification", checked);
               onSave("email_notification");
             }}
-            color="primary"
-            size="md"
           />
         </div>
         <div className="flex items-center justify-between p-6 rounded-2xl bg-white/5 border border-white/5 transition-all hover:bg-white/10">
@@ -50,13 +50,13 @@ export const NotificationSettings: FC<NotificationSettingsProps> = ({
             </p>
           </div>
           <Switch
+            color="primary"
             isSelected={settings.auto_archive}
+            size="md"
             onValueChange={(checked) => {
               onChange("auto_archive", checked);
               onSave("auto_archive");
             }}
-            color="primary"
-            size="md"
           />
         </div>
       </div>

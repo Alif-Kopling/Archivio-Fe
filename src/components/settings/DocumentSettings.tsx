@@ -52,10 +52,18 @@ export const DocumentSettings: FC<DocumentSettingsProps> = ({
             </Select.Trigger>
             <Select.Popover>
               <ListBox>
-                <ListBox.Item id="10" textValue="10 items per page">10 items</ListBox.Item>
-                <ListBox.Item id="25" textValue="25 items per page">25 items</ListBox.Item>
-                <ListBox.Item id="50" textValue="50 items per page">50 items</ListBox.Item>
-                <ListBox.Item id="100" textValue="100 items per page">100 items</ListBox.Item>
+                <ListBox.Item id="10" textValue="10 items per page">
+                  10 items
+                </ListBox.Item>
+                <ListBox.Item id="25" textValue="25 items per page">
+                  25 items
+                </ListBox.Item>
+                <ListBox.Item id="50" textValue="50 items per page">
+                  50 items
+                </ListBox.Item>
+                <ListBox.Item id="100" textValue="100 items per page">
+                  100 items
+                </ListBox.Item>
               </ListBox>
             </Select.Popover>
           </Select>
@@ -75,14 +83,20 @@ export const DocumentSettings: FC<DocumentSettingsProps> = ({
             </Select.Trigger>
             <Select.Popover>
               <ListBox>
-                <ListBox.Item id="DD/MM/YYYY" textValue="DD/MM/YYYY">DD/MM/YYYY</ListBox.Item>
-                <ListBox.Item id="MM/DD/YYYY" textValue="MM/DD/YYYY">MM/DD/YYYY</ListBox.Item>
-                <ListBox.Item id="YYYY-MM-DD" textValue="YYYY-MM-DD">YYYY-MM-DD</ListBox.Item>
+                <ListBox.Item id="DD/MM/YYYY" textValue="DD/MM/YYYY">
+                  DD/MM/YYYY
+                </ListBox.Item>
+                <ListBox.Item id="MM/DD/YYYY" textValue="MM/DD/YYYY">
+                  MM/DD/YYYY
+                </ListBox.Item>
+                <ListBox.Item id="YYYY-MM-DD" textValue="YYYY-MM-DD">
+                  YYYY-MM-DD
+                </ListBox.Item>
               </ListBox>
             </Select.Popover>
           </Select>
-            </div>
-        <TextField name="retention_period" type="number" className="col-span-2">
+        </div>
+        <TextField className="col-span-2" name="retention_period" type="number">
           <Label className="block text-xs font-bold uppercase tracking-wider mb-2 text-default-600 ml-1">
             Retention Period (Years)
           </Label>
@@ -94,7 +108,7 @@ export const DocumentSettings: FC<DocumentSettingsProps> = ({
           />
         </TextField>
       </div>
-      
+
       <div className="flex justify-end pt-4 border-t border-white/10">
         <Button
           className="bg-primary text-white font-bold px-8 h-12 shadow-lg shadow-primary/20"

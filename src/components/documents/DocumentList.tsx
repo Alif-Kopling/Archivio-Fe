@@ -316,7 +316,11 @@ export const DocumentList: FC<DocumentListProps> = ({
                   : "No documents available at the moment"}
               </p>
               {searchQuery.trim() && (
-                <Button size="sm" variant="ghost" onPress={() => onSearchChange("")}>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onPress={() => onSearchChange("")}
+                >
                   Clear Search
                 </Button>
               )}
@@ -352,8 +356,8 @@ export const DocumentList: FC<DocumentListProps> = ({
         </span>
         <div className="flex items-center gap-2">
           <Button
-            isDisabled={page <= 1}
             className="h-8 text-xs font-semibold"
+            isDisabled={page <= 1}
             size="sm"
             variant="ghost"
             onPress={() => onPageChange(page - 1)}
@@ -362,8 +366,8 @@ export const DocumentList: FC<DocumentListProps> = ({
             Previous
           </Button>
           <Button
-            isDisabled={page >= totalPages}
             className="h-8 text-xs font-semibold"
+            isDisabled={page >= totalPages}
             size="sm"
             variant="ghost"
             onPress={() => onPageChange(page + 1)}

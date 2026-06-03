@@ -43,7 +43,7 @@ export const StorageSettings: FC<StorageSettingsProps> = ({
             Maximum file size that can be uploaded
           </p>
         </TextField>
-        
+
         <TextField name="allowed_file_types">
           <Label className="block text-xs font-bold uppercase tracking-wider mb-2 text-default-600 ml-1">
             Allowed File Types
@@ -59,7 +59,7 @@ export const StorageSettings: FC<StorageSettingsProps> = ({
           </p>
         </TextField>
       </div>
-      
+
       <div className="flex justify-end pt-4 border-t border-white/10">
         <Button
           className="bg-primary text-white font-bold px-8 h-12 shadow-lg shadow-primary/20"

@@ -30,14 +30,19 @@ export const SettingsHeader: FC<SettingsHeaderProps> = ({
       </div>
       <div className="flex items-center gap-3">
         {hasChanges && (
-          <Chip color="warning" size="sm" variant="flat" className="backdrop-blur-sm">
+          <Chip
+            className="backdrop-blur-sm"
+            color="warning"
+            size="sm"
+            variant="flat"
+          >
             Unsaved changes
           </Chip>
         )}
-        <Button 
-          variant="flat" 
-          onClick={onReset}
+        <Button
           className="backdrop-blur-sm bg-default-100/50 hover:bg-default-200/50"
+          variant="flat"
+          onClick={onReset}
         >
           <RefreshCw className="mr-2" size={16} />
           Reset

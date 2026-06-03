@@ -41,7 +41,7 @@ export const SecuritySettings: FC<SecuritySettingsProps> = ({
           Session will end after a period of inactivity
         </p>
       </TextField>
-      
+
       <div className="flex justify-end pt-4 border-t border-white/10">
         <Button
           className="bg-primary text-white font-bold px-8 h-12 shadow-lg shadow-primary/20"
