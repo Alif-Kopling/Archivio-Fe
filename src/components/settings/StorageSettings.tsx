@@ -20,42 +20,49 @@ export const StorageSettings: FC<StorageSettingsProps> = ({
   onSave,
 }) => {
   return (
-    <div className="space-y-6">
+    <div className="p-8 rounded-[32px] bg-white/5 backdrop-blur-xl border border-white/10 shadow-xl space-y-8">
       <div>
+        <h2 className="text-xl font-bold text-foreground">Storage Settings</h2>
+        <p className="text-sm text-default-500">
+          Configure file storage limitations and file type policies.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6">
         <TextField name="max_file_size" type="number">
-          <Label className="block text-sm font-semibold mb-2 text-foreground">
+          <Label className="block text-xs font-bold uppercase tracking-wider mb-2 text-default-600 ml-1">
             Max File Size (MB)
           </Label>
           <Input
-            className="w-full h-12"
+            className="h-12 bg-white/5 border-white/10"
             placeholder="10"
             value={settings.max_file_size}
             onChange={(e) => onChange("max_file_size", e.target.value)}
           />
+          <p className="text-xs text-default-500 mt-2 ml-1">
+            Maximum file size that can be uploaded
+          </p>
         </TextField>
-        <p className="text-xs text-foreground mt-1.5">
-          Maximum file size that can be uploaded
-        </p>
-      </div>
-      <div>
+        
         <TextField name="allowed_file_types">
-          <Label className="block text-sm font-semibold mb-2 text-foreground">
+          <Label className="block text-xs font-bold uppercase tracking-wider mb-2 text-default-600 ml-1">
             Allowed File Types
           </Label>
           <Input
-            className="w-full h-12"
+            className="h-12 bg-white/5 border-white/10"
             placeholder="pdf,doc,docx,jpg,png"
             value={settings.allowed_file_types}
             onChange={(e) => onChange("allowed_file_types", e.target.value)}
           />
+          <p className="text-xs text-default-500 mt-2 ml-1">
+            Separate with commas (e.g.: pdf,doc,docx)
+          </p>
         </TextField>
-        <p className="text-xs text-foreground mt-1.5">
-          Separate with commas (e.g.: pdf,doc,docx)
-        </p>
       </div>
-      <div className="flex justify-end pt-4 border-t border-divider">
+      
+      <div className="flex justify-end pt-4 border-t border-white/10">
         <Button
-          className="bg-primary text-white font-medium px-6"
+          className="bg-primary text-white font-bold px-8 h-12 shadow-lg shadow-primary/20"
           isDisabled={loading && savingCategory === "storage"}
           onClick={onSave}
         >

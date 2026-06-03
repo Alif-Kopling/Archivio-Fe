@@ -19,26 +19,32 @@ export const SecuritySettings: FC<SecuritySettingsProps> = ({
   onSave,
 }) => {
   return (
-    <div className="space-y-6">
+    <div className="p-8 rounded-[32px] bg-white/5 backdrop-blur-xl border border-white/10 shadow-xl space-y-8">
       <div>
-        <TextField name="session_timeout" type="number">
-          <Label className="block text-sm font-semibold mb-2 text-foreground">
-            Session Timeout (Minutes)
-          </Label>
-          <Input
-            className="w-full h-12"
-            placeholder="30"
-            value={settings.session_timeout}
-            onChange={(e) => onChange("session_timeout", e.target.value)}
-          />
-        </TextField>
-        <p className="text-xs text-foreground mt-1.5">
-          Session will end after a period of inactivity
+        <h2 className="text-xl font-bold text-foreground">Security Settings</h2>
+        <p className="text-sm text-default-500">
+          Configure security and session policies.
         </p>
       </div>
-      <div className="flex justify-end pt-4 border-t border-divider">
+
+      <TextField name="session_timeout" type="number">
+        <Label className="block text-xs font-bold uppercase tracking-wider mb-2 text-default-600 ml-1">
+          Session Timeout (Minutes)
+        </Label>
+        <Input
+          className="h-12 bg-white/5 border-white/10"
+          placeholder="30"
+          value={settings.session_timeout}
+          onChange={(e) => onChange("session_timeout", e.target.value)}
+        />
+        <p className="text-xs text-default-500 mt-2 ml-1">
+          Session will end after a period of inactivity
+        </p>
+      </TextField>
+      
+      <div className="flex justify-end pt-4 border-t border-white/10">
         <Button
-          className="bg-primary text-white font-medium px-6"
+          className="bg-primary text-white font-bold px-8 h-12 shadow-lg shadow-primary/20"
           isDisabled={loading && savingCategory === "security"}
           onClick={onSave}
         >

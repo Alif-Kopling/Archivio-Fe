@@ -1,4 +1,4 @@
-import { Switch } from "@heroui/react";
+import { Switch, Label } from "@heroui/react";
 import { FC } from "react";
 
 interface NotificationSettingsProps {
@@ -16,44 +16,49 @@ export const NotificationSettings: FC<NotificationSettingsProps> = ({
   onSave,
 }) => {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between p-4 rounded-lg bg-default-50 hover:bg-default-100 transition-colors">
-        <div className="flex-1">
-          <p className="font-semibold text-foreground">Email Notifications</p>
-          <p className="text-sm text-foreground mt-0.5">
-            Send email for documents that need verification
-          </p>
-        </div>
-        <Switch
-          isSelected={settings.email_notification}
-          onChange={(checked) => {
-            onChange("email_notification", checked);
-            onSave("email_notification");
-          }}
-        >
-          <Switch.Control>
-            <Switch.Thumb />
-          </Switch.Control>
-        </Switch>
+    <div className="p-8 rounded-[32px] bg-white/5 backdrop-blur-xl border border-white/10 shadow-xl space-y-6">
+      <div>
+        <h2 className="text-xl font-bold text-foreground">Notifications</h2>
+        <p className="text-sm text-default-500">
+          Manage how you receive alerts and system updates.
+        </p>
       </div>
-      <div className="flex items-center justify-between p-4 rounded-lg bg-default-50 hover:bg-default-100 transition-colors">
-        <div className="flex-1">
-          <p className="font-semibold text-foreground">Auto Archive</p>
-          <p className="text-sm text-foreground mt-0.5">
-            Automatically archive documents after retention period
-          </p>
+
+      <div className="space-y-4">
+        <div className="flex items-center justify-between p-6 rounded-2xl bg-white/5 border border-white/5 transition-all hover:bg-white/10">
+          <div className="flex-1">
+            <p className="font-bold text-foreground">Email Notifications</p>
+            <p className="text-sm text-default-500 mt-1">
+              Send email for documents that need verification
+            </p>
+          </div>
+          <Switch
+            isSelected={settings.email_notification}
+            onValueChange={(checked) => {
+              onChange("email_notification", checked);
+              onSave("email_notification");
+            }}
+            color="primary"
+            size="md"
+          />
         </div>
-        <Switch
-          isSelected={settings.auto_archive}
-          onChange={(checked) => {
-            onChange("auto_archive", checked);
-            onSave("auto_archive");
-          }}
-        >
-          <Switch.Control>
-            <Switch.Thumb />
-          </Switch.Control>
-        </Switch>
+        <div className="flex items-center justify-between p-6 rounded-2xl bg-white/5 border border-white/5 transition-all hover:bg-white/10">
+          <div className="flex-1">
+            <p className="font-bold text-foreground">Auto Archive</p>
+            <p className="text-sm text-default-500 mt-1">
+              Automatically archive documents after retention period
+            </p>
+          </div>
+          <Switch
+            isSelected={settings.auto_archive}
+            onValueChange={(checked) => {
+              onChange("auto_archive", checked);
+              onSave("auto_archive");
+            }}
+            color="primary"
+            size="md"
+          />
+        </div>
       </div>
     </div>
   );
