@@ -266,7 +266,7 @@ export const Sidebar: FC = () => {
       </Drawer>
 
       {/* Sidebar Desktop */}
-      <aside className="w-64 border-r border-divider p-6 hidden md:flex flex-col gap-8 bg-content1/50 backdrop-blur-sm h-screen sticky top-0">
+      <aside className="w-64 border-r border-divider p-6 hidden md:flex flex-col gap-8 bg-background h-screen sticky top-0">
         <div className="flex items-center gap-3 px-2">
           <Logo className="text-primary" size={32} />
           <div>
@@ -288,8 +288,8 @@ export const Sidebar: FC = () => {
                 className={({ isActive }) =>
                   `group relative flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium ${
                     isActive
-                      ? "bg-primary/15 text-primary shadow-sm shadow-primary/10"
-                      : "text-default-500 hover:bg-default-100 hover:text-foreground"
+                      ? "backdrop-blur-md bg-white/30 dark:bg-white/[0.07] border border-white/30 dark:border-white/10 text-primary shadow-sm"
+                      : "text-default-500 hover:backdrop-blur-sm hover:bg-white/20 dark:hover:bg-white/[0.05] hover:text-foreground"
                   }`
                 }
                 end={isDashboard}
@@ -340,7 +340,7 @@ export const Sidebar: FC = () => {
           <div className="flex items-center gap-1">
             {/* Notification Bell */}
             <button
-              className="relative flex items-center justify-center w-9 h-9 rounded-xl transition-all duration-200 text-default-400 hover:bg-default-100 hover:text-foreground"
+              className="relative flex items-center justify-center w-9 h-9 rounded-xl transition-all duration-200 text-default-400 hover:backdrop-blur-md hover:bg-white/20 dark:hover:bg-white/[0.05] hover:text-foreground"
               onClick={() => drawerState.toggle()}
             >
               <Bell size={18} />
@@ -355,7 +355,7 @@ export const Sidebar: FC = () => {
               <Tooltip.Trigger>
                 <Button
                   isIconOnly
-                  className="text-default-400 hover:text-danger hover:bg-danger/10 rounded-xl"
+                  className="text-default-400 hover:text-danger hover:bg-danger/10 hover:backdrop-blur-md rounded-xl"
                   variant="ghost"
                   onPress={handleLogout}
                 >
