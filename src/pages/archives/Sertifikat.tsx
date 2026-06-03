@@ -118,6 +118,7 @@ export default function SertifikatPage() {
         onChange={handleFileChange}
       />
       <ArchiveStats configs={STAT_CONFIG} stats={stats as any} />
+      <div className="flex-1 min-h-0">
       <DocumentList
         files={files}
         isSelectionMode={isSelectionMode}
@@ -162,6 +163,7 @@ export default function SertifikatPage() {
         }}
         onUploadClick={handleUploadClick}
       />
+      </div>
       <div className="flex items-center justify-between px-1 py-1">
         <div className="flex-1 max-w-xs">
           <StorageIndicator

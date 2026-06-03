@@ -104,7 +104,8 @@ export default function SuratMasukPage() {
         onSubmit={handleSubmitUpload}
       />
       <ArchiveStats configs={STAT_CONFIG} stats={stats as any} />
-      <DocumentList
+      <div className="flex-1 min-h-0">
+        <DocumentList
         files={files}
         isSelectionMode={isSelectionMode}
         page={page}
@@ -147,6 +148,7 @@ export default function SuratMasukPage() {
         }}
         onUploadClick={openUploadDialog}
       />
+      </div>
       <div className="flex items-center justify-between px-1 py-1">
         <div className="flex-1 max-w-xs">
           <StorageIndicator

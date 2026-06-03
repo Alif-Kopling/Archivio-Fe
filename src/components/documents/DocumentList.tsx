@@ -88,7 +88,7 @@ export const DocumentList: FC<DocumentListProps> = ({
   const [isDeleteDialogOpen, setIsDeleteOpen] = useState(false);
 
   return (
-    <div className="flex flex-col gap-3 w-full">
+    <div className="flex flex-col gap-3 w-full h-full">
       <AnimatePresence mode="wait">
         {!isSelectionMode ? (
           <motion.div
@@ -288,95 +288,91 @@ export const DocumentList: FC<DocumentListProps> = ({
         )}
       </AnimatePresence>
 
-      {searchLoading ? (
-        <div className="flex flex-col gap-2">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <Card key={i} className="border-none bg-content1 animate-pulse">
-              <Card.Content className="px-4 py-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-default-200" />
-                  <div className="flex-1 space-y-2">
-                    <div className="h-4 w-3/5 rounded bg-default-200" />
-                    <div className="h-3 w-2/5 rounded bg-default-100" />
+      <div className="flex-1">
+        {searchLoading ? (
+          <div className="flex flex-col gap-2">
+            {[1, 2, 3, 4].map((i) => (
+              <Card key={i} className="border-none bg-content1 animate-pulse">
+                <Card.Content className="px-4 py-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-default-200" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 w-3/5 rounded bg-default-200" />
+                      <div className="h-3 w-2/5 rounded bg-default-100" />
+                    </div>
+                    <div className="h-5 w-16 rounded bg-default-200" />
                   </div>
-                  <div className="h-5 w-16 rounded bg-default-200" />
-                </div>
-              </Card.Content>
-            </Card>
-          ))}
-        </div>
-      ) : files.length === 0 ? (
-        <Card className="border-none bg-content1">
-          <Card.Content className="flex flex-col items-center justify-center py-16 gap-3">
-            <Upload className="text-default-300" size={40} />
-            <p className="text-sm text-default-400 font-medium">
-              {searchQuery.trim()
-                ? `"${searchQuery.trim()}" not found. Try another search.`
-                : "No documents available at the moment"}
-            </p>
-            {searchQuery.trim() && (
-              <Button
-                size="sm"
-                variant="ghost"
-                onPress={() => onSearchChange("")}
-              >
-                Clear Search
-              </Button>
-            )}
-          </Card.Content>
-        </Card>
-      ) : (
-        <div className="flex flex-col gap-2">
-          <AnimatePresence>
-            {files.map((file, idx) => (
-              <motion.div
-                key={file.id}
-                animate={{ opacity: 1, y: 0 }}
-                initial={{ opacity: 0, y: 10 }}
-                transition={{ delay: idx * 0.03, duration: 0.2 }}
-              >
-                <Card
-                  className={`border-none bg-content1 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.002] ${isSelectionMode && (file as any)._selected ? "ring-2 ring-primary" : ""}`}
-                >
-                  <Card.Content className="px-4 py-2.5">
-                    {renderRow(file)}
-                  </Card.Content>
-                </Card>
-              </motion.div>
+                </Card.Content>
+              </Card>
             ))}
-          </AnimatePresence>
-        </div>
-      )}
-
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between px-1 py-2">
-          <span className="text-xs text-default-400">
-            Page {page} of {totalPages} ({total} total)
-          </span>
-          <div className="flex items-center gap-2">
-            <Button
-              isDisabled={page <= 1}
-              className="h-8 text-xs font-semibold"
-              size="sm"
-              variant="ghost"
-              onPress={() => onPageChange(page - 1)}
-            >
-              <ChevronLeft size={14} />
-              Previous
-            </Button>
-            <Button
-              isDisabled={page >= totalPages}
-              className="h-8 text-xs font-semibold"
-              size="sm"
-              variant="ghost"
-              onPress={() => onPageChange(page + 1)}
-            >
-              Next
-              <ChevronRight size={14} />
-            </Button>
           </div>
+        ) : files.length === 0 ? (
+          <Card className="border-none bg-content1 h-full">
+            <Card.Content className="flex flex-col items-center justify-center h-full gap-3">
+              <Upload className="text-default-300" size={40} />
+              <p className="text-sm text-default-400 font-medium">
+                {searchQuery.trim()
+                  ? `"${searchQuery.trim()}" not found. Try another search.`
+                  : "No documents available at the moment"}
+              </p>
+              {searchQuery.trim() && (
+                <Button size="sm" variant="ghost" onPress={() => onSearchChange("")}>
+                  Clear Search
+                </Button>
+              )}
+            </Card.Content>
+          </Card>
+        ) : (
+          <div className="flex flex-col gap-2">
+            <AnimatePresence>
+              {files.map((file, idx) => (
+                <motion.div
+                  key={file.id}
+                  animate={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, y: 10 }}
+                  transition={{ delay: idx * 0.03, duration: 0.2 }}
+                >
+                  <Card
+                    className={`border-none bg-content1 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.002] ${isSelectionMode && (file as any)._selected ? "ring-2 ring-primary" : ""}`}
+                  >
+                    <Card.Content className="px-4 py-2.5">
+                      {renderRow(file)}
+                    </Card.Content>
+                  </Card>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+        )}
+      </div>
+
+      <div className="flex items-center justify-between px-1 py-2 mt-auto">
+        <span className="text-xs text-default-400">
+          Page {page} of {totalPages} ({total} total)
+        </span>
+        <div className="flex items-center gap-2">
+          <Button
+            isDisabled={page <= 1}
+            className="h-8 text-xs font-semibold"
+            size="sm"
+            variant="ghost"
+            onPress={() => onPageChange(page - 1)}
+          >
+            <ChevronLeft size={14} />
+            Previous
+          </Button>
+          <Button
+            isDisabled={page >= totalPages}
+            className="h-8 text-xs font-semibold"
+            size="sm"
+            variant="ghost"
+            onPress={() => onPageChange(page + 1)}
+          >
+            Next
+            <ChevronRight size={14} />
+          </Button>
         </div>
-      )}
+      </div>
     </div>
   );
 };

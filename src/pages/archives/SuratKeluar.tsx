@@ -178,6 +178,7 @@ export default function SuratKeluarPage() {
         onSubmit={handleSubmitUpload}
       />
       <ArchiveStats configs={STAT_CONFIG} stats={stats as any} />
+      <div className="flex-1 min-h-0">
       <DocumentList
         files={files}
         isSelectionMode={isSelectionMode}
@@ -222,6 +223,7 @@ export default function SuratKeluarPage() {
         }}
         onUploadClick={openUploadDialog}
       />
+      </div>
       <div className="flex items-center justify-between px-1 py-1">
         <div className="flex-1 max-w-xs">
           <StorageIndicator
