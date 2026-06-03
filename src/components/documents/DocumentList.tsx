@@ -95,9 +95,12 @@ export const DocumentList: FC<DocumentListProps> = ({
               initial={{ opacity: 0, y: 20 }}
             >
               <div className="flex flex-col">
-                <h3 className="font-bold text-sm text-foreground">Document List</h3>
+                <h3 className="font-bold text-sm text-foreground">
+                  Document List
+                </h3>
                 <p className="text-default-400 text-[9px] font-medium tracking-wide">
-                  Total of <span className="text-primary font-bold">{total}</span>{" "}
+                  Total of{" "}
+                  <span className="text-primary font-bold">{total}</span>{" "}
                   archives found.
                 </p>
               </div>
@@ -115,7 +118,11 @@ export const DocumentList: FC<DocumentListProps> = ({
                   <Select.Popover>
                     <ListBox>
                       {statusOptions.map((opt) => (
-                        <ListBox.Item key={opt.id} id={opt.id} textValue={opt.label}>
+                        <ListBox.Item
+                          key={opt.id}
+                          id={opt.id}
+                          textValue={opt.label}
+                        >
                           {opt.label}
                         </ListBox.Item>
                       ))}
@@ -135,7 +142,11 @@ export const DocumentList: FC<DocumentListProps> = ({
                   <Select.Popover>
                     <ListBox>
                       {sortOptions.map((opt) => (
-                        <ListBox.Item key={opt.id} id={opt.id} textValue={opt.label}>
+                        <ListBox.Item
+                          key={opt.id}
+                          id={opt.id}
+                          textValue={opt.label}
+                        >
                           {opt.label}
                         </ListBox.Item>
                       ))}
@@ -197,7 +208,10 @@ export const DocumentList: FC<DocumentListProps> = ({
               </div>
               <div className="flex items-center gap-2">
                 {onBulkDelete && (
-                  <AlertDialog isOpen={isDeleteDialogOpen} onOpenChange={setIsDeleteOpen}>
+                  <AlertDialog
+                    isOpen={isDeleteDialogOpen}
+                    onOpenChange={setIsDeleteOpen}
+                  >
                     <AlertDialog.Trigger>
                       <Button
                         className="bg-danger/10 text-danger font-bold text-xs h-9"
@@ -221,7 +235,10 @@ export const DocumentList: FC<DocumentListProps> = ({
                           <AlertDialog.Body>
                             <p className="text-sm text-default-500">
                               Are you sure you want to permanently delete{" "}
-                              <strong className="text-foreground">{selectedCount}</strong> selected documents?
+                              <strong className="text-foreground">
+                                {selectedCount}
+                              </strong>{" "}
+                              selected documents?
                             </p>
                             <p className="text-[11px] text-danger mt-2 font-medium">
                               This action cannot be undone.
@@ -280,7 +297,14 @@ export const DocumentList: FC<DocumentListProps> = ({
               aria-label="Document List"
               className="h-[380px] overflow-y-auto scrollbar-hide"
               // Trik biar checkbox nyala: buat array baru supaya Virtualizer mau gambar ulang
-              items={isSelectionMode ? files.map(f => ({ ...f, _selected: selectedIds?.has(f.id) })) : files}
+              items={
+                isSelectionMode
+                  ? files.map((f) => ({
+                      ...f,
+                      _selected: selectedIds?.has(f.id),
+                    }))
+                  : files
+              }
               selectedKeys={selectedIds}
               selectionMode={isSelectionMode ? "multiple" : "none"}
             >

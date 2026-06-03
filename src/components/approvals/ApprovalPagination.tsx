@@ -26,8 +26,8 @@ export const ApprovalPagination: FC<ApprovalPaginationProps> = ({
       <span className="font-semibold text-foreground">
         {Math.min(currentPage * pageSize, total)}
       </span>{" "}
-      of <span className="font-semibold text-foreground">{total}</span>{" "}
-      pending documents
+      of <span className="font-semibold text-foreground">{total}</span> pending
+      documents
     </p>
     {totalPages > 1 ? (
       <div className="flex items-center gap-2">

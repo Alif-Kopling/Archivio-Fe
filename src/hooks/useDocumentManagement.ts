@@ -55,7 +55,9 @@ export function useDocumentManagement({
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
-  const [selectedIds, setSelectedIds] = useState<Set<number | string>>(new Set());
+  const [selectedIds, setSelectedIds] = useState<Set<number | string>>(
+    new Set(),
+  );
   const limit = 10;
   const notify = useNotify();
 
@@ -64,11 +66,13 @@ export function useDocumentManagement({
   const toggleSelection = useCallback((id: number | string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
+
       if (next.has(id)) {
         next.delete(id);
       } else {
         next.add(id);
       }
+
       return next;
     });
   }, []);
@@ -168,7 +172,10 @@ export function useDocumentManagement({
       formData.append("documentDate", uploadForm.documentDate);
       formData.append("sender", uploadForm.sender.trim());
       formData.append("status", "draft");
-      formData.append("approverIds", JSON.stringify(uploadForm.approverIds || []));
+      formData.append(
+        "approverIds",
+        JSON.stringify(uploadForm.approverIds || []),
+      );
 
       await documentService.uploadDocument(endpoint, formData);
       setUploadOpen(false);
@@ -325,7 +332,10 @@ export function useDocumentManagement({
         );
       });
 
-      formData.append("approverIds", JSON.stringify(uploadForm.approverIds || []));
+      formData.append(
+        "approverIds",
+        JSON.stringify(uploadForm.approverIds || []),
+      );
 
       await documentService.bulkUploadDocuments(endpoint, formData);
       notify({

@@ -155,17 +155,12 @@ export default function SertifikatPage() {
             files={files}
             isSelectionMode={isSelectionMode}
             page={page}
-            searchLoading={searchLoading}
-            searchQuery={searchQuery}
-            selectedCount={selectedIds.size}
-            onBulkDelete={handleBulkDelete}
-            onClearSelection={clearSelection}
             renderRow={(file) => (
               <DocumentRow
                 key={file.id}
                 file={file}
-                isSelectionMode={isSelectionMode}
                 isSelected={selectedIds.has(file.id)}
+                isSelectionMode={isSelectionMode}
                 type="certificate"
                 onDelete={handleDelete}
                 onDownload={handleDownload}
@@ -173,12 +168,17 @@ export default function SertifikatPage() {
                 onView={handleView}
               />
             )}
+            searchLoading={searchLoading}
+            searchQuery={searchQuery}
+            selectedCount={selectedIds.size}
             selectedIds={selectedIds}
             sortBy={sortBy}
             sortOrder={sortOrder}
             statusFilter={statusFilter}
             total={total}
             totalPages={totalPages}
+            onBulkDelete={handleBulkDelete}
+            onClearSelection={clearSelection}
             onDelete={handleDelete}
             onDownload={handleDownload}
             onPageChange={setPage}

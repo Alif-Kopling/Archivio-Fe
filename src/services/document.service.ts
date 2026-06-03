@@ -48,5 +48,5 @@ export const documentService = {
 
   downloadDocument: async (endpoint: string, id: string | number) => {
     return api.get(`${endpoint}/download/${id}`, { responseType: "blob" });
-  }
+  },
 };

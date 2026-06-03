@@ -135,29 +135,29 @@ export default function SuratMasukPage() {
             files={files}
             isSelectionMode={isSelectionMode}
             page={page}
-            searchLoading={searchLoading}
-            searchQuery={searchQuery}
-            selectedCount={selectedIds.size}
-            onBulkDelete={handleBulkDelete}
-            onClearSelection={clearSelection}
             renderRow={(file) => (
               <DocumentRow
                 key={file.id}
                 file={file}
-                isSelectionMode={isSelectionMode}
                 isSelected={selectedIds.has(file.id)}
+                isSelectionMode={isSelectionMode}
                 onDelete={handleDelete}
                 onDownload={handleDownload}
                 onSelect={toggleSelection}
                 onView={handleView}
               />
             )}
+            searchLoading={searchLoading}
+            searchQuery={searchQuery}
+            selectedCount={selectedIds.size}
             selectedIds={selectedIds}
             sortBy={sortBy}
             sortOrder={sortOrder}
             statusFilter={statusFilter}
             total={total}
             totalPages={totalPages}
+            onBulkDelete={handleBulkDelete}
+            onClearSelection={clearSelection}
             onDelete={handleDelete}
             onDownload={handleDownload}
             onPageChange={setPage}

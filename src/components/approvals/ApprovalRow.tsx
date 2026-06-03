@@ -8,6 +8,7 @@ import {
   getSourceChipProps,
   getSourceLabel,
 } from "./types";
+
 import { getStatusInfo, getApprovalProgress } from "@/utils/document";
 
 interface ApprovalRowProps {
@@ -18,8 +19,15 @@ interface ApprovalRowProps {
 
 export const ApprovalRow: FC<ApprovalRowProps> = memo(
   ({ doc, onApprove, onReject }) => {
-    const { label, color } = getStatusInfo(doc.status, doc.approverIds, doc.approvedByIds);
-    const { approvedCount, totalCount } = getApprovalProgress(doc.approverIds, doc.approvedByIds);
+    const { label, color } = getStatusInfo(
+      doc.status,
+      doc.approverIds,
+      doc.approvedByIds,
+    );
+    const { approvedCount, totalCount } = getApprovalProgress(
+      doc.approverIds,
+      doc.approvedByIds,
+    );
 
     return (
       <Table.Row

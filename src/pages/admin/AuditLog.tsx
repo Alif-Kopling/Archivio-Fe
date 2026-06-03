@@ -23,7 +23,10 @@ interface AuditResponse {
   totalPages: number;
 }
 
-const actionColors: Record<string, "accent" | "success" | "warning" | "danger" | "default"> = {
+const actionColors: Record<
+  string,
+  "accent" | "success" | "warning" | "danger" | "default"
+> = {
   create: "success",
   approve: "accent",
   reject: "danger",
@@ -50,9 +53,10 @@ const actionLabels: Record<string, string> = {
 };
 
 function getActionLabel(action: string): string {
-  return actionLabels[action] || action
-    .replace(/-/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+  return (
+    actionLabels[action] ||
+    action.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+  );
 }
 
 export default function AuditLogPage() {
@@ -70,6 +74,7 @@ export default function AuditLogPage() {
       const res = await api.get<AuditResponse>("/audit", {
         params: { page, limit },
       });
+
       setEntries(res.data.data);
       setTotalPages(res.data.totalPages);
     } catch (err) {
@@ -114,9 +119,9 @@ export default function AuditLogPage() {
         </div>
 
         <Button
-          variant="danger"
-          size="sm"
           isDisabled={entries.length === 0}
+          size="sm"
+          variant="danger"
           onPress={() => setClearOpen(true)}
         >
           <Trash2 size={16} />
@@ -135,14 +140,23 @@ export default function AuditLogPage() {
               </AlertDialog.Header>
               <AlertDialog.Body>
                 <p className="text-sm text-default-500">
-                  This action cannot be undone. All audit log entries will be permanently deleted.
+                  This action cannot be undone. All audit log entries will be
+                  permanently deleted.
                 </p>
               </AlertDialog.Body>
               <AlertDialog.Footer className="flex justify-end gap-3">
-                <Button variant="tertiary" isDisabled={clearing} onPress={() => setClearOpen(false)}>
+                <Button
+                  isDisabled={clearing}
+                  variant="tertiary"
+                  onPress={() => setClearOpen(false)}
+                >
                   Cancel
                 </Button>
-                <Button variant="danger" isPending={clearing} onPress={handleClearAll}>
+                <Button
+                  isPending={clearing}
+                  variant="danger"
+                  onPress={handleClearAll}
+                >
                   {clearing ? "Deleting..." : "Delete All"}
                 </Button>
               </AlertDialog.Footer>
@@ -188,7 +202,10 @@ export default function AuditLogPage() {
                     </Table.Row>
                   ) : entries.length === 0 ? (
                     <Table.Row>
-                      <Table.Cell className="py-10 text-center italic text-default-400" colSpan={5}>
+                      <Table.Cell
+                        className="py-10 text-center italic text-default-400"
+                        colSpan={5}
+                      >
                         Log activity records not found.
                       </Table.Cell>
                     </Table.Row>
@@ -200,9 +217,9 @@ export default function AuditLogPage() {
                       >
                         <Table.Cell>
                           <Chip
+                            color={actionColors[entry.action] || "default"}
                             size="sm"
                             variant="soft"
-                            color={actionColors[entry.action] || "default"}
                           >
                             {getActionLabel(entry.action)}
                           </Chip>

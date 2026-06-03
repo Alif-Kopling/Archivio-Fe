@@ -1,6 +1,13 @@
 import { FC, useRef, useState, useCallback } from "react";
 import { FileText, Download, Eye, Trash2, Mail } from "lucide-react";
-import { Button, Tooltip, Chip, ListBox, AlertDialog, Checkbox } from "@heroui/react";
+import {
+  Button,
+  Tooltip,
+  Chip,
+  ListBox,
+  AlertDialog,
+  Checkbox,
+} from "@heroui/react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { Document } from "@/types/document";
@@ -29,7 +36,11 @@ export const DocumentRow: FC<DocumentRowProps> = ({
   isSelectionMode = false,
   onSelect,
 }) => {
-  const { isFinal, label, color } = getStatusInfo(file.status, file.approverIds, file.approvedByIds);
+  const { isFinal, label, color } = getStatusInfo(
+    file.status,
+    file.approverIds,
+    file.approvedByIds,
+  );
   const isPdf = file.filePath?.toUpperCase().endsWith(".PDF");
 
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
@@ -58,6 +69,7 @@ export const DocumentRow: FC<DocumentRowProps> = ({
   const handleClick = useCallback(() => {
     if (preventClickRef.current) {
       preventClickRef.current = false;
+
       return;
     }
 
@@ -72,9 +84,15 @@ export const DocumentRow: FC<DocumentRowProps> = ({
       className={`py-0 px-0 border-b border-divider/10 rounded-none transition-colors duration-300 ${isSelected ? "bg-primary-50/50 dark:bg-primary-900/10" : ""}`}
       textValue={file.title}
     >
+      {}
       <div
         className={`flex items-center justify-between w-full gap-3 px-3 py-2 select-none hover:bg-default-100/50 transition-all duration-200 cursor-pointer ${isLongPressing ? "scale-[0.98] bg-default-100" : ""}`}
+        role="button"
+        tabIndex={-1}
         onClick={handleClick}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") handleClick();
+        }}
         onPointerCancel={handlePointerUp}
         onPointerDown={handlePointerDown}
         onPointerLeave={handlePointerUp}
@@ -85,10 +103,15 @@ export const DocumentRow: FC<DocumentRowProps> = ({
           <AnimatePresence mode="popLayout">
             {isSelectionMode && (
               <motion.div
-                animate={{ opacity: 1, scale: 1, width: "auto", marginRight: "8px" }}
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                  width: "auto",
+                  marginRight: "8px",
+                }}
+                className="flex items-center justify-center"
                 exit={{ opacity: 0, scale: 0.5, width: 0, marginRight: 0 }}
                 initial={{ opacity: 0, scale: 0.5, width: 0, marginRight: 0 }}
-                className="flex items-center justify-center"
                 transition={{ type: "spring", stiffness: 400, damping: 30 }}
               >
                 <Checkbox
@@ -119,7 +142,9 @@ export const DocumentRow: FC<DocumentRowProps> = ({
           </div>
 
           <div className="flex flex-col overflow-hidden">
-            <span className={`text-[13px] font-bold truncate transition-colors ${isSelected ? "text-primary" : "text-foreground"}`}>
+            <span
+              className={`text-[13px] font-bold truncate transition-colors ${isSelected ? "text-primary" : "text-foreground"}`}
+            >
               {file.title}
             </span>
             <div className="flex items-center gap-1.5 mt-0.5">

@@ -115,7 +115,9 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
 
   useEffect(() => {
     if (open) {
-      userService.getAll().then((data) => setUsers(data.filter((u: User) => u.role === 'staff')));
+      userService
+        .getAll()
+        .then((data) => setUsers(data.filter((u: User) => u.role === "staff")));
     }
   }, [open]);
 
@@ -387,30 +389,39 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                 <Label className="text-xs font-bold text-foreground">
                   Pilih Approver
                 </Label>
-                  <Select
-                    key={`bulk-${open}`}
-                    placeholder="Pilih user untuk approve"
-                    selectionMode="multiple"
-                    onChange={(value: any) => {
-                      if (Array.isArray(value)) {
-                        onFieldChange("approverIds", value.map(String));
-                      }
-                    }}
-                  >
-                    <Select.Trigger>
-                      <Select.Value />
-                      <Select.Indicator />
-                    </Select.Trigger>
-                    <Select.Popover>
-                      <ListBox selectionMode="multiple">
-                        {users.map((user) => (
-                          <ListBox.Item key={String(user.id)} id={String(user.id)} textValue={user.name}>
-                            {user.name}
-                          </ListBox.Item>
-                        ))}
-                      </ListBox>
-                    </Select.Popover>
-                  </Select>
+                <Select
+                  key={`bulk-${open}`}
+                  placeholder="Pilih user untuk approve"
+                  selectionMode="multiple"
+                  onSelectionChange={(keys: any) => {
+                    const selected =
+                      keys instanceof Set ? Array.from(keys) : [];
+
+                    if (selected.length) {
+                      onFieldChange("approverIds", selected.map(String));
+                    } else {
+                      onFieldChange("approverIds", []);
+                    }
+                  }}
+                >
+                  <Select.Trigger>
+                    <Select.Value />
+                    <Select.Indicator />
+                  </Select.Trigger>
+                  <Select.Popover>
+                    <ListBox selectionMode="multiple">
+                      {users.map((user) => (
+                        <ListBox.Item
+                          key={String(user.id)}
+                          id={String(user.id)}
+                          textValue={user.name}
+                        >
+                          {user.name}
+                        </ListBox.Item>
+                      ))}
+                    </ListBox>
+                  </Select.Popover>
+                </Select>
               </TextField>
 
               <div className="space-y-1.5">

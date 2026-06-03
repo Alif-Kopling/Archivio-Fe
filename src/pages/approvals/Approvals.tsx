@@ -283,9 +283,9 @@ export default function ApprovalsPage() {
           
           <ApprovalPagination
             currentPage={approvalQuery.page}
-            totalPages={approvalTotalPages}
-            total={approvalTotal}
             pageSize={APPROVAL_PAGE_SIZE}
+            total={approvalTotal}
+            totalPages={approvalTotalPages}
             onPageChange={handlePageChange}
           />
         </Card>
@@ -293,9 +293,9 @@ export default function ApprovalsPage() {
 
       <BulkActionModal
         isOpen={isMagicModalOpen}
-        onOpenChange={setIsMagicModalOpen}
         magicAction={magicAction}
         onConfirm={magicAction === "approve" ? handleBulkApprove : handleBulkReject}
+        onOpenChange={setIsMagicModalOpen}
       />
     </div>
   );

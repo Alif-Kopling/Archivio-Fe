@@ -4,11 +4,13 @@ import { Notification } from "@/types/notification";
 export const notificationService = {
   getAll: async (): Promise<{ data: Notification[]; unreadCount: number }> => {
     const response = await api.get("/notifications");
+
     return response.data;
   },
 
   getUnreadCount: async (): Promise<number> => {
     const response = await api.get("/notifications/unread-count");
+
     return response.data.count;
   },
 

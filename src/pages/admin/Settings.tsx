@@ -34,7 +34,6 @@ import {
   TrashSettings,
   type SettingCategory,
 } from "@/components/settings";
-
 import alarmDanger from "@/assets/alarm-danger-danger.mp3";
 
 const categories: SettingCategory[] = [

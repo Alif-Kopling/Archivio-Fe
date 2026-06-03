@@ -23,8 +23,6 @@ export const Logo: React.FC<IconSvgProps> = ({
   </svg>
 );
 
-
-
 export const MoonFilledIcon = ({
   size = 24,
   width,
@@ -68,5 +66,3 @@ export const SunFilledIcon = ({
     </g>
   </svg>
 );
-
-

@@ -69,7 +69,10 @@ export function getDownloadFileName(file: Document): string {
   return file.title || "document.pdf";
 }
 
-export function getApprovalProgress(approverIds?: string | null, approvedByIds?: string | null): { approvedCount: number; totalCount: number } {
+export function getApprovalProgress(
+  approverIds?: string | null,
+  approvedByIds?: string | null,
+): { approvedCount: number; totalCount: number } {
   const ids: string[] = approverIds ? JSON.parse(approverIds) : [];
   const approved: string[] = approvedByIds ? JSON.parse(approvedByIds) : [];
 
@@ -79,7 +82,11 @@ export function getApprovalProgress(approverIds?: string | null, approvedByIds?:
   };
 }
 
-export function getStatusInfo(status: string, approverIds?: string | null, approvedByIds?: string | null) {
+export function getStatusInfo(
+  status: string,
+  approverIds?: string | null,
+  approvedByIds?: string | null,
+) {
   const normalizedStatus = status?.toLowerCase();
   const isFinal = [
     "final",
@@ -91,17 +98,35 @@ export function getStatusInfo(status: string, approverIds?: string | null, appro
   const isRejected = normalizedStatus === "rejected";
 
   if (isFinal) {
-    return { isFinal: true, isRejected: false, label: "VERIFIED", color: "success" as const };
+    return {
+      isFinal: true,
+      isRejected: false,
+      label: "VERIFIED",
+      color: "success" as const,
+    };
   }
 
   if (isRejected) {
-    return { isFinal: false, isRejected: true, label: "REJECTED", color: "danger" as const };
+    return {
+      isFinal: false,
+      isRejected: true,
+      label: "REJECTED",
+      color: "danger" as const,
+    };
   }
 
-  const { approvedCount, totalCount } = getApprovalProgress(approverIds, approvedByIds);
+  const { approvedCount, totalCount } = getApprovalProgress(
+    approverIds,
+    approvedByIds,
+  );
 
   if (totalCount === 0) {
-    return { isFinal: false, isRejected: false, label: "PENDING", color: "warning" as const };
+    return {
+      isFinal: false,
+      isRejected: false,
+      label: "PENDING",
+      color: "warning" as const,
+    };
   }
 
   return {

@@ -15,12 +15,10 @@ export const BulkActionModal: FC<BulkActionModalProps> = ({
   magicAction,
   onConfirm,
 }) => (
-  <Modal>
+  <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
     <Modal.Backdrop
       className="bg-gradient-to-t from-primary/20 to-black/40 z-[9999]"
-      isOpen={isOpen}
       variant="blur"
-      onOpenChange={onOpenChange}
     >
       <Modal.Container placement="center">
         <Modal.Dialog>
@@ -53,23 +51,16 @@ export const BulkActionModal: FC<BulkActionModalProps> = ({
                 </p>
                 <p className="text-default-500 text-sm">
                   Apply{" "}
-                  {magicAction === "approve"
-                    ? "authorization"
-                    : "rejection"}{" "}
-                  to all selected documents.
+                  {magicAction === "approve" ? "authorization" : "rejection"} to
+                  all selected documents.
                 </p>
               </Modal.Body>
               <Modal.Footer>
-                <Button
-                  variant="tertiary"
-                  onPress={() => onOpenChange(false)}
-                >
+                <Button variant="tertiary" onPress={() => onOpenChange(false)}>
                   Cancel
                 </Button>
                 <Button
-                  variant={
-                    magicAction === "approve" ? "primary" : "danger"
-                  }
+                  variant={magicAction === "approve" ? "primary" : "danger"}
                   onPress={onConfirm}
                 >
                   {magicAction === "approve"
