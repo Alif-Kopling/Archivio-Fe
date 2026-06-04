@@ -53,7 +53,7 @@ export const ApprovalRow: FC<ApprovalRowProps> = memo(
           <Chip
             className={`capitalize border-none ${getSourceChipProps(doc.sourceType).className}`}
             size="sm"
-            variant="flat"
+            variant="soft"
           >
             {getSourceLabel(doc.sourceType)}
           </Chip>
@@ -80,7 +80,7 @@ export const ApprovalRow: FC<ApprovalRowProps> = memo(
                   className="text-success bg-success/10 hover:bg-success/20 backdrop-blur-sm"
                   isDisabled={approvedCount >= totalCount && totalCount > 0}
                   size="sm"
-                  variant="flat"
+                  variant="soft"
                   onClick={() => onApprove(doc)}
                 >
                   <CheckCircle2 size={16} />
@@ -94,7 +94,7 @@ export const ApprovalRow: FC<ApprovalRowProps> = memo(
                   isIconOnly
                   className="text-danger bg-danger/10 hover:bg-danger/20 backdrop-blur-sm"
                   size="sm"
-                  variant="flat"
+                  variant="soft"
                   onClick={() => onReject(doc)}
                 >
                   <XCircle size={16} />

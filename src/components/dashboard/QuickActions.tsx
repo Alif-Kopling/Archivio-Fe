@@ -36,23 +36,26 @@ export const QuickActions: FC = () => {
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <>
       {actions.map(({ label, icon: Icon, href, color, bg }) => (
-        <Link key={label} to={href}>
-          <Card className="border-none shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group hover:-translate-y-0.5">
-            <Card.Content className="p-4 flex items-center gap-3">
+        <Link key={label} className="block" to={href}>
+          <Card className="border-none shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer group hover:-translate-y-0.5 relative overflow-hidden">
+            <div
+              className={`absolute inset-0 opacity-[0.03] ${bg} group-hover:opacity-[0.08] transition-opacity`}
+            />
+            <Card.Content className="p-2.5 flex items-center gap-3 relative z-10">
               <div
-                className={`p-2.5 rounded-xl ${bg} ${color} group-hover:scale-105 transition-transform shrink-0`}
+                className={`p-2 rounded-xl ${bg} ${color} group-hover:scale-110 transition-all duration-300 shadow-sm shrink-0`}
               >
-                <Icon size={20} />
+                <Icon size={18} />
               </div>
-              <span className="text-sm font-semibold text-default-700 group-hover:text-foreground transition-colors truncate">
+              <span className="text-[10px] font-bold text-default-600 group-hover:text-foreground transition-colors uppercase tracking-tight truncate">
                 {label}
               </span>
             </Card.Content>
           </Card>
         </Link>
       ))}
-    </div>
+    </>
   );
 };

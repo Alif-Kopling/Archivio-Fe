@@ -32,7 +32,7 @@ const STAT_CONFIG: readonly StatConfigItem[] = [
     key: "pending",
     label: "Pending / Draft",
     Icon: Clock,
-    color: "text-warning",
+    color: "text-amber-500",
   },
   {
     key: "verified",
