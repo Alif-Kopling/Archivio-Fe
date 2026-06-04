@@ -1,5 +1,5 @@
 import { Avatar, Button, Chip, Table, Tooltip } from "@heroui/react";
-import { CheckCircle2, XCircle } from "lucide-react";
+import { CheckCircle2, XCircle, Eye } from "lucide-react";
 import { FC, memo } from "react";
 
 import {
@@ -15,10 +15,11 @@ interface ApprovalRowProps {
   doc: ApprovalDocument;
   onApprove: (doc: ApprovalDocument) => void;
   onReject: (doc: ApprovalDocument) => void;
+  onPreview: (doc: ApprovalDocument) => void;
 }
 
 export const ApprovalRow: FC<ApprovalRowProps> = memo(
-  ({ doc, onApprove, onReject }) => {
+  ({ doc, onApprove, onReject, onPreview }) => {
     const { label, color } = getStatusInfo(
       doc.status,
       doc.approverIds,
@@ -73,6 +74,20 @@ export const ApprovalRow: FC<ApprovalRowProps> = memo(
         </Table.Cell>
         <Table.Cell>
           <div className="flex gap-2 justify-center opacity-60 group-hover:opacity-100 transition-opacity">
+            <Tooltip>
+              <Tooltip.Trigger>
+                <Button
+                  isIconOnly
+                  className="text-primary bg-primary/10 hover:bg-primary/20 backdrop-blur-sm"
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => onPreview(doc)}
+                >
+                  <Eye size={16} />
+                </Button>
+              </Tooltip.Trigger>
+              <Tooltip.Content>Preview Document</Tooltip.Content>
+            </Tooltip>
             <Tooltip>
               <Tooltip.Trigger>
                 <Button

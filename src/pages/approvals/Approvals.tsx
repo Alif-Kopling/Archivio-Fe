@@ -16,6 +16,7 @@ import {
   ApprovalSearchBar,
   BulkActionModal,
   ApprovalPagination,
+  ApprovalPreviewModal,
   mapSourceType,
   type ApprovalDocument,
 } from "@/components/approvals";
@@ -35,6 +36,7 @@ export default function ApprovalsPage() {
   const [selectedKeys, setSelectedKeys] = useState<Set<string | number>>(new Set());
   const [isMagicModalOpen, setIsMagicModalOpen] = useState(false);
   const [magicAction, setMagicAction] = useState<"approve" | "reject" | null>(null);
+  const [previewDoc, setPreviewDoc] = useState<ApprovalDocument | null>(null);
   
   const notify = useNotify();
 
@@ -129,6 +131,10 @@ export default function ApprovalsPage() {
     } catch (error) {
       notify({ title: "Approval Failed", description: "Check backend logs.", status: "danger" });
     }
+  };
+
+  const handlePreview = (doc: ApprovalDocument) => {
+    setPreviewDoc(doc);
   };
 
   const handleReject = async (doc: ApprovalDocument) => {
@@ -272,6 +278,7 @@ export default function ApprovalsPage() {
                           doc={doc}
                           onApprove={handleApprove}
                           onReject={handleReject}
+                          onPreview={handlePreview}
                         />
                       ))
                     )}
@@ -296,6 +303,12 @@ export default function ApprovalsPage() {
         magicAction={magicAction}
         onConfirm={magicAction === "approve" ? handleBulkApprove : handleBulkReject}
         onOpenChange={setIsMagicModalOpen}
+      />
+
+      <ApprovalPreviewModal
+        doc={previewDoc}
+        isOpen={!!previewDoc}
+        onClose={() => setPreviewDoc(null)}
       />
     </div>
   );
