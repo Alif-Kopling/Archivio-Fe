@@ -1,7 +1,5 @@
 # Archivio — Enterprise Digital Archive System
 
-![Archivio Main Interface](./src/docs/Main%20menu.png)
-
 > **"Manage Documents Smarter, Not Harder"**  
 > Sistem manajemen arsip digital terintegrasi yang menggabungkan keamanan data tingkat tinggi dengan arsitektur antarmuka modern. Dirancang untuk mengoptimalkan efisiensi operasional, aksesibilitas instan, dan integritas dokumen dalam ekosistem digital.
 
