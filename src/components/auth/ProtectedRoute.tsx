@@ -19,7 +19,7 @@ const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
 
     if (!isAllowed) {
       return (
-        <Navigate replace to={role === "ADMIN" ? "/admin" : "/archives"} />
+        <Navigate replace to={role === "ADMIN" ? "/admin" : "/dashboard"} />
       );
     }
   }

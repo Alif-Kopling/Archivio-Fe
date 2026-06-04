@@ -280,14 +280,14 @@ export function useDocumentManagement({
 
   const handleBulkFileChange = (files: FileList | null) => {
     if (!files) return;
-    const newFiles: BulkFileItem[] = [];
     const today = getTodayDateString();
+    const newItems: BulkFileItem[] = [];
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       const title = stripFileExtension(file.name);
 
-      newFiles.push({
+      newItems.push({
         id: `${Date.now()}-${i}`,
         file,
         title,
@@ -296,7 +296,7 @@ export function useDocumentManagement({
         isValid: false,
       });
     }
-    setBulkFiles(newFiles);
+    setBulkFiles((current) => [...current, ...newItems]);
   };
 
   const handleBulkItemChange = (id: string, field: string, value: string) => {
@@ -324,12 +324,9 @@ export function useDocumentManagement({
 
       bulkFiles.forEach((item, index) => {
         formData.append("files", item.file);
-        formData.append(`title_${item.file.name}_${index}`, item.title);
-        formData.append(`sender_${item.file.name}_${index}`, item.sender);
-        formData.append(
-          `documentDate_${item.file.name}_${index}`,
-          item.documentDate,
-        );
+        formData.append(`title_${index}`, item.title);
+        formData.append(`sender_${index}`, item.sender);
+        formData.append(`documentDate_${index}`, item.documentDate);
       });
 
       formData.append(

@@ -153,6 +153,7 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     onBulkFileChange(event.target.files);
+    event.target.value = "";
   };
 
   const handleApplySenderToAll = () => {

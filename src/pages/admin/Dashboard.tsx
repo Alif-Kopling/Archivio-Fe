@@ -15,15 +15,10 @@ import {
   Users,
   TrendingUp,
   Trophy,
+  Trash2,
+  CalendarDays,
 } from "lucide-react";
-import {
-  XAxis,
-  CartesianGrid,
-  Tooltip as RechartsTooltip,
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-} from "recharts";
+
 import { motion } from "framer-motion";
 
 import api from "@/lib/axios";
@@ -40,6 +35,9 @@ interface Stats {
   total: number;
   pending: number;
   verified: number;
+  draft: number;
+  rejected: number;
+  thisMonth: number;
 }
 
 interface StatItem {
@@ -83,6 +81,9 @@ const StatsGrid: FC<{ stats: Stats }> = memo(({ stats }) => {
       { label: "Total Docs",  value: stats.total,   Icon: Files,      color: "text-primary",   trend: "+5.2%",  isUp: true },
       { label: "Pending",     value: stats.pending,  Icon: Hourglass,  color: "text-default-500",   trend: "+2.1%",  isUp: true },
       { label: "Verified",    value: stats.verified, Icon: ShieldCheck,color: "text-default-500", trend: "+12.5%", isUp: true },
+      { label: "Draft",       value: stats.draft,    Icon: Files,      color: "text-default-500", trend: "-",     isUp: true },
+      { label: "Rejected",    value: stats.rejected, Icon: Trash2,     color: "text-danger",     trend: "-",     isUp: false },
+      { label: "This Month",  value: stats.thisMonth,Icon: CalendarDays,color: "text-primary",    trend: "-",     isUp: true },
       { label: "Status",      value: "Online",       Icon: Activity,   color: "text-secondary", trend: "Stable", isUp: true, isTextValue: true },
     ],
     [stats],
@@ -129,22 +130,6 @@ const StatsGrid: FC<{ stats: Stats }> = memo(({ stats }) => {
   );
 });
 StatsGrid.displayName = "StatsGrid";
-
-// ─── Chart Tooltip ────────────────────────────────────────────────────────────
-const ChartTooltip: FC<{
-  active?: boolean;
-  payload?: { value: number }[];
-  label?: string;
-}> = ({ active, payload, label }) => {
-  if (!active || !payload?.length) return null;
-
-  return (
-    <div className="bg-content1 shadow-sm border border-divider rounded-lg py-1 px-2">
-      <p className="text-[10px] text-default-500">{label}</p>
-      <p className="text-xs font-bold text-foreground">{payload[0].value}</p>
-    </div>
-  );
-};
 
 // ─── Table — Document Distribution ───────────────────────────────────────────
 const DistributionChart: FC<{ stats: Stats }> = memo(({ stats }) => {
@@ -201,42 +186,228 @@ const DistributionChart: FC<{ stats: Stats }> = memo(({ stats }) => {
 });
 DistributionChart.displayName = "DistributionChart";
 
-// ─── Area Chart — Storage Growth ─────────────────────────────────────────────
-const GrowthChart: FC<{ data: MonitoringData["storageGrowth"] }> = ({ data }) => (
-  <Card className="border-divider shadow-sm flex flex-col h-full">
-    <Card.Content className="p-3 flex flex-col h-full">
-      <div className="flex justify-between items-center mb-2 shrink-0">
-        <div className="flex items-center gap-1.5">
-          <div className="p-1 rounded-lg bg-secondary/10 text-secondary">
-            <TrendingUp size={14} />
+// ─── Sparkline Table — Storage Growth ────────────────────────────────────────
+function linearPath(pts: { x: number; y: number }[]): string {
+  if (pts.length === 0) return "";
+  return pts.map((p, i) => `${i === 0 ? "M" : "L"}${p.x} ${p.y}`).join(" ");
+}
+
+function buildGradientStops(data: { count: number }[]): { offset: string; color: string }[] {
+  if (data.length < 2) return [];
+  const stops: { offset: string; color: string }[] = [];
+  const n = data.length;
+  for (let i = 0; i < n - 1; i++) {
+    const start = (i / (n - 1)) * 100;
+    const end = ((i + 1) / (n - 1)) * 100;
+    const c = data[i + 1].count > data[i].count ? "#17c964" : data[i + 1].count < data[i].count ? "#f31260" : "#9353d3";
+    stops.push({ offset: `${start}%`, color: c });
+    stops.push({ offset: `${end}%`, color: c });
+  }
+  return stops;
+}
+
+const GrowthTable: FC<{ data: MonitoringData["storageGrowth"] }> = ({ data }) => {
+  const {
+    rows, total, mainPath, sparkPath, gradientStops, overallChange,
+  } = useMemo(() => {
+    if (!data || data.length === 0) {
+      return {
+        rows: [], total: 0, mainPath: "", sparkPath: "",
+        gradientStops: [], overallChange: null,
+      };
+    }
+
+    const counts = data.map((d) => d.count);
+    const max = Math.max(...counts);
+    const min = Math.min(...counts);
+    const range = max - min || 1;
+    const sw = 80;
+
+    const computedRows = data.map((item, idx) => {
+      const prev = idx > 0 ? data[idx - 1].count : null;
+      const change = prev !== null ? ((item.count - prev) / prev) * 100 : null;
+      return { ...item, change };
+    });
+
+    const ptFn = (h: number) => (d: (typeof data)[0], i: number) => ({
+      x: data.length > 1 ? (i / (data.length - 1)) * sw : sw / 2,
+      y: h - ((d.count - min) / range) * (h - 4) - 2,
+    });
+
+    const mainPts = data.map(ptFn(36));
+    const sparkPts = data.map(ptFn(24));
+    const mainPath = linearPath(mainPts);
+    const sparkPath = linearPath(sparkPts);
+    const gradientStops = buildGradientStops(data);
+
+    const overall =
+      data.length > 1
+        ? ((data[data.length - 1].count - data[0].count) / data[0].count) * 100
+        : null;
+
+    return {
+      rows: computedRows,
+      total: counts.reduce((a, b) => a + b, 0),
+      mainPath,
+      sparkPath,
+      gradientStops,
+      overallChange: overall,
+    };
+  }, [data]);
+
+  if (!data || data.length === 0) {
+    return (
+      <Card className="border-divider shadow-sm flex flex-col h-full">
+        <Card.Content className="p-3 flex flex-col h-full justify-center items-center">
+          <TrendingUp size={20} className="text-default-300 mb-2" />
+          <p className="text-xs text-default-400">No growth data yet</p>
+        </Card.Content>
+      </Card>
+    );
+  }
+
+  const sw = 80;
+  const sh = 24;
+
+  return (
+    <Card className="border-divider shadow-sm flex flex-col h-full">
+      <Card.Content className="p-3 flex flex-col h-full">
+        <div className="flex justify-between items-center mb-2 shrink-0">
+          <div className="flex items-center gap-1.5">
+            <div className="p-1 rounded-lg bg-secondary/10 text-secondary">
+              <TrendingUp size={14} />
+            </div>
+            <h4 className="font-bold text-xs">Growth</h4>
           </div>
-          <h4 className="font-bold text-xs">Growth</h4>
+          <Chip className="h-4 text-[9px]" color="default" size="sm" variant="soft">
+            7 Days
+          </Chip>
         </div>
-        <Chip className="h-4 text-[9px]" color="default" size="sm" variant="soft">7 Days</Chip>
-      </div>
-      <div className="flex-1 min-h-0">
-        <ResponsiveContainer height="100%" width="100%">
-          <AreaChart data={data} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+
+        {/* ── Mini Chart ── */}
+        <div className="mb-2 shrink-0 relative">
+          <svg width="100%" height="40" viewBox="0 0 80 40" className="w-full overflow-visible">
             <defs>
-              <linearGradient id="colorCount" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="5%"  stopColor="#9353d3" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#9353d3" stopOpacity={0}   />
+              <linearGradient id="growthGrad" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stopColor="#9353d3" stopOpacity={0.15} />
+                <stop offset="100%" stopColor="#9353d3" stopOpacity={0} />
+              </linearGradient>
+              <linearGradient id="lineGrad" x1="0" x2="1" y1="0" y2="0">
+                {gradientStops.map((s, i) => (
+                  <stop key={i} offset={s.offset} stopColor={s.color} />
+                ))}
               </linearGradient>
             </defs>
-            <CartesianGrid className="stroke-default-100" strokeDasharray="3 3" vertical={false} />
-            <XAxis
-              axisLine={false} className="text-[9px]" dataKey="date"
-              tickFormatter={(v) => v.split("-").slice(2).join("/")}
-              tickLine={false}
+
+            <motion.path
+              d={`${mainPath} L80 40 L0 40 Z`}
+              fill="url(#growthGrad)"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6 }}
             />
-            <RechartsTooltip content={<ChartTooltip />} />
-            <Area dataKey="count" fill="url(#colorCount)" fillOpacity={1} stroke="#9353d3" strokeWidth={2} type="monotone" />
-          </AreaChart>
-        </ResponsiveContainer>
-      </div>
-    </Card.Content>
-  </Card>
-);
+
+            <motion.path
+              d={mainPath}
+              stroke="url(#lineGrad)"
+              strokeWidth={2.5}
+              fill="none"
+              strokeLinejoin="miter"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 0.5, ease: "linear" }}
+            />
+          </svg>
+        </div>
+
+        {/* ── Table ── */}
+        <div className="flex-1 min-h-0 overflow-auto">
+          <table className="w-full text-xs border-collapse">
+            <thead>
+              <tr className="text-[9px] font-bold text-default-400 uppercase tracking-wider">
+                <th className="text-left py-1 pr-2 font-medium">Date</th>
+                <th className="text-right py-1 px-2 font-medium">Docs</th>
+                <th className="text-right py-1 px-2 font-medium">Change</th>
+                <th className="text-right py-1 pl-2 font-medium">Trend</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row, idx) => (
+                <tr key={idx} className="group hover:bg-default-100/40 transition-colors">
+                  <td className="py-1.5 pr-2 font-medium text-foreground whitespace-nowrap">
+                    {row.date.split("-").slice(2).join("/")}
+                  </td>
+                  <td className="py-1.5 px-2 text-right font-bold tabular-nums text-foreground">
+                    {row.count}
+                  </td>
+                  <td className="py-1.5 px-2 text-right">
+                    {row.change !== null ? (
+                      <span className={`tabular-nums font-semibold ${row.change >= 0 ? "text-success" : "text-danger"}`}>
+                        {row.change >= 0 ? "+" : ""}
+                        {row.change.toFixed(1)}%
+                      </span>
+                    ) : (
+                      <span className="text-default-300">&mdash;</span>
+                    )}
+                  </td>
+                  <td className="py-1.5 pl-2 text-right">
+                    <svg width={sw} height={sh} viewBox={`0 0 ${sw} ${sh}`} className="inline-block align-middle overflow-visible">
+                      <defs>
+                        <linearGradient id={`sg-${idx}`} x1="0" x2="1" y1="0" y2="0">
+                          {gradientStops.map((s, i) => (
+                            <stop key={i} offset={s.offset} stopColor={s.color} />
+                          ))}
+                        </linearGradient>
+                      </defs>
+                      <path d={sparkPath} stroke={`url(#sg-${idx})`} strokeWidth={1.5} fill="none" className="opacity-40" />
+                    </svg>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr className="border-t border-divider">
+                <td className="pt-2 pr-2 font-bold text-foreground text-[10px]">Total</td>
+                <td className="pt-2 px-2 text-right font-bold tabular-nums text-foreground">{total}</td>
+                <td className="pt-2 px-2 text-right">
+                  {overallChange !== null ? (
+                    <span className={`tabular-nums font-semibold text-[10px] ${overallChange >= 0 ? "text-success" : "text-danger"}`}>
+                      {overallChange >= 0 ? "+" : ""}
+                      {overallChange.toFixed(1)}%
+                    </span>
+                  ) : (
+                    <span className="text-default-300">&mdash;</span>
+                  )}
+                </td>
+                <td className="pt-2 pl-2 text-right">
+                  <svg width={sw} height={sh} viewBox={`0 0 ${sw} ${sh}`} className="inline-block align-middle">
+                    <defs>
+                      <linearGradient id="sf" x1="0" x2="1" y1="0" y2="0">
+                        {gradientStops.map((s, i) => (
+                          <stop key={i} offset={s.offset} stopColor={s.color} />
+                        ))}
+                      </linearGradient>
+                    </defs>
+                    <motion.path
+                      d={sparkPath}
+                      stroke="url(#sf)"
+                      strokeWidth={2}
+                      fill="none"
+                      strokeLinejoin="miter"
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ duration: 0.5, delay: 0.2, ease: "linear" }}
+                    />
+                  </svg>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </Card.Content>
+    </Card>
+  );
+};
 
 // ─── Active Staff ─────────────────────────────────────────────────────────────
 const ActiveStaff: FC<{ data: MonitoringData["activeStaff"] }> = ({ data }) => (
@@ -313,7 +484,7 @@ const HealthBadge: FC = () => (
 const DashboardSkeleton: FC = () => (
   <div className="flex flex-col gap-4">
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {Array.from({ length: 4 }).map((_, i) => (
+      {Array.from({ length: 7 }).map((_, i) => (
         <Card key={i} className="h-[100px] bg-default-100 animate-pulse" />
       ))}
     </div>
@@ -327,7 +498,7 @@ const DashboardSkeleton: FC = () => (
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
 export default function AdminDashboard() {
-  const [stats,      setStats]      = useState<Stats>({ total: 0, pending: 0, verified: 0 });
+  const [stats,      setStats]      = useState<Stats>({ total: 0, pending: 0, verified: 0, draft: 0, rejected: 0, thisMonth: 0 });
   const [monitoring, setMonitoring] = useState<MonitoringData>({ activeStaff: [], storageGrowth: [], leaderboard: [] });
   const [loading,    setLoading]    = useState(true);
 
@@ -338,9 +509,12 @@ export default function AdminDashboard() {
       const payload  = response.data ?? {};
 
       setStats({
-        total:    Number(payload.stats?.total   || 0),
-        pending:  Number(payload.stats?.pending  || 0),
-        verified: Number(payload.stats?.verified || 0),
+        total:     Number(payload.stats?.total     || 0),
+        pending:   Number(payload.stats?.pending   || 0),
+        verified:  Number(payload.stats?.verified  || 0),
+        draft:     Number(payload.stats?.draft     || 0),
+        rejected:  Number(payload.stats?.rejected  || 0),
+        thisMonth: Number(payload.stats?.thisMonth || 0),
       });
       if (payload.monitoring) {
         setMonitoring({
@@ -366,8 +540,8 @@ export default function AdminDashboard() {
       {loading ? <DashboardSkeleton /> : (
         <div className="flex-1 flex flex-col gap-3 min-h-0">
           {/* ── Row 2: Stats Cards ── */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 shrink-0">
-            <StatsGrid stats={stats} />
+           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 shrink-0">
+            <StatsGrid stats={stats as Stats} />
           </div>
 
           {/* ── Row 3: Main content area ── */}
@@ -387,7 +561,7 @@ export default function AdminDashboard() {
                 <DistributionChart stats={stats} />
               </div>
               <div className="flex-1 min-h-0">
-                <GrowthChart data={monitoring.storageGrowth} />
+                <GrowthTable data={monitoring.storageGrowth} />
               </div>
             </div>
 

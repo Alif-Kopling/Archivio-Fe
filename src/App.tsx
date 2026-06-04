@@ -2,6 +2,7 @@
 import { Route, Routes, Navigate } from "react-router-dom";
 
 import AdminPage from "@/pages/admin/Dashboard";
+import StaffDashboard from "@/pages/staff/StaffDashboard";
 import ApprovalsPage from "@/pages/approvals/Approvals";
 import UsersPage from "@/pages/admin/Users";
 import SettingsPage from "@/pages/admin/Settings";
@@ -39,6 +40,7 @@ function App() {
         {/* Shared Protected Routes (Admin & Staff) */}
         <Route element={<ProtectedRoute allowedRoles={["ADMIN", "STAFF"]} />}>
           <Route element={<AdminLayout />}>
+            <Route element={<StaffDashboard />} path="/dashboard" />
             <Route element={<ApprovalsPage />} path="/approvals" />
             <Route element={<ArchiveLayout />} path="/archives">
               <Route element={<Navigate replace to="surat-masuk" />} index />

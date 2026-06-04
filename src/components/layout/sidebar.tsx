@@ -98,8 +98,8 @@ export const Sidebar: FC = () => {
     {
       icon: LayoutDashboard,
       label: "Dashboard",
-      href: "/admin",
-      roles: ["ADMIN"],
+      href: isAdmin ? "/admin" : "/dashboard",
+      roles: ["ADMIN", "STAFF"],
     },
     {
       icon: FileText,

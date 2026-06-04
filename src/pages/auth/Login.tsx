@@ -100,7 +100,7 @@ export default function LoginPage() {
         if (userRole === "ADMIN") {
           navigate("/admin");
         } else {
-          navigate("/archives");
+          navigate("/dashboard");
         }
       }, 2000);
     } catch (err: any) {

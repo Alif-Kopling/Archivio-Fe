@@ -1,6 +1,6 @@
-import { useRef, useState } from "react";
 import { Award, Clock, CheckCircle2 } from "lucide-react";
 
+import { DocumentUploadDialog } from "@/components/documents/DocumentUploadDialog";
 import { DocumentPreviewDialog } from "@/components/documents/DocumentPreviewDialog";
 import { StorageIndicator } from "@/components/dashboard/StorageIndicator";
 import {
@@ -11,10 +11,9 @@ import {
 import { DocumentRow } from "@/components/documents/DocumentRow";
 import { DocumentList } from "@/components/documents/DocumentList";
 import { useDocumentManagement } from "@/hooks/useDocumentManagement";
-import { useNotify } from "@/context/NotificationContext";
-import api from "@/lib/axios";
 
-const ACCEPTED_FORMATS = ".pdf,.jpg,.jpeg,.png";
+const ACCEPTED_UPLOAD_FORMATS = ".pdf,.jpg,.jpeg,.png";
+const ACCEPTED_UPLOAD_FORMATS_LABEL = "PDF, JPG, JPEG, PNG";
 
 const STAT_CONFIG: readonly StatConfigItem[] = [
   {
@@ -38,12 +37,9 @@ const STAT_CONFIG: readonly StatConfigItem[] = [
 ] as const;
 
 export default function SertifikatPage() {
-  const notify = useNotify();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [issuer, setIssuer] = useState("");
-
   const {
     files,
+    loading,
     previewFile,
     previewUrl,
     previewLoading,
@@ -57,15 +53,28 @@ export default function SertifikatPage() {
     setSortBy,
     sortOrder,
     setSortOrder,
+    uploadOpen,
+    uploadForm,
+    bulkFiles,
+    uploadMode,
     page,
     setPage,
     totalPages,
     total,
+    openUploadDialog,
+    closeUploadDialog,
+    handleUploadFieldChange,
+    handleUploadFileChange,
+    handleSubmitUpload,
     handleDelete,
     handleDownload,
     handleView,
     handleClosePreview,
-    fetchDocuments,
+    handleBulkFileChange,
+    handleBulkItemChange,
+    handleBulkItemRemove,
+    handleBulkSubmit,
+    setUploadMode,
     selectedIds,
     isSelectionMode,
     toggleSelection,
@@ -73,53 +82,30 @@ export default function SertifikatPage() {
     handleBulkDelete,
   } = useDocumentManagement({ endpoint: "/sertifikat" });
 
-  const handleUploadClick = () => fileInputRef.current?.click();
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-
-    if (!file) return;
-
-    const formData = new FormData();
-
-    formData.append("file", file);
-    formData.append("title", file.name);
-    formData.append("status", "pending");
-    if (issuer) {
-      formData.append("issuer", issuer);
-    }
-
-    try {
-      await api.post("/sertifikat", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      notify({
-        title: "Certificate Uploaded",
-        description:
-          "Your document has been submitted and is pending administrator approval.",
-        status: "success",
-      });
-      setIssuer("");
-      fetchDocuments();
-    } catch (error: any) {
-      notify({
-        title: "Upload Failed",
-        description: error.response?.data?.error ?? error.message,
-        status: "danger",
-      });
-    } finally {
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    }
-  };
-
   return (
     <div className="flex flex-col gap-4 w-full h-full pb-2 ">
-      <input
-        ref={fileInputRef}
-        accept={ACCEPTED_FORMATS}
-        className="hidden"
-        type="file"
-        onChange={handleFileChange}
+      <DocumentUploadDialog
+        acceptedFormats={ACCEPTED_UPLOAD_FORMATS}
+        acceptedFormatsLabel={ACCEPTED_UPLOAD_FORMATS_LABEL}
+        badgeClassName="bg-amber-500/10 text-amber-500"
+        badgeIcon={<Award size={22} />}
+        bulkFiles={bulkFiles}
+        description="Tambahkan metadata sebelum sertifikat masuk ke arsip."
+        form={uploadForm}
+        loading={loading}
+        open={uploadOpen}
+        submitLabel="Upload Certificate"
+        title="Upload Certificate"
+        uploadMode={uploadMode}
+        onBulkFileChange={handleBulkFileChange}
+        onBulkItemChange={handleBulkItemChange}
+        onBulkItemRemove={handleBulkItemRemove}
+        onBulkSubmit={handleBulkSubmit}
+        onClose={closeUploadDialog}
+        onFieldChange={handleUploadFieldChange}
+        onFileChange={handleUploadFileChange}
+        onModeChange={setUploadMode}
+        onSubmit={handleSubmitUpload}
       />
       <ArchiveStats configs={STAT_CONFIG} stats={stats as any} />
       <TabsNavigation />
@@ -166,7 +152,7 @@ export default function SertifikatPage() {
             setStatusFilter(v);
             setPage(1);
           }}
-          onUploadClick={handleUploadClick}
+          onUploadClick={openUploadDialog}
         />
       </div>
       <div className="flex items-center justify-between px-1 py-1">
