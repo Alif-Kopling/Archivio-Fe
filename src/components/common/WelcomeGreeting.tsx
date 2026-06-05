@@ -1,4 +1,5 @@
 import { FC, useEffect, useMemo, useRef, useState } from "react";
+import { motion } from "framer-motion";
 
 interface Quote {
   text: string;
@@ -40,10 +41,43 @@ interface WelcomeGreetingProps {
 
 export const WelcomeGreeting: FC<WelcomeGreetingProps> = ({ userName }) => {
   const greeting = useMemo(() => getGreeting(), []);
+  const fullText = useMemo(() => `${greeting}, ${userName}.`, [greeting, userName]);
   const quote = useMemo(() => quotes[Math.floor(Math.random() * quotes.length)], []);
   const [imgSrc, setImgSrc] = useState<string | null>(imageCache.get(quote.wiki) || null);
   const [imgError, setImgError] = useState(false);
   const fetchedRef = useRef(false);
+  const [displayCount, setDisplayCount] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showCursor, setShowCursor] = useState(true);
+
+  useEffect(() => {
+    const typingSpeed = 60;
+    const deletingSpeed = 35;
+    const pauseAtEnd = 2000;
+    const pauseAtStart = 800;
+
+    if (!isDeleting && displayCount < fullText.length) {
+      const timer = setTimeout(() => setDisplayCount((prev) => prev + 1), typingSpeed);
+      return () => clearTimeout(timer);
+    }
+    if (!isDeleting && displayCount === fullText.length) {
+      const timer = setTimeout(() => setIsDeleting(true), pauseAtEnd);
+      return () => clearTimeout(timer);
+    }
+    if (isDeleting && displayCount > 0) {
+      const timer = setTimeout(() => setDisplayCount((prev) => prev - 1), deletingSpeed);
+      return () => clearTimeout(timer);
+    }
+    if (isDeleting && displayCount === 0) {
+      const timer = setTimeout(() => setIsDeleting(false), pauseAtStart);
+      return () => clearTimeout(timer);
+    }
+  }, [displayCount, isDeleting, fullText.length]);
+
+  useEffect(() => {
+    const interval = setInterval(() => setShowCursor((prev) => !prev), 530);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (imageCache.has(quote.wiki)) {
@@ -68,8 +102,21 @@ export const WelcomeGreeting: FC<WelcomeGreetingProps> = ({ userName }) => {
 
   return (
     <div className="flex flex-col items-center text-center gap-2">
-      <p className="text-5xl font-extrabold tracking-tight text-foreground">
-        {greeting}, {userName}.
+      <p className="text-5xl font-extrabold tracking-tight text-foreground min-h-[1.2em]">
+        {fullText.split("").map((char, i) => (
+          <motion.span
+            key={i}
+            animate={{ opacity: i < displayCount ? 1 : 0 }}
+            transition={{ duration: 0.05 }}
+          >
+            {char}
+          </motion.span>
+        ))}
+        {displayCount > 0 && displayCount < fullText.length && (
+          <span
+            className={`inline-block w-[3px] h-[1em] bg-foreground ml-0.5 align-middle transition-opacity duration-150 ${showCursor ? "opacity-100" : "opacity-0"}`}
+          />
+        )}
       </p>
       <div className="max-w-md mt-6">
         <div className="flex items-start gap-4">
