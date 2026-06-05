@@ -35,6 +35,7 @@ interface Stats {
   pending: number;
   verified: number;
   thisMonth: number;
+  thisMonthTrend?: number;
 }
 
 interface StatItem {
@@ -78,7 +79,7 @@ const StatsGrid: FC<{ stats: Stats }> = memo(({ stats }) => {
       { label: "Total Docs",  value: stats.total,   Icon: Files,      color: "text-primary",   trend: "+5.2%",  isUp: true },
       { label: "Pending",     value: stats.pending,  Icon: Hourglass,  color: "text-warning",   trend: "+2.1%",  isUp: true },
       { label: "Verified",    value: stats.verified, Icon: ShieldCheck,color: "text-success", trend: "+12.5%", isUp: true },
-      { label: "This Month",  value: stats.thisMonth,Icon: CalendarDays,color: "text-primary",    trend: "-",     isUp: true },
+      { label: "This Month",  value: stats.thisMonth,Icon: CalendarDays,color: "text-primary",    trend: stats.thisMonthTrend !== undefined ? `${stats.thisMonthTrend >= 0 ? "+" : ""}${stats.thisMonthTrend}%` : "-", isUp: (stats.thisMonthTrend ?? 0) >= 0 },
     ],
     [stats],
   );
@@ -507,6 +508,7 @@ export default function AdminDashboard() {
         pending:   Number(payload.stats?.pending   || 0),
         verified:  Number(payload.stats?.verified  || 0),
         thisMonth: Number(payload.stats?.thisMonth || 0),
+        thisMonthTrend: payload.stats?.thisMonthTrend,
       });
       if (payload.monitoring) {
         setMonitoring({
