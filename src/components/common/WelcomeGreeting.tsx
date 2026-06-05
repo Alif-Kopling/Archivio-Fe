@@ -40,7 +40,7 @@ interface WelcomeGreetingProps {
 }
 
 export const WelcomeGreeting: FC<WelcomeGreetingProps> = ({ userName }) => {
-  const greeting = useMemo(() => getGreeting(), []);
+  const greeting = getGreeting();
   const fullText = useMemo(() => `${greeting}, ${userName}.`, [greeting, userName]);
   const quote = useMemo(() => quotes[Math.floor(Math.random() * quotes.length)], []);
   const [imgSrc, setImgSrc] = useState<string | null>(imageCache.get(quote.wiki) || null);
