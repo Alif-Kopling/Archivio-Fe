@@ -93,16 +93,10 @@ export default function LoginPage() {
 
       setSuccess(`Welcome back, ${user.name}!`);
 
-      const userRole = user.role.toUpperCase();
-
       // brief delay so user sees the success message
       setTimeout(() => {
-        if (userRole === "ADMIN") {
-          navigate("/admin");
-        } else {
-          navigate("/dashboard");
-        }
-      }, 2000);
+        navigate("/welcome");
+      }, 1500);
     } catch (err: any) {
       setError(err.response?.data?.message || "Invalid email or password.");
       // Auto hide error after 5 seconds

@@ -8,6 +8,7 @@ import UsersPage from "@/pages/admin/Users";
 import SettingsPage from "@/pages/admin/Settings";
 import AuditLogPage from "@/pages/admin/AuditLog";
 import LoginPage from "@/pages/auth/Login";
+import WelcomePage from "@/pages/Welcome";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import IndexPage from "@/pages/Home";
 import AdminLayout from "@/layouts/admin";
@@ -26,6 +27,11 @@ function App() {
         {/* Public Routes */}
         <Route element={<LoginPage />} path="/login" />
         <Route element={<IndexPage />} path="/" />
+
+        {/* Welcome Landing (after login) */}
+        <Route element={<ProtectedRoute allowedRoles={["ADMIN", "STAFF"]} />}>
+          <Route element={<WelcomePage />} path="/welcome" />
+        </Route>
 
         {/* Admin Specific Routes */}
         <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
