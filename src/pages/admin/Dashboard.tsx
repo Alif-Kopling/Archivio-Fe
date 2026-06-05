@@ -15,7 +15,6 @@ import {
   Users,
   TrendingUp,
   Trophy,
-  Trash2,
   CalendarDays,
 } from "lucide-react";
 
@@ -35,8 +34,6 @@ interface Stats {
   total: number;
   pending: number;
   verified: number;
-  draft: number;
-  rejected: number;
   thisMonth: number;
 }
 
@@ -79,12 +76,9 @@ const StatsGrid: FC<{ stats: Stats }> = memo(({ stats }) => {
   const items = useMemo<StatItem[]>(
     () => [
       { label: "Total Docs",  value: stats.total,   Icon: Files,      color: "text-primary",   trend: "+5.2%",  isUp: true },
-      { label: "Pending",     value: stats.pending,  Icon: Hourglass,  color: "text-default-500",   trend: "+2.1%",  isUp: true },
-      { label: "Verified",    value: stats.verified, Icon: ShieldCheck,color: "text-default-500", trend: "+12.5%", isUp: true },
-      { label: "Draft",       value: stats.draft,    Icon: Files,      color: "text-default-500", trend: "-",     isUp: true },
-      { label: "Rejected",    value: stats.rejected, Icon: Trash2,     color: "text-danger",     trend: "-",     isUp: false },
+      { label: "Pending",     value: stats.pending,  Icon: Hourglass,  color: "text-warning",   trend: "+2.1%",  isUp: true },
+      { label: "Verified",    value: stats.verified, Icon: ShieldCheck,color: "text-success", trend: "+12.5%", isUp: true },
       { label: "This Month",  value: stats.thisMonth,Icon: CalendarDays,color: "text-primary",    trend: "-",     isUp: true },
-      { label: "Status",      value: "Online",       Icon: Activity,   color: "text-secondary", trend: "Stable", isUp: true, isTextValue: true },
     ],
     [stats],
   );
@@ -484,7 +478,7 @@ const HealthBadge: FC = () => (
 const DashboardSkeleton: FC = () => (
   <div className="flex flex-col gap-4">
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {Array.from({ length: 7 }).map((_, i) => (
+      {Array.from({ length: 4 }).map((_, i) => (
         <Card key={i} className="h-[100px] bg-default-100 animate-pulse" />
       ))}
     </div>
@@ -498,7 +492,7 @@ const DashboardSkeleton: FC = () => (
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
 export default function AdminDashboard() {
-  const [stats,      setStats]      = useState<Stats>({ total: 0, pending: 0, verified: 0, draft: 0, rejected: 0, thisMonth: 0 });
+  const [stats,      setStats]      = useState<Stats>({ total: 0, pending: 0, verified: 0, thisMonth: 0 });
   const [monitoring, setMonitoring] = useState<MonitoringData>({ activeStaff: [], storageGrowth: [], leaderboard: [] });
   const [loading,    setLoading]    = useState(true);
 
@@ -512,8 +506,6 @@ export default function AdminDashboard() {
         total:     Number(payload.stats?.total     || 0),
         pending:   Number(payload.stats?.pending   || 0),
         verified:  Number(payload.stats?.verified  || 0),
-        draft:     Number(payload.stats?.draft     || 0),
-        rejected:  Number(payload.stats?.rejected  || 0),
         thisMonth: Number(payload.stats?.thisMonth || 0),
       });
       if (payload.monitoring) {
