@@ -46,6 +46,45 @@ const formatMonth = (m: string) => {
   return months[parseInt(mm, 10) - 1] || m;
 };
 
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (!active || !payload || payload.length === 0) return null;
+
+  const items = [
+    { key: "masuk", label: "Surat Masuk", color: CHART_COLORS.masuk },
+    { key: "keluar", label: "Surat Keluar", color: CHART_COLORS.keluar },
+    { key: "sertifikat", label: "Sertifikat", color: CHART_COLORS.sertifikat },
+  ];
+
+  return (
+    <Card className="min-w-[140px] shadow-md border-divider rounded-lg">
+      <Card.Content className="px-3 py-2">
+        <p className="text-xs font-bold text-foreground mb-1">{label}</p>
+        <div className="h-px bg-divider mb-1.5" />
+        {items.map(({ key, label: lbl, color }) => {
+          const p = payload.find((d: any) => d.dataKey === key);
+          const val = p?.value ?? 0;
+          return (
+            <div key={key} className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
+                <span className="text-[10px] text-default-500">{lbl}</span>
+              </div>
+              <span className="text-[10px] font-bold text-foreground tabular-nums">{val}</span>
+            </div>
+          );
+        })}
+        <div className="h-px bg-divider mt-1.5 mb-1" />
+        <div className="flex items-center justify-between gap-4">
+          <span className="text-[10px] font-semibold text-default-500">Total</span>
+          <span className="text-[10px] font-bold text-foreground tabular-nums">
+            {payload.reduce((s: number, d: any) => s + (d.value ?? 0), 0)}
+          </span>
+        </div>
+      </Card.Content>
+    </Card>
+  );
+};
+
 const TrendsChart: FC<{ data: TrendItem[] }> = ({ data }) => {
   const chartData = useMemo(() => {
     return data.map((d) => ({
@@ -112,12 +151,7 @@ const TrendsChart: FC<{ data: TrendItem[] }> = ({ data }) => {
                 tickLine={false}
               />
               <Tooltip
-                contentStyle={{
-                  fontSize: 11,
-                  borderRadius: 8,
-                  border: "1px solid hsl(var(--heroui-default-200))",
-                  background: "hsl(var(--heroui-background))",
-                }}
+                content={<CustomTooltip />}
                 cursor={{
                   fill: "hsl(var(--heroui-default-100))",
                   opacity: 0.5,
@@ -136,6 +170,12 @@ const TrendsChart: FC<{ data: TrendItem[] }> = ({ data }) => {
                 name="Surat Masuk"
                 radius={[0, 0, 0, 0]}
                 stackId="type"
+                shape={(props: any) => {
+                  const { x, y, width, height, payload } = props;
+                  if (payload.total > 0) return <rect x={x} y={y} width={width} height={height} fill={CHART_COLORS.masuk} rx={0} />;
+                  const segW = width / 3;
+                  return <rect x={x} y={y + height - 4} width={segW} height={4} fill={CHART_COLORS.masuk} opacity={0.3} rx={1} />;
+                }}
               />
               <Bar
                 dataKey="keluar"
@@ -143,6 +183,12 @@ const TrendsChart: FC<{ data: TrendItem[] }> = ({ data }) => {
                 name="Surat Keluar"
                 radius={[0, 0, 0, 0]}
                 stackId="type"
+                shape={(props: any) => {
+                  const { x, y, width, height, payload } = props;
+                  if (payload.total > 0) return <rect x={x} y={y} width={width} height={height} fill={CHART_COLORS.keluar} rx={0} />;
+                  const segW = width / 3;
+                  return <rect x={x + segW} y={y + height - 4} width={segW} height={4} fill={CHART_COLORS.keluar} opacity={0.3} rx={1} />;
+                }}
               />
               <Bar
                 dataKey="sertifikat"
@@ -150,6 +196,12 @@ const TrendsChart: FC<{ data: TrendItem[] }> = ({ data }) => {
                 name="Sertifikat"
                 radius={[4, 4, 0, 0]}
                 stackId="type"
+                shape={(props: any) => {
+                  const { x, y, width, height, payload } = props;
+                  if (payload.total > 0) return <rect x={x} y={y} width={width} height={height} fill={CHART_COLORS.sertifikat} rx={4} />;
+                  const segW = width / 3;
+                  return <rect x={x + segW * 2} y={y + height - 4} width={segW} height={4} fill={CHART_COLORS.sertifikat} opacity={0.3} rx={1} />;
+                }}
               />
             </BarChart>
           </ResponsiveContainer>
