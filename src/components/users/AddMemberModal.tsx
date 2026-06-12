@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button, Input, Label, ListBox, Modal, Select } from "@heroui/react";
-import { Mail, Shield, User, UserPlus, X } from "lucide-react";
+import { Mail, Shield, User, UserPlus, X, KeyRound } from "lucide-react";
+import { motion, type Variants } from "framer-motion";
 
 import api from "@/lib/axios";
 import { useNotify } from "@/context/NotificationContext";
@@ -38,6 +39,15 @@ interface FormData {
 function validateEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
+
+const fieldVariants: Variants = {
+  hidden: { opacity: 0, x: -10 },
+  visible: (i: number) => ({
+    opacity: 1,
+    x: 0,
+    transition: { delay: (i as number) * 0.06, duration: 0.2, ease: "easeOut" },
+  }),
+};
 
 export default function AddMemberModal({ onSuccess }: AddMemberModalProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -124,12 +134,20 @@ export default function AddMemberModal({ onSuccess }: AddMemberModalProps) {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const fields = [
+    { id: "name" as const, label: "Full Name", icon: User, placeholder: "Enter full name", type: "text" },
+    { id: "email" as const, label: "Email Address", icon: Mail, placeholder: "Enter email address", type: "email" },
+    { id: "password" as const, label: "Password", icon: KeyRound, placeholder: "Set a secure password", type: "password" },
+  ];
+
   return (
     <Modal isOpen={isOpen} onOpenChange={setIsOpen}>
-      <Button className="gap-2 shadow-lg shadow-primary/20" variant="primary">
-        <UserPlus size={18} />
-        Register User
-      </Button>
+      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+        <Button className="gap-2 shadow-lg shadow-primary/20" variant="primary">
+          <UserPlus size={18} />
+          Register User
+        </Button>
+      </motion.div>
 
       <Modal.Backdrop
         className="bg-black/35 backdrop-blur-0"
@@ -149,54 +167,39 @@ export default function AddMemberModal({ onSuccess }: AddMemberModalProps) {
               </p>
             </Modal.Header>
             <Modal.Body className="flex flex-col gap-4 p-6 py-2">
-              <div className="space-y-1.5">
-                <Label
-                  className="flex items-center gap-1.5 text-xs font-bold text-foreground"
-                  htmlFor="user-name"
+              {fields.map(({ id, label, icon: Icon, placeholder, type }, i) => (
+                <motion.div
+                  key={id}
+                  custom={i}
+                  variants={fieldVariants}
+                  initial="hidden"
+                  animate={isOpen ? "visible" : "hidden"}
+                  className="space-y-1.5"
                 >
-                  <User size={14} /> Full Name
-                </Label>
-                <Input
-                  className="h-10 w-full"
-                  id="user-name"
-                  placeholder="Enter full name"
-                  value={formData.name}
-                  onChange={(e) => updateField("name", e.target.value)}
-                />
-              </div>
-              <div className="space-y-1.5 mt-2">
-                <Label
-                  className="flex items-center gap-1.5 text-xs font-bold text-foreground"
-                  htmlFor="user-email"
-                >
-                  <Mail size={14} /> Email Address
-                </Label>
-                <Input
-                  className="h-10 w-full"
-                  id="user-email"
-                  placeholder="Enter email address"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => updateField("email", e.target.value)}
-                />
-              </div>
-              <div className="space-y-1.5 mt-2">
-                <Label
-                  className="flex items-center gap-1.5 text-xs font-bold text-foreground"
-                  htmlFor="user-password"
-                >
-                  <Shield size={14} /> Password
-                </Label>
-                <Input
-                  className="h-10 w-full"
-                  id="user-password"
-                  placeholder="Set a secure password"
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => updateField("password", e.target.value)}
-                />
-              </div>
-              <div className="space-y-1.5 mt-2">
+                  <Label
+                    className="flex items-center gap-1.5 text-xs font-bold text-foreground"
+                    htmlFor={`user-${id}`}
+                  >
+                    <Icon size={14} /> {label}
+                  </Label>
+                  <Input
+                    className="h-10 w-full"
+                    id={`user-${id}`}
+                    placeholder={placeholder}
+                    type={type}
+                    value={formData[id]}
+                    onChange={(e) => updateField(id, e.target.value)}
+                  />
+                </motion.div>
+              ))}
+
+              <motion.div
+                custom={3}
+                variants={fieldVariants}
+                initial="hidden"
+                animate={isOpen ? "visible" : "hidden"}
+                className="space-y-1.5"
+              >
                 <Label
                   className="flex items-center gap-1.5 text-xs font-bold text-foreground"
                   htmlFor="user-role"
@@ -227,7 +230,7 @@ export default function AddMemberModal({ onSuccess }: AddMemberModalProps) {
                     </ListBox>
                   </Select.Popover>
                 </Select>
-              </div>
+              </motion.div>
             </Modal.Body>
             <Modal.Footer className="flex justify-end gap-3 p-6 pt-4">
               <Button
