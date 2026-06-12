@@ -2,6 +2,7 @@ import { FC } from "react";
 import { Card } from "@heroui/react";
 import { Users, ClipboardCheck, Settings, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 export const QuickActions: FC = () => {
   const actions = [
@@ -37,24 +38,34 @@ export const QuickActions: FC = () => {
 
   return (
     <>
-      {actions.map(({ label, icon: Icon, href, color, bg }) => (
-        <Link key={label} className="block" to={href}>
-          <Card className="border-none shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer group hover:-translate-y-0.5 relative overflow-hidden">
-            <div
-              className={`absolute inset-0 opacity-[0.03] ${bg} group-hover:opacity-[0.08] transition-opacity`}
-            />
-            <Card.Content className="p-2.5 flex items-center gap-3 relative z-10">
+      {actions.map(({ label, icon: Icon, href, color, bg }, idx) => (
+        <motion.div
+          key={label}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, delay: 0.35 + idx * 0.08, ease: "easeOut" }}
+        >
+          <Link className="block" to={href}>
+            <Card className="border-none shadow-sm cursor-pointer group relative overflow-hidden hover:shadow-lg transition-all duration-500">
               <div
-                className={`p-2 rounded-xl ${bg} ${color} group-hover:scale-110 transition-all duration-300 shadow-sm shrink-0`}
-              >
-                <Icon size={18} />
-              </div>
-              <span className="text-[10px] font-bold text-default-600 group-hover:text-foreground transition-colors uppercase tracking-tight truncate">
-                {label}
-              </span>
-            </Card.Content>
-          </Card>
-        </Link>
+                className={`absolute inset-0 opacity-[0.03] ${bg} group-hover:opacity-[0.1] transition-all duration-500`}
+              />
+              <Card.Content className="p-2.5 flex items-center gap-3 relative z-10">
+                <motion.div
+                  className={`p-2 rounded-xl ${bg} ${color} shadow-sm shrink-0`}
+                  whileHover={{ rotate: [0, -10, 10, 0], scale: 1.15 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <Icon size={18} />
+                </motion.div>
+                <span className="text-[10px] font-bold text-default-600 group-hover:text-foreground transition-colors uppercase tracking-tight truncate">
+                  {label}
+                </span>
+              </Card.Content>
+              <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-500 shimmer-overlay" />
+            </Card>
+          </Link>
+        </motion.div>
       ))}
     </>
   );

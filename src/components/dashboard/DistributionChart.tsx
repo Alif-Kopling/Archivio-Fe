@@ -3,9 +3,20 @@ import type { DashboardStats } from "@/components/dashboard/StatsGrid";
 import { FC, memo, useMemo } from "react";
 import { Card } from "@heroui/react";
 import { motion } from "framer-motion";
+import { Clock, CheckCircle, FileText } from "lucide-react";
+
+interface RowConfig {
+  label: string;
+  count: number;
+  pct: number;
+  color: string;
+  dot: string;
+  gradient: string;
+  Icon: typeof Clock;
+}
 
 const DistributionChart: FC<{ stats: DashboardStats }> = memo(({ stats }) => {
-  const rows = useMemo(() => {
+  const rows = useMemo<RowConfig[]>(() => {
     const total = stats.total || 1;
 
     return [
@@ -15,6 +26,8 @@ const DistributionChart: FC<{ stats: DashboardStats }> = memo(({ stats }) => {
         pct: (stats.pending / total) * 100,
         color: "bg-warning",
         dot: "bg-warning",
+        gradient: "from-warning-300 to-warning-500",
+        Icon: Clock,
       },
       {
         label: "Verified",
@@ -22,6 +35,8 @@ const DistributionChart: FC<{ stats: DashboardStats }> = memo(({ stats }) => {
         pct: (stats.verified / total) * 100,
         color: "bg-success",
         dot: "bg-success",
+        gradient: "from-success-300 to-success-500",
+        Icon: CheckCircle,
       },
       {
         label: "Total",
@@ -29,12 +44,14 @@ const DistributionChart: FC<{ stats: DashboardStats }> = memo(({ stats }) => {
         pct: 100,
         color: "bg-primary",
         dot: "bg-primary",
+        gradient: "from-primary-300 to-primary-500",
+        Icon: FileText,
       },
     ];
   }, [stats]);
 
   return (
-    <Card className="border-divider shadow-sm flex flex-col h-full">
+    <Card className="border-divider shadow-sm flex flex-col h-full overflow-hidden group">
       <Card.Content className="p-3 flex flex-col h-full">
         <div className="flex justify-between items-center mb-3 shrink-0">
           <div>
@@ -51,13 +68,18 @@ const DistributionChart: FC<{ stats: DashboardStats }> = memo(({ stats }) => {
               <span className="text-right">Count</span>
               <span className="text-right">%</span>
             </div>
-            {rows.map((r) => (
-              <div key={r.label} className="group">
+            {rows.map((r, idx) => (
+              <motion.div
+                key={r.label}
+                initial={{ opacity: 0, x: -12 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.35, delay: 0.1 + idx * 0.12, ease: "easeOut" }}
+                className="group/row"
+              >
                 <div className="grid grid-cols-[1fr_44px_48px] gap-x-2 items-center px-2 py-1.5 rounded-lg hover:bg-default-100/50 transition-colors">
                   <div className="flex items-center gap-2 min-w-0">
-                    <span
-                      className={`w-2 h-2 rounded-full shrink-0 ${r.dot}`}
-                    />
+                    <span className={`w-2 h-2 rounded-full shrink-0 ${r.dot} group-hover/row:animate-pulse`} />
+                    <r.Icon size={11} className="text-default-400 group-hover/row:hidden shrink-0" />
                     <span className="text-xs font-semibold text-foreground truncate">
                       {r.label}
                     </span>
@@ -69,15 +91,17 @@ const DistributionChart: FC<{ stats: DashboardStats }> = memo(({ stats }) => {
                     {r.pct.toFixed(1)}%
                   </span>
                 </div>
-                <div className="h-1.5 rounded-full bg-default-100 mx-2 overflow-hidden">
+                <div className="h-2 rounded-full bg-default-100 mx-2 overflow-hidden relative">
                   <motion.div
                     animate={{ width: `${r.pct}%` }}
-                    className={`h-full rounded-full ${r.color}`}
+                    className={`h-full rounded-full ${r.color} relative`}
                     initial={{ width: 0 }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
-                  />
+                    transition={{ duration: 0.8, delay: 0.2 + idx * 0.12, ease: "easeOut" }}
+                  >
+                    <div className="absolute inset-0 rounded-full shimmer-overlay" />
+                  </motion.div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>

@@ -14,6 +14,8 @@ import {
   CheckCheck,
   History,
   Menu,
+  ChevronLeft,
+  FolderArchive,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
@@ -23,17 +25,43 @@ import {
   Drawer,
   useOverlayState,
 } from "@heroui/react";
+import { motion } from "framer-motion";
 
 import { Logo } from "@/components/common/icons";
 import { getRole, getUserFromToken } from "@/lib/auth";
 import { notificationService } from "@/services/notification.service";
 
+const COLLAPSED_KEY = "archivio-sidebar-collapsed";
+
+function useLocalStorageState(key: string, defaultValue: boolean) {
+  const [value, setValue] = useState(defaultValue);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(key);
+      if (stored !== null) setValue(stored === "true");
+    } catch {}
+    setReady(true);
+  }, [key]);
+
+  const setStoredValue = (next: boolean) => {
+    setValue(next);
+    try {
+      localStorage.setItem(key, String(next));
+    } catch {}
+  };
+
+  return [value, setStoredValue, ready] as const;
+}
+
 export const Sidebar: FC = () => {
   const role = getRole();
   const navigate = useNavigate();
   const user = getUserFromToken();
-
   const isAdmin = role === "ADMIN";
+
+  const [collapsed, setCollapsed, ready] = useLocalStorageState(COLLAPSED_KEY, false);
 
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -43,18 +71,14 @@ export const Sidebar: FC = () => {
   const fetchNotifications = useCallback(async () => {
     try {
       const result = await notificationService.getAll();
-
       setNotifications(result.data);
       setUnreadCount(result.unreadCount);
-    } catch {
-      // silent fail
-    }
+    } catch {}
   }, []);
 
   useEffect(() => {
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 30000);
-
     return () => clearInterval(interval);
   }, [fetchNotifications]);
 
@@ -63,9 +87,7 @@ export const Sidebar: FC = () => {
       await notificationService.markAllAsRead();
       setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
       setUnreadCount(0);
-    } catch {
-      // silent fail
-    }
+    } catch {}
   };
 
   const handleClearAll = async () => {
@@ -73,9 +95,7 @@ export const Sidebar: FC = () => {
       await notificationService.deleteAll();
       setNotifications([]);
       setUnreadCount(0);
-    } catch {
-      // silent fail
-    }
+    } catch {}
   };
 
   const handleNotificationClick = async (notif: Notification) => {
@@ -86,56 +106,11 @@ export const Sidebar: FC = () => {
           prev.map((n) => (n.id === notif.id ? { ...n, isRead: true } : n)),
         );
         setUnreadCount((prev) => Math.max(0, prev - 1));
-      } catch {
-        // silent fail
-      }
+      } catch {}
     }
-    navigate(`/approvals`);
+    navigate("/approvals");
     drawerState.close();
   };
-
-  const menuItems = [
-    {
-      icon: LayoutDashboard,
-      label: "Dashboard",
-      href: isAdmin ? "/admin" : "/dashboard",
-      roles: ["ADMIN", "STAFF"],
-    },
-    {
-      icon: FileText,
-      label: "Document Archive",
-      href: "/archives",
-      roles: ["ADMIN", "STAFF"],
-    },
-    {
-      icon: ClipboardCheck,
-      label: "Approvals",
-      href: "/approvals",
-      roles: ["ADMIN", "STAFF"],
-    },
-    {
-      icon: Users,
-      label: "Master Users",
-      href: "/admin/users",
-      roles: ["ADMIN"],
-    },
-    {
-      icon: History,
-      label: "Log Activity",
-      href: "/admin/audit",
-      roles: ["ADMIN"],
-    },
-    {
-      icon: Settings,
-      label: "Settings",
-      href: "/admin/settings",
-      roles: ["ADMIN"],
-    },
-  ];
-
-  const filteredItems = menuItems.filter(
-    (item) => !role || item.roles.includes(role),
-  );
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -144,12 +119,118 @@ export const Sidebar: FC = () => {
     navigate("/login");
   };
 
+  const mainMenuItems = [
+    {
+      icon: LayoutDashboard,
+      label: "Dashboard",
+      href: isAdmin ? "/admin" : "/dashboard",
+    },
+    {
+      icon: FolderArchive,
+      label: "Document Archive",
+      href: "/archives/surat-masuk",
+    },
+    {
+      icon: ClipboardCheck,
+      label: "Approvals",
+      href: "/approvals",
+    },
+  ];
+
+  const adminMenuItems = [
+    { icon: Users, label: "Master Users", href: "/admin/users" },
+    { icon: History, label: "Log Activity", href: "/admin/audit" },
+    { icon: Settings, label: "Settings", href: "/admin/settings" },
+  ];
+
+  const Text: FC<{ show: boolean; className?: string; children: React.ReactNode }> = ({
+    show,
+    className = "",
+    children,
+  }) => (
+    <div
+      className={`overflow-hidden whitespace-nowrap transition-all duration-200 ${
+        show ? "w-auto opacity-100 delay-75" : "w-0 opacity-0"
+      } ${className}`}
+    >
+      {children}
+    </div>
+  );
+
+  const NavItem: FC<{
+    item: { icon: FC<{ size?: number }>; label: string; href: string };
+  }> = ({ item }) => {
+    const Icon = item.icon;
+    const isDashboard = item.href === "/admin" || item.href === "/dashboard";
+
+    return (
+      <NavLink end={isDashboard} to={item.href} className="block">
+        {({ isActive }) => (
+          <div className="relative">
+            {isActive && (
+              <motion.div
+                layoutId="active"
+                className="absolute inset-0 rounded-xl bg-primary/10 dark:bg-primary/15 border border-primary/20"
+                transition={{ type: "spring", stiffness: 500, damping: 35, mass: 0.5 }}
+              />
+            )}
+            <div className="relative z-10 flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200">
+              {collapsed ? (
+                <Tooltip content={item.label} delay={300} placement="right">
+                  <div
+                    className={`flex items-center justify-center w-9 h-9 rounded-lg transition-colors duration-200 ${
+                      isActive
+                        ? "text-primary bg-primary/10"
+                        : "text-default-400"
+                    }`}
+                  >
+                    <Icon size={18} />
+                  </div>
+                </Tooltip>
+              ) : (
+                <>
+                  <div
+                    className={`flex items-center justify-center w-9 h-9 rounded-lg transition-colors duration-200 shrink-0 ${
+                      isActive
+                        ? "text-primary bg-primary/10"
+                        : "text-default-400"
+                    }`}
+                  >
+                    <Icon size={18} />
+                  </div>
+                  <span
+                    className={`text-sm font-medium transition-colors duration-200 ${
+                      isActive ? "text-primary font-semibold" : "text-default-500"
+                    }`}
+                  >
+                    {item.label}
+                  </span>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+      </NavLink>
+    );
+  };
+
+  if (!ready) {
+    return (
+      <>
+        {/* Mobile spacer */}
+        <div className="md:hidden h-14" />
+        {/* Desktop spacer */}
+        <aside className="hidden md:flex w-64 shrink-0" />
+      </>
+    );
+  }
+
   return (
     <>
       {/* Mobile Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 flex md:hidden items-center justify-between px-4 h-14 bg-content1/95 backdrop-blur-md border-b border-divider">
+      <header className="fixed top-0 left-0 right-0 z-50 flex md:hidden items-center justify-between px-4 h-14 bg-content1/95 backdrop-blur-xl border-b border-divider">
         <button
-          className="flex items-center justify-center w-9 h-9 rounded-xl text-default-500 hover:bg-default-100"
+          className="flex items-center justify-center w-9 h-9 rounded-xl text-default-500 hover:bg-default-100 transition-colors"
           onClick={() => menuDrawerState.open()}
         >
           <Menu size={20} />
@@ -182,7 +263,7 @@ export const Sidebar: FC = () => {
         </div>
       </header>
 
-      {/* Mobile Navigation Drawer */}
+      {/* Mobile Drawer */}
       <Drawer state={menuDrawerState}>
         <Drawer.Backdrop isDismissable>
           <Drawer.Content placement="left">
@@ -191,22 +272,16 @@ export const Sidebar: FC = () => {
                 <div className="flex items-center gap-3">
                   <Logo className="text-primary" size={28} />
                   <div>
-                    <p className="text-foreground font-bold text-sm">
-                      Archivio
-                    </p>
-                    <p className="text-default-500 text-xs">
-                      Management System
-                    </p>
+                    <p className="text-foreground font-bold text-sm">Archivio</p>
+                    <p className="text-default-500 text-xs">Management System</p>
                   </div>
                 </div>
                 <Drawer.CloseTrigger />
               </Drawer.Header>
               <Drawer.Body>
-                <p className="text-[10px] font-semibold text-default-400 uppercase px-2 mb-2">
-                  Main Menu
-                </p>
+                <p className="text-[10px] font-semibold text-default-400 uppercase px-2 mb-2">Main Menu</p>
                 <div className="flex flex-col gap-1">
-                  {filteredItems.map((item) => (
+                  {[...mainMenuItems, ...(isAdmin ? adminMenuItems : [])].map((item) => (
                     <NavLink
                       key={item.href}
                       className={({ isActive }) =>
@@ -216,7 +291,7 @@ export const Sidebar: FC = () => {
                             : "text-default-500 hover:bg-default-100 hover:text-foreground"
                         }`
                       }
-                      end={item.href === "/admin"}
+                      end={item.href === "/admin" || item.href === "/dashboard"}
                       to={item.href}
                       onClick={() => menuDrawerState.close()}
                     >
@@ -234,20 +309,12 @@ export const Sidebar: FC = () => {
                       size="sm"
                     >
                       <Avatar.Fallback>
-                        {isAdmin ? (
-                          <Crown size={16} strokeWidth={2.5} />
-                        ) : (
-                          <User size={16} strokeWidth={2.5} />
-                        )}
+                        {isAdmin ? <Crown size={16} strokeWidth={2.5} /> : <User size={16} strokeWidth={2.5} />}
                       </Avatar.Fallback>
                     </Avatar>
                     <div className="flex flex-col min-w-0">
-                      <p className="text-xs font-bold text-foreground truncate">
-                        {user?.name || "User"}
-                      </p>
-                      <p className="text-[10px] text-default-400 font-medium truncate">
-                        {role}
-                      </p>
+                      <p className="text-xs font-bold text-foreground truncate">{user?.name || "User"}</p>
+                      <p className="text-[10px] text-default-400 font-medium truncate">{role}</p>
                     </div>
                   </div>
                   <Button
@@ -265,108 +332,157 @@ export const Sidebar: FC = () => {
         </Drawer.Backdrop>
       </Drawer>
 
-      {/* Sidebar Desktop */}
-      <aside className="w-64 border-r border-divider p-6 hidden md:flex flex-col gap-8 bg-background h-screen sticky top-0">
-        <div className="flex items-center gap-3 px-2">
-          <Logo className="text-primary" size={32} />
-          <div>
+      {/* Desktop Sidebar */}
+      <aside
+        className={`hidden md:flex flex-col bg-background/80 backdrop-blur-xl border-r border-divider h-screen sticky top-0 overflow-hidden shrink-0 will-change-[width] transition-[width] duration-300 ease-out ${
+          collapsed ? "w-[72px]" : "w-64"
+        }`}
+      >
+        {/* Logo */}
+        <div
+          className={`flex items-center border-b border-divider shrink-0 transition-all duration-300 ${
+            collapsed ? "justify-center px-3 py-5" : "px-6 py-5 gap-3"
+          }`}
+        >
+          <Logo className="text-primary shrink-0" size={collapsed ? 24 : 28} />
+          <Text show={!collapsed}>
             <p className="text-foreground font-bold text-sm">Archivio</p>
-            <p className="text-default-500 text-xs">Management System</p>
-          </div>
+            <p className="text-default-500 text-[10px]">Management System</p>
+          </Text>
         </div>
 
-        <nav className="flex flex-col gap-2 flex-grow">
-          <p className="text-[10px] font-semibold text-default-400 uppercase px-2 mb-2">
-            Main Menu
-          </p>
-          {filteredItems.map((item) => {
-            const isDashboard = item.href === "/admin";
-
-            return (
-              <NavLink
-                key={item.href}
-                className={({ isActive }) =>
-                  `group relative flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium ${
-                    isActive
-                      ? "backdrop-blur-md bg-white/30 dark:bg-white/[0.07] border border-white/30 dark:border-white/10 text-primary shadow-sm"
-                      : "text-default-500 hover:backdrop-blur-sm hover:bg-white/20 dark:hover:bg-white/[0.05] hover:text-foreground"
-                  }`
-                }
-                end={isDashboard}
-                to={item.href}
-              >
-                {({ isActive }) => (
-                  <>
-                    {isActive && (
-                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full animate-in fade-in slide-in-from-left-2 duration-300" />
-                    )}
-                    <item.icon
-                      className={`transition-transform duration-200 ${isActive ? "scale-110" : "group-hover:scale-110"}`}
-                      size={18}
-                    />
-                    {item.label}
-                  </>
-                )}
-              </NavLink>
-            );
-          })}
-        </nav>
-
-        {/* Footer Section with User Info & Logout */}
-        <div className="mt-auto pt-6 border-t border-divider flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 overflow-hidden">
-            <Avatar
-              className={`${isAdmin ? "bg-amber-500/10 text-amber-600" : "bg-primary/10 text-primary"} font-bold text-xs shrink-0`}
-              size="sm"
+        {/* Navigation */}
+        <div className="flex-1 flex flex-col gap-5 py-4 overflow-y-auto overflow-x-hidden">
+          <div className="flex flex-col gap-1">
+            <p
+              className={`text-[10px] font-semibold text-default-400 uppercase tracking-wider px-4 transition-opacity duration-200 ${
+                collapsed ? "opacity-0" : "opacity-100"
+              }`}
             >
-              <Avatar.Fallback>
-                {isAdmin ? (
-                  <Crown size={16} strokeWidth={2.5} />
-                ) : (
-                  <User size={16} strokeWidth={2.5} />
-                )}
-              </Avatar.Fallback>
-            </Avatar>
-            <div className="flex flex-col min-w-0">
-              <p className="text-xs font-bold text-foreground truncate">
-                {user?.name || "User"}
-              </p>
-              <p className="text-[10px] text-default-400 font-medium truncate">
-                {role}
-              </p>
+              Main
+            </p>
+            <div className="flex flex-col gap-0.5 px-2 mt-1">
+              {mainMenuItems.map((item) => (
+                <NavItem key={item.href} item={item} />
+              ))}
             </div>
           </div>
 
-          <div className="flex items-center gap-1">
-            {/* Notification Bell */}
-            <button
-              className="relative flex items-center justify-center w-9 h-9 rounded-xl transition-all duration-200 text-default-400 hover:backdrop-blur-md hover:bg-white/20 dark:hover:bg-white/[0.05] hover:text-foreground"
-              onClick={() => drawerState.toggle()}
-            >
-              <Bell size={18} />
-              {unreadCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-danger text-white text-[10px] font-bold rounded-full min-w-[15px] h-[15px] flex items-center justify-center px-1">
-                  {unreadCount > 99 ? "99+" : unreadCount}
-                </span>
-              )}
-            </button>
+          {isAdmin && (
+            <div className="flex flex-col gap-1">
+              <p
+                className={`text-[10px] font-semibold text-default-400 uppercase tracking-wider px-4 transition-opacity duration-200 ${
+                  collapsed ? "opacity-0" : "opacity-100"
+                }`}
+              >
+                Admin
+              </p>
+              <div className="flex flex-col gap-0.5 px-2 mt-1">
+                {adminMenuItems.map((item) => (
+                  <NavItem key={item.href} item={item} />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
 
-            <Tooltip delay={0}>
-              <Tooltip.Trigger>
-                <Button
-                  isIconOnly
-                  className="text-default-400 hover:text-danger hover:bg-danger/10 hover:backdrop-blur-md rounded-xl"
-                  variant="ghost"
-                  onPress={handleLogout}
-                >
-                  <LogOut size={18} />
-                </Button>
-              </Tooltip.Trigger>
-              <Tooltip.Content>Sign Out</Tooltip.Content>
+        {/* Bottom Section */}
+        <div className="border-t border-divider shrink-0">
+          {/* Toggle */}
+          <div className={`flex ${collapsed ? "justify-center py-2" : "justify-end px-3 py-1"}`}>
+            <Tooltip content={collapsed ? "Expand sidebar" : "Collapse sidebar"} delay={300} placement="right">
+              <button
+                className="flex items-center justify-center w-7 h-7 rounded-lg text-default-400 hover:text-foreground hover:bg-default-100 transition-all duration-200"
+                onClick={() => setCollapsed(!collapsed)}
+              >
+                <ChevronLeft
+                  size={14}
+                  className={`transition-transform duration-300 ease-out ${collapsed ? "rotate-180" : ""}`}
+                />
+              </button>
             </Tooltip>
+          </div>
+
+          <div
+            className={`flex items-center py-3 transition-all duration-300 ${
+              collapsed ? "justify-center flex-col gap-2 px-2" : "justify-between px-4 gap-2"
+            }`}
+          >
+            <div className="flex items-center gap-3 overflow-hidden min-w-0">
+              <div className="relative shrink-0">
+                <Avatar
+                  className={`${isAdmin ? "bg-amber-500/10 text-amber-600" : "bg-primary/10 text-primary"} font-bold text-xs shrink-0`}
+                  size="sm"
+                >
+                  <Avatar.Fallback>
+                    {isAdmin ? <Crown size={16} strokeWidth={2.5} /> : <User size={16} strokeWidth={2.5} />}
+                  </Avatar.Fallback>
+                </Avatar>
+                <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-success border-2 border-background animate-breathing" />
+              </div>
+              <Text show={!collapsed}>
+                <p className="text-xs font-bold text-foreground truncate">{user?.name || "User"}</p>
+                <p className="text-[10px] text-default-400 font-medium truncate">{role}</p>
+              </Text>
+            </div>
+
+            <div className="flex items-center gap-1 shrink-0">
+              {collapsed ? (
+                <>
+                  <Tooltip content="Notifications" delay={300} placement="right">
+                    <button
+                      className="relative flex items-center justify-center w-8 h-8 rounded-lg text-default-400 hover:text-foreground hover:bg-default-100 transition-all duration-200"
+                      onClick={() => drawerState.toggle()}
+                    >
+                      <Bell size={16} />
+                      {unreadCount > 0 && (
+                        <span className="absolute -top-0.5 -right-0.5 bg-danger text-white text-[8px] font-bold rounded-full min-w-[14px] h-[14px] flex items-center justify-center px-1">
+                          {unreadCount > 99 ? "99+" : unreadCount}
+                        </span>
+                      )}
+                    </button>
+                  </Tooltip>
+                  <Tooltip content="Sign Out" delay={300} placement="right">
+                    <button
+                      className="flex items-center justify-center w-8 h-8 rounded-lg text-default-400 hover:text-danger hover:bg-danger/10 transition-all duration-200"
+                      onClick={handleLogout}
+                    >
+                      <LogOut size={16} />
+                    </button>
+                  </Tooltip>
+                </>
+              ) : (
+                <Text show={!collapsed}>
+                  <div className="flex items-center gap-1">
+                    <Tooltip content="Notifications" delay={300}>
+                      <button
+                        className="relative flex items-center justify-center w-8 h-8 rounded-lg text-default-400 hover:text-foreground hover:bg-default-100 transition-all duration-200"
+                        onClick={() => drawerState.toggle()}
+                      >
+                        <Bell size={16} />
+                        {unreadCount > 0 && (
+                          <span className="absolute -top-0.5 -right-0.5 bg-danger text-white text-[8px] font-bold rounded-full min-w-[14px] h-[14px] flex items-center justify-center px-1">
+                            {unreadCount > 99 ? "99+" : unreadCount}
+                          </span>
+                        )}
+                      </button>
+                    </Tooltip>
+                    <Tooltip content="Sign Out" delay={300}>
+                      <button
+                        className="flex items-center justify-center w-8 h-8 rounded-lg text-default-400 hover:text-danger hover:bg-danger/10 transition-all duration-200"
+                        onClick={handleLogout}
+                      >
+                        <LogOut size={16} />
+                      </button>
+                    </Tooltip>
+                  </div>
+                </Text>
+              )}
+            </div>
           </div>
         </div>
 
+        {/* Notification Drawer */}
         <Drawer state={drawerState}>
           <Drawer.Backdrop isDismissable>
             <Drawer.Content placement="left">
@@ -377,9 +493,7 @@ export const Sidebar: FC = () => {
                 </Drawer.Header>
                 <Drawer.Body>
                   {notifications.length === 0 ? (
-                    <div className="text-center text-sm text-default-400 py-8">
-                      No notifications
-                    </div>
+                    <div className="text-center text-sm text-default-400 py-8">No notifications</div>
                   ) : (
                     <div className="flex flex-col gap-1">
                       {notifications.map((notif) => (
@@ -390,13 +504,7 @@ export const Sidebar: FC = () => {
                           }`}
                           onClick={() => handleNotificationClick(notif)}
                         >
-                          <p
-                            className={`text-sm ${
-                              !notif.isRead
-                                ? "font-bold text-foreground"
-                                : "text-default-500"
-                            }`}
-                          >
+                          <p className={`text-sm ${!notif.isRead ? "font-bold text-foreground" : "text-default-500"}`}>
                             {notif.message}
                           </p>
                           <p className="text-xs text-default-400 mt-1">
@@ -410,19 +518,12 @@ export const Sidebar: FC = () => {
                 {(notifications.length > 0 || unreadCount > 0) && (
                   <Drawer.Footer className="flex justify-end gap-3">
                     {unreadCount > 0 && (
-                      <button
-                        className="text-xs text-primary font-semibold hover:underline"
-                        onClick={handleMarkAllRead}
-                      >
-                        <CheckCheck className="inline mr-1" size={14} />
-                        Mark all read
+                      <button className="text-xs text-primary font-semibold hover:underline" onClick={handleMarkAllRead}>
+                        <CheckCheck className="inline mr-1" size={14} /> Mark all read
                       </button>
                     )}
                     {notifications.length > 0 && (
-                      <button
-                        className="text-xs text-danger font-semibold hover:underline"
-                        onClick={handleClearAll}
-                      >
+                      <button className="text-xs text-danger font-semibold hover:underline" onClick={handleClearAll}>
                         Clear all
                       </button>
                     )}
