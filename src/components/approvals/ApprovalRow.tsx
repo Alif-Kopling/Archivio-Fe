@@ -1,6 +1,7 @@
 import { Avatar, Button, Chip, Table, Tooltip } from "@heroui/react";
-import { CheckCircle2, XCircle, Eye } from "lucide-react";
+import { CheckCircle2, XCircle, Eye, Users } from "lucide-react";
 import { FC, memo } from "react";
+import { motion } from "framer-motion";
 
 import {
   ApprovalDocument,
@@ -16,10 +17,11 @@ interface ApprovalRowProps {
   onApprove: (doc: ApprovalDocument) => void;
   onReject: (doc: ApprovalDocument) => void;
   onPreview: (doc: ApprovalDocument) => void;
+  index?: number;
 }
 
 export const ApprovalRow: FC<ApprovalRowProps> = memo(
-  ({ doc, onApprove, onReject, onPreview }) => {
+  ({ doc, onApprove, onReject, onPreview, index = 0 }) => {
     const { label, color } = getStatusInfo(
       doc.status,
       doc.approverIds,
@@ -34,6 +36,7 @@ export const ApprovalRow: FC<ApprovalRowProps> = memo(
       <Table.Row
         key={`${doc.sourceType}-${doc.id}`}
         className="group border-b border-white/10 hover:bg-white/5 transition-all duration-300"
+        style={{ animation: `fadeIn 0.25s ease-out ${index * 30}ms both` }}
       >
         <Table.Cell>
           <div className="flex items-center gap-3 py-1">
@@ -45,9 +48,25 @@ export const ApprovalRow: FC<ApprovalRowProps> = memo(
                 {getFileExt(doc.filePath)}
               </Avatar.Fallback>
             </Avatar>
-            <span className="font-medium text-sm text-foreground group-hover:text-primary transition-colors">
-              {doc.title}
-            </span>
+            <div className="flex flex-col min-w-0">
+              <span className="font-medium text-sm text-foreground group-hover:text-primary transition-colors truncate">
+                {doc.title}
+              </span>
+              {totalCount > 0 && (
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <div className="w-16 h-1 rounded-full bg-default-100 overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-warning transition-all duration-500"
+                      style={{ width: `${(approvedCount / totalCount) * 100}%` }}
+                    />
+                  </div>
+                  <span className="text-[9px] font-medium text-default-400 flex items-center gap-0.5">
+                    <Users size={8} />
+                    {approvedCount}/{totalCount}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
         </Table.Cell>
         <Table.Cell>
@@ -64,7 +83,7 @@ export const ApprovalRow: FC<ApprovalRowProps> = memo(
             className="font-bold border-none h-6 px-3 text-[10px] shadow-sm backdrop-blur-md"
             color={color as any}
             size="sm"
-            variant="solid"
+            variant="soft"
           >
             {label}
           </Chip>
@@ -73,7 +92,12 @@ export const ApprovalRow: FC<ApprovalRowProps> = memo(
           {new Date(doc.createdAt).toLocaleDateString()}
         </Table.Cell>
         <Table.Cell>
-          <div className="flex gap-2 justify-center opacity-60 group-hover:opacity-100 transition-opacity">
+          <motion.div
+            className="flex gap-2 justify-center opacity-60 group-hover:opacity-100 transition-opacity"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: index * 0.03 + 0.1 }}
+          >
             <Tooltip>
               <Tooltip.Trigger>
                 <Button
@@ -95,7 +119,7 @@ export const ApprovalRow: FC<ApprovalRowProps> = memo(
                   className="text-success bg-success/10 hover:bg-success/20 backdrop-blur-sm"
                   isDisabled={approvedCount >= totalCount && totalCount > 0}
                   size="sm"
-                  variant="soft"
+                  variant="ghost"
                   onClick={() => onApprove(doc)}
                 >
                   <CheckCircle2 size={16} />
@@ -109,7 +133,7 @@ export const ApprovalRow: FC<ApprovalRowProps> = memo(
                   isIconOnly
                   className="text-danger bg-danger/10 hover:bg-danger/20 backdrop-blur-sm"
                   size="sm"
-                  variant="soft"
+                  variant="ghost"
                   onClick={() => onReject(doc)}
                 >
                   <XCircle size={16} />
@@ -117,7 +141,7 @@ export const ApprovalRow: FC<ApprovalRowProps> = memo(
               </Tooltip.Trigger>
               <Tooltip.Content>Reject Document</Tooltip.Content>
             </Tooltip>
-          </div>
+          </motion.div>
         </Table.Cell>
       </Table.Row>
     );

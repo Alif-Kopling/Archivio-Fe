@@ -1,12 +1,14 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import {
   Card,
   Table,
   Spinner,
 } from "@heroui/react";
+import { Clock, CheckCircle2, FileText } from "lucide-react";
+import { motion } from "framer-motion";
 
 import api from "@/lib/axios";
 import { useNotify } from "@/context/NotificationContext";
@@ -37,7 +39,8 @@ export default function ApprovalsPage() {
   const [isMagicModalOpen, setIsMagicModalOpen] = useState(false);
   const [magicAction, setMagicAction] = useState<"approve" | "reject" | null>(null);
   const [previewDoc, setPreviewDoc] = useState<ApprovalDocument | null>(null);
-  
+  const [sourceFilter, setSourceFilter] = useState("all");
+
   const notify = useNotify();
 
   const fetchData = useCallback(async () => {
@@ -83,12 +86,12 @@ export default function ApprovalsPage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       const trimmedInput = approvalSearchInput.trim().toLowerCase();
-      
+
       if (trimmedInput === "/bulk approve" || trimmedInput === "/bulk aprove") {
         setMagicAction("approve");
         setIsMagicModalOpen(true);
         setApprovalSearchInput("");
- 
+
         return;
       }
 
@@ -96,7 +99,7 @@ export default function ApprovalsPage() {
         setMagicAction("reject");
         setIsMagicModalOpen(true);
         setApprovalSearchInput("");
- 
+
         return;
       }
 
@@ -108,6 +111,17 @@ export default function ApprovalsPage() {
 
     return () => clearTimeout(timer);
   }, [approvalSearchInput]);
+
+  const filteredDocs = useMemo(() => {
+    if (sourceFilter === "all") return pendingDocs;
+    return pendingDocs.filter((d) => d.sourceType === sourceFilter);
+  }, [pendingDocs, sourceFilter]);
+
+  const sourceStats = useMemo(() => ({
+    incoming: pendingDocs.filter((d) => d.sourceType === "incoming").length,
+    outgoing: pendingDocs.filter((d) => d.sourceType === "outgoing").length,
+    certificate: pendingDocs.filter((d) => d.sourceType === "certificate").length,
+  }), [pendingDocs]);
 
   const handlePageChange = (page: number) => {
     setApprovalQuery((prev) => ({
@@ -155,9 +169,9 @@ export default function ApprovalsPage() {
   };
 
   const handleBulkApprove = async () => {
-    const idsToApprove = selectedKeys.size > 0 
-      ? Array.from(selectedKeys) 
-      : pendingDocs.map(d => d.id); 
+    const idsToApprove = selectedKeys.size > 0
+      ? Array.from(selectedKeys)
+      : pendingDocs.map(d => d.id);
 
     if (idsToApprove.length === 0) {
       notify({ title: "Operation Aborted", description: "No documents selected.", status: "warning" });
@@ -165,14 +179,14 @@ export default function ApprovalsPage() {
 
       return;
     }
-    
+
     try {
       setApprovalLoading(true);
       await api.post("/dashboard/bulk-approve", { ids: idsToApprove });
-      notify({ 
-        title: "Bulk Authorization Success", 
-        description: `${idsToApprove.length} documents processed.`, 
-        status: "success" 
+      notify({
+        title: "Bulk Authorization Success",
+        description: `${idsToApprove.length} documents processed.`,
+        status: "success"
       });
       setIsMagicModalOpen(false);
       fetchData();
@@ -183,9 +197,9 @@ export default function ApprovalsPage() {
   };
 
   const handleBulkReject = async () => {
-    const idsToReject = selectedKeys.size > 0 
-      ? Array.from(selectedKeys) 
-      : pendingDocs.map(d => d.id); 
+    const idsToReject = selectedKeys.size > 0
+      ? Array.from(selectedKeys)
+      : pendingDocs.map(d => d.id);
 
     if (idsToReject.length === 0) {
       notify({ title: "Operation Aborted", description: "No documents selected.", status: "warning" });
@@ -197,10 +211,10 @@ export default function ApprovalsPage() {
     try {
       setApprovalLoading(true);
       await api.post("/dashboard/bulk-reject", { ids: idsToReject });
-      notify({ 
-        title: "Bulk Rejection Complete", 
-        description: `${idsToReject.length} documents rejected.`, 
-        status: "success" 
+      notify({
+        title: "Bulk Rejection Complete",
+        description: `${idsToReject.length} documents rejected.`,
+        status: "success"
       });
       setIsMagicModalOpen(false);
       fetchData();
@@ -211,92 +225,124 @@ export default function ApprovalsPage() {
   };
 
   return (
-    <div className="p-6 overflow-y-auto h-full">
-      <ApprovalHeader />
-      
-      <div className="mb-8">
-        <ApprovalSearchBar
-          searchQuery={approvalSearchInput}
-          onSearchChange={setApprovalSearchInput}
-        />
-        
-        <Card className="bg-content1 border-divider shadow-none">
-          <div className="relative">
-            {approvalLoading ? (
-              <div className="absolute inset-0 z-10 flex items-center justify-center bg-content1/60 backdrop-blur-[1px]">
-                <Spinner />
-              </div>
-            ) : null}
-            <Table
-              aria-label="Approval table"
-              className="bg-transparent"
-            >
-              <Table.ScrollContainer>
-                <Table.Content
-                  selectedKeys={selectedKeys}
-                  selectionMode="multiple"
-                  onSelectionChange={(keys: string | Set<string | number>) => {
-                    if (keys === "all") {
-                      setSelectedKeys(new Set(pendingDocs.map(d => d.id)));
-                    } else {
-                      setSelectedKeys(keys as Set<string | number>);
-                    }
-                  }}
-                >
-                  <Table.Header>
-                    <Table.Column isRowHeader className="bg-transparent border-b border-divider text-default-500 font-semibold uppercase text-xs">
-                      DOCUMENT NAME
-                    </Table.Column>
-                    <Table.Column className="bg-transparent border-b border-divider text-default-500 font-semibold uppercase text-xs">
-                      SOURCE
-                    </Table.Column>
-                    <Table.Column className="bg-transparent border-b border-divider text-default-500 font-semibold uppercase text-xs">
-                      STATUS
-                    </Table.Column>
-                    <Table.Column className="bg-transparent border-b border-divider text-default-500 font-semibold uppercase text-xs">
-                      UPLOAD DATE
-                    </Table.Column>
-                    <Table.Column className="bg-transparent border-b border-divider text-default-500 font-semibold uppercase text-xs text-center">
-                      ACTIONS
-                    </Table.Column>
-                  </Table.Header>
-                  <Table.Body>
-                    {pendingDocs.length === 0 ? (
-                      <Table.Row>
-                        <Table.Cell className="py-4 text-default-400 italic">
-                          No pending documents found.
-                        </Table.Cell>
-                        <Table.Cell> </Table.Cell>
-                        <Table.Cell> </Table.Cell>
-                        <Table.Cell> </Table.Cell>
-                        <Table.Cell> </Table.Cell>
-                      </Table.Row>
-                    ) : (
-                      pendingDocs.map((doc) => (
-                        <ApprovalRow
-                          key={`${doc.sourceType}-${doc.id}`}
-                          doc={doc}
-                          onApprove={handleApprove}
-                          onReject={handleReject}
-                          onPreview={handlePreview}
-                        />
-                      ))
-                    )}
-                  </Table.Body>
-                </Table.Content>
-              </Table.ScrollContainer>
-            </Table>
-          </div>
-          
-          <ApprovalPagination
-            currentPage={approvalQuery.page}
-            pageSize={APPROVAL_PAGE_SIZE}
-            total={approvalTotal}
-            totalPages={approvalTotalPages}
-            onPageChange={handlePageChange}
-          />
-        </Card>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+      className="p-6 overflow-y-auto h-full space-y-6"
+    >
+      <ApprovalHeader total={approvalTotal} />
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {[
+          { label: "Pending Review", value: pendingDocs.length, Icon: Clock, color: "text-warning", bg: "bg-warning/10" },
+          { label: "Total Documents", value: approvalTotal, Icon: FileText, color: "text-primary", bg: "bg-primary/10" },
+          { label: "Resolved", value: Math.max(0, approvalTotal - pendingDocs.length), Icon: CheckCircle2, color: "text-success", bg: "bg-success/10" },
+        ].map(({ label, value, Icon, color, bg }, i) => (
+          <motion.div
+            key={label}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.06, duration: 0.25 }}
+            className="flex items-center gap-3 rounded-xl border border-divider bg-content1 p-3.5 shadow-sm"
+          >
+            <div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center ${color}`}>
+              <Icon size={18} />
+            </div>
+            <div>
+              <p className="text-xs text-default-400 font-medium">{label}</p>
+              <p className="text-lg font-bold text-foreground">{value}</p>
+            </div>
+          </motion.div>
+        ))}
       </div>
+
+      <ApprovalSearchBar
+        searchQuery={approvalSearchInput}
+        onSearchChange={setApprovalSearchInput}
+        sourceFilter={sourceFilter}
+        onSourceFilterChange={setSourceFilter}
+        stats={sourceStats}
+      />
+
+      <Card className="bg-content1 border-divider shadow-none">
+        <div className="relative">
+          {approvalLoading ? (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-content1/60 backdrop-blur-[1px]">
+              <Spinner />
+            </div>
+          ) : null}
+          <Table
+            aria-label="Approval table"
+            className="bg-transparent"
+          >
+            <Table.ScrollContainer>
+              <Table.Content
+                selectedKeys={selectedKeys}
+                selectionMode="multiple"
+                onSelectionChange={(keys: string | Set<string | number>) => {
+                  if (keys === "all") {
+                    setSelectedKeys(new Set(pendingDocs.map(d => d.id)));
+                  } else {
+                    setSelectedKeys(keys as Set<string | number>);
+                  }
+                }}
+              >
+                <Table.Header>
+                  <Table.Column isRowHeader className="bg-transparent border-b border-divider text-default-500 font-semibold uppercase text-xs">
+                    DOCUMENT NAME
+                  </Table.Column>
+                  <Table.Column className="bg-transparent border-b border-divider text-default-500 font-semibold uppercase text-xs">
+                    SOURCE
+                  </Table.Column>
+                  <Table.Column className="bg-transparent border-b border-divider text-default-500 font-semibold uppercase text-xs">
+                    STATUS
+                  </Table.Column>
+                  <Table.Column className="bg-transparent border-b border-divider text-default-500 font-semibold uppercase text-xs">
+                    UPLOAD DATE
+                  </Table.Column>
+                  <Table.Column className="bg-transparent border-b border-divider text-default-500 font-semibold uppercase text-xs text-center">
+                    ACTIONS
+                  </Table.Column>
+                </Table.Header>
+                <Table.Body>
+                  {filteredDocs.length === 0 ? (
+                    <Table.Row>
+                      <Table.Cell className="py-4 text-default-400 italic">
+                        No pending documents found.
+                      </Table.Cell>
+                      <Table.Cell> </Table.Cell>
+                      <Table.Cell> </Table.Cell>
+                      <Table.Cell> </Table.Cell>
+                      <Table.Cell> </Table.Cell>
+                    </Table.Row>
+                  ) : (
+                    filteredDocs.map((doc, idx) => (
+                      <ApprovalRow
+                        key={`${doc.sourceType}-${doc.id}`}
+                        doc={doc}
+                        index={idx}
+                        onApprove={handleApprove}
+                        onReject={handleReject}
+                        onPreview={handlePreview}
+                      />
+                    ))
+                  )}
+                </Table.Body>
+              </Table.Content>
+            </Table.ScrollContainer>
+          </Table>
+        </div>
+
+        <ApprovalPagination
+          currentPage={approvalQuery.page}
+          pageSize={APPROVAL_PAGE_SIZE}
+          total={approvalTotal}
+          totalPages={approvalTotalPages}
+          onPageChange={handlePageChange}
+        />
+      </Card>
 
       <BulkActionModal
         isOpen={isMagicModalOpen}
@@ -310,6 +356,6 @@ export default function ApprovalsPage() {
         isOpen={!!previewDoc}
         onClose={() => setPreviewDoc(null)}
       />
-    </div>
+    </motion.div>
   );
 }

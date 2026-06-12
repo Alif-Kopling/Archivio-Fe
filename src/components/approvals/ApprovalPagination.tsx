@@ -1,4 +1,5 @@
 import { Button } from "@heroui/react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { FC } from "react";
 
 interface ApprovalPaginationProps {
@@ -35,17 +36,36 @@ export const ApprovalPagination: FC<ApprovalPaginationProps> = ({
           isDisabled={currentPage <= 1}
           size="sm"
           variant="ghost"
+          className="h-8 text-xs font-semibold"
           onPress={() => onPageChange(currentPage - 1)}
         >
+          <ChevronLeft size={14} />
           Previous
         </Button>
+        <div className="flex items-center gap-1">
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+            <button
+              key={p}
+              className={`w-6 h-6 rounded-lg text-[10px] font-bold transition-all duration-150 ${
+                p === currentPage
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-default-400 hover:bg-default-100"
+              }`}
+              onClick={() => onPageChange(p)}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
         <Button
           isDisabled={currentPage >= totalPages}
           size="sm"
           variant="ghost"
+          className="h-8 text-xs font-semibold"
           onPress={() => onPageChange(currentPage + 1)}
         >
           Next
+          <ChevronRight size={14} />
         </Button>
       </div>
     ) : null}
