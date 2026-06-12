@@ -115,7 +115,7 @@ export const DocumentRow: FC<DocumentRowProps> = ({
   return (
     <motion.div
       layout
-      className={`relative rounded-xl border border-divider bg-content1 transition-all duration-200 select-none
+      className={`relative flex flex-col rounded-xl border border-divider bg-content1 transition-all duration-200 select-none
         ${isHovered ? "shadow-lg -translate-y-0.5" : "shadow-sm"}
         ${isSelected ? "ring-2 ring-primary ring-offset-1 ring-offset-background" : ""}
         ${isLongPressing ? "scale-[0.98]" : ""}
@@ -129,8 +129,8 @@ export const DocumentRow: FC<DocumentRowProps> = ({
       onPointerCancel={handlePointerUp}
       onPointerLeave={handlePointerUp}
     >
-      <div className="p-3 flex items-start gap-3">
-        {/* Checkbox */}
+      {/* Main Content */}
+      <div className="p-3 flex items-start gap-3 flex-1">
         <AnimatePresence>
           {isSelectionMode && (
             <motion.div
@@ -148,12 +148,10 @@ export const DocumentRow: FC<DocumentRowProps> = ({
           )}
         </AnimatePresence>
 
-        {/* File Icon */}
         <div className={`w-10 h-10 shrink-0 rounded-xl ${fileBg} flex items-center justify-center shadow-sm`}>
           <FileIcon size={18} className={fileColor} />
         </div>
 
-        {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0 flex-1">
@@ -175,7 +173,6 @@ export const DocumentRow: FC<DocumentRowProps> = ({
               </div>
             </div>
 
-            {/* Status Chip */}
             <Chip
               className="font-bold border-none h-5 px-2 text-[9px] tracking-tighter shrink-0 gap-1"
               color={chipColor as any}
@@ -187,7 +184,6 @@ export const DocumentRow: FC<DocumentRowProps> = ({
             </Chip>
           </div>
 
-          {/* Approval Progress */}
           {!isFinal && !isRejected && totalCount > 0 && (
             <div className="flex items-center gap-2 mt-2">
               <div className="flex-1 h-1 rounded-full bg-default-100 overflow-hidden max-w-[120px]">
@@ -207,63 +203,54 @@ export const DocumentRow: FC<DocumentRowProps> = ({
         </div>
       </div>
 
-      {/* Hover Actions - overlay instead of pushing */}
-      <AnimatePresence>
-        {isHovered && !isSelectionMode && (
-          <motion.div
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 4 }}
-            className="absolute bottom-0 left-0 right-0 z-10"
+      {/* Hover Actions - always reserved, fade in on hover */}
+      <div className={`transition-all duration-200 ${isHovered && !isSelectionMode ? "opacity-100 max-h-10" : "opacity-0 max-h-0"} overflow-hidden`}>
+        <div className="h-px bg-divider mx-3" />
+        <div className="flex items-center gap-1 px-3 py-2">
+          {onView && (
+            <Button
+              size="sm"
+              variant="ghost"
+              className={`h-7 text-[10px] font-semibold gap-1 rounded-lg ${isFinal ? "text-default-500 hover:text-primary" : "text-default-200 opacity-50 cursor-not-allowed"}`}
+              isDisabled={!isFinal}
+              onPress={() => isFinal && onView(file)}
+            >
+              <Eye size={12} /> Preview
+            </Button>
+          )}
+          {onDownload && (
+            <Button
+              size="sm"
+              variant="ghost"
+              className={`h-7 text-[10px] font-semibold gap-1 rounded-lg ${isFinal ? "text-default-500 hover:text-success" : "text-default-200 opacity-50 cursor-not-allowed"}`}
+              isDisabled={!isFinal}
+              onPress={() => isFinal && onDownload(file)}
+            >
+              <Download size={12} /> Download
+            </Button>
+          )}
+          {onSendEmail && (
+            <Button
+              size="sm"
+              variant="ghost"
+              className={`h-7 text-[10px] font-semibold gap-1 rounded-lg ${isFinal ? "text-default-500 hover:text-violet-500" : "text-default-200 opacity-50 cursor-not-allowed"}`}
+              isDisabled={!isFinal}
+              onPress={() => isFinal && onSendEmail(file)}
+            >
+              <Mail size={12} /> Email
+            </Button>
+          )}
+          <div className="flex-1" />
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-7 text-[10px] font-semibold gap-1 rounded-lg text-default-400 hover:text-danger"
+            onPress={() => setDeleteOpen(true)}
           >
-            <div className="h-px bg-divider mx-3" />
-            <div className="flex items-center gap-1 px-3 py-2 bg-content1/90 backdrop-blur-sm rounded-b-xl">
-              {onView && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className={`h-7 text-[10px] font-semibold gap-1 rounded-lg ${isFinal ? "text-default-500 hover:text-primary" : "text-default-200 opacity-50 cursor-not-allowed"}`}
-                  isDisabled={!isFinal}
-                  onPress={() => isFinal && onView(file)}
-                >
-                  <Eye size={12} /> Preview
-                </Button>
-              )}
-              {onDownload && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className={`h-7 text-[10px] font-semibold gap-1 rounded-lg ${isFinal ? "text-default-500 hover:text-success" : "text-default-200 opacity-50 cursor-not-allowed"}`}
-                  isDisabled={!isFinal}
-                  onPress={() => isFinal && onDownload(file)}
-                >
-                  <Download size={12} /> Download
-                </Button>
-              )}
-              {onSendEmail && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className={`h-7 text-[10px] font-semibold gap-1 rounded-lg ${isFinal ? "text-default-500 hover:text-violet-500" : "text-default-200 opacity-50 cursor-not-allowed"}`}
-                  isDisabled={!isFinal}
-                  onPress={() => isFinal && onSendEmail(file)}
-                >
-                  <Mail size={12} /> Email
-                </Button>
-              )}
-              <div className="flex-1" />
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-7 text-[10px] font-semibold gap-1 rounded-lg text-default-400 hover:text-danger"
-                onPress={() => setDeleteOpen(true)}
-              >
-                <Trash2 size={12} /> Delete
-              </Button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <Trash2 size={12} /> Delete
+          </Button>
+        </div>
+      </div>
 
       {/* Delete Confirmation */}
       <AlertDialog isOpen={deleteOpen} onOpenChange={setDeleteOpen}>
