@@ -2,8 +2,8 @@
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 import type { DateValue } from "@internationalized/date";
 
-import { FC, ReactNode, useRef, useState, useEffect } from "react";
-import { Upload, X, FileText, Trash2 } from "lucide-react";
+import { FC, ReactNode, useRef, useState, useEffect, useCallback } from "react";
+import { Upload, X, FileText, Trash2, FileUp } from "lucide-react";
 import { parseDate } from "@internationalized/date";
 import {
   Calendar,
@@ -18,6 +18,7 @@ import {
   Select,
   ListBox,
 } from "@heroui/react";
+import { motion, AnimatePresence } from "framer-motion";
 
 import {
   DocumentUploadFormState,
@@ -110,8 +111,12 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bulkFileInputRef = useRef<HTMLInputElement>(null);
+  const dropZoneRef = useRef<HTMLDivElement>(null);
+  const bulkDropZoneRef = useRef<HTMLDivElement>(null);
   const [bulkSenderTemplate, setBulkSenderTemplate] = useState("");
   const [users, setUsers] = useState<User[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isBulkDragging, setIsBulkDragging] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -167,6 +172,72 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
       onBulkItemChange(item.id, "sender", sender);
     });
   };
+
+  // Drag & Drop handlers for Single mode
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }, []);
+
+  const handleDragEnter = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (dropZoneRef.current && !dropZoneRef.current.contains(e.relatedTarget as Node)) {
+      setIsDragging(false);
+    }
+  }, []);
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsDragging(false);
+      const file = e.dataTransfer.files?.[0] ?? null;
+      if (file) {
+        onFieldChange("title", stripFileExtension(file.name));
+        onFileChange(file);
+      }
+    },
+    [onFieldChange, onFileChange],
+  );
+
+  // Drag & Drop handlers for Bulk mode
+  const handleBulkDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }, []);
+
+  const handleBulkDragEnter = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsBulkDragging(true);
+  }, []);
+
+  const handleBulkDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (bulkDropZoneRef.current && !bulkDropZoneRef.current.contains(e.relatedTarget as Node)) {
+      setIsBulkDragging(false);
+    }
+  }, []);
+
+  const handleBulkDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsBulkDragging(false);
+      if (e.dataTransfer.files?.length) {
+        onBulkFileChange(e.dataTransfer.files);
+      }
+    },
+    [onBulkFileChange],
+  );
 
   if (!open) {
     return null;
@@ -353,6 +424,7 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                   </Select>
                 </TextField>
 
+                {/* Drag & Drop Zone for Single */}
                 <div className="space-y-1.5">
                   <Label className="text-xs font-bold text-foreground">
                     Upload File
@@ -364,26 +436,98 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                     type="file"
                     onChange={handleFileSelection}
                   />
-                  <div className="flex flex-col gap-3 rounded-2xl border border-divider bg-default-50/70 p-4 md:flex-row md:items-center md:justify-between">
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-foreground">
-                        Pilih file dokumen
-                      </p>
-                      <p className="text-xs text-default-500">
-                        Format yang diterima: {acceptedFormatsLabel}.
-                      </p>
-                      <p className="mt-2 truncate text-xs text-default-400">
-                        {form.file?.name ?? "No file selected"}
-                      </p>
-                    </div>
-                    <Button
-                      className="shrink-0 font-semibold"
-                      variant="outline"
-                      onClick={handlePickFile}
-                    >
-                      <Upload size={16} />
-                      Choose File
-                    </Button>
+                  <div
+                    ref={dropZoneRef}
+                    className={`relative flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed p-8 transition-all duration-200 cursor-pointer ${
+                      isDragging
+                        ? "border-primary bg-primary/5 scale-[1.02]"
+                        : form.file
+                          ? "border-success/40 bg-success/5"
+                          : "border-divider bg-default-50/70 hover:border-primary/40 hover:bg-primary/5"
+                    }`}
+                    onClick={handlePickFile}
+                    onDragEnter={handleDragEnter}
+                    onDragLeave={handleDragLeave}
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
+                  >
+                    <AnimatePresence mode="wait">
+                      {isDragging ? (
+                        <motion.div
+                          key="dragging"
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="flex flex-col items-center gap-2"
+                          exit={{ opacity: 0, scale: 0.9 }}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                        >
+                          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                            <FileUp
+                              className="text-primary"
+                              size={24}
+                            />
+                          </div>
+                          <p className="text-sm font-bold text-primary">
+                            Drop file here
+                          </p>
+                        </motion.div>
+                      ) : form.file ? (
+                        <motion.div
+                          key="selected"
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="flex flex-col items-center gap-2"
+                          exit={{ opacity: 0, scale: 0.9 }}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                        >
+                          <div className="w-12 h-12 rounded-full bg-success/10 flex items-center justify-center">
+                            <FileText
+                              className="text-success"
+                              size={24}
+                            />
+                          </div>
+                          <p className="text-sm font-semibold text-foreground truncate max-w-[260px]">
+                            {form.file.name}
+                          </p>
+                          <p className="text-[11px] text-default-400">
+                            {(form.file.size / 1024 / 1024).toFixed(2)} MB
+                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-7 text-[10px] font-semibold text-default-500"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onFileChange(null);
+                                onFieldChange("title", "");
+                              }}
+                            >
+                              Remove
+                            </Button>
+                          </div>
+                        </motion.div>
+                      ) : (
+                        <motion.div
+                          key="empty"
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="flex flex-col items-center gap-2"
+                          exit={{ opacity: 0, scale: 0.9 }}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                        >
+                          <div className="w-12 h-12 rounded-full bg-default-100 flex items-center justify-center">
+                            <Upload
+                              className="text-default-400"
+                              size={22}
+                            />
+                          </div>
+                          <p className="text-sm font-semibold text-foreground">
+                            Drop file here or click to browse
+                          </p>
+                          <p className="text-xs text-default-400">
+                            Accepted: {acceptedFormatsLabel}
+                          </p>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 </div>
               </div>
@@ -424,6 +568,7 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                 </Select>
               </TextField>
 
+              {/* Drag & Drop Zone for Bulk */}
               <div className="space-y-1.5">
                 <Label className="text-xs font-bold text-foreground">
                   Upload Multiple Files
@@ -436,14 +581,79 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                   type="file"
                   onChange={handleBulkFileSelection}
                 />
-                <Button
-                  className="font-semibold"
-                  variant="outline"
+                <div
+                  ref={bulkDropZoneRef}
+                  className={`relative flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed p-6 transition-all duration-200 cursor-pointer ${
+                    isBulkDragging
+                      ? "border-primary bg-primary/5 scale-[1.02]"
+                      : bulkFiles.length > 0
+                        ? "border-success/40 bg-success/5"
+                        : "border-divider bg-default-50/70 hover:border-primary/40 hover:bg-primary/5"
+                  }`}
                   onClick={handleBulkPickFile}
+                  onDragEnter={handleBulkDragEnter}
+                  onDragLeave={handleBulkDragLeave}
+                  onDragOver={handleBulkDragOver}
+                  onDrop={handleBulkDrop}
                 >
-                  <Upload size={16} />
-                  Select Files ({bulkFiles.length} selected)
-                </Button>
+                  <AnimatePresence mode="wait">
+                    {isBulkDragging ? (
+                      <motion.div
+                        key="bulk-dragging"
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="flex flex-col items-center gap-1"
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                      >
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                          <FileUp className="text-primary" size={20} />
+                        </div>
+                        <p className="text-sm font-bold text-primary">
+                          Drop files here
+                        </p>
+                        <p className="text-xs text-default-400">
+                          Drop multiple files at once
+                        </p>
+                      </motion.div>
+                    ) : bulkFiles.length > 0 ? (
+                      <motion.div
+                        key="bulk-selected"
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="flex flex-col items-center gap-1"
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                      >
+                        <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center">
+                          <FileText className="text-success" size={20} />
+                        </div>
+                        <p className="text-sm font-semibold text-foreground">
+                          {bulkFiles.length} files selected
+                        </p>
+                        <p className="text-xs text-default-400">
+                          Click or drag more to add
+                        </p>
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="bulk-empty"
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="flex flex-col items-center gap-1"
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                      >
+                        <div className="w-10 h-10 rounded-full bg-default-100 flex items-center justify-center">
+                          <Upload className="text-default-400" size={20} />
+                        </div>
+                        <p className="text-sm font-semibold text-foreground">
+                          Drop files or click to browse
+                        </p>
+                        <p className="text-xs text-default-400">
+                          Accepted: {acceptedFormatsLabel}
+                        </p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
 
               <div className="space-y-1.5 rounded-2xl border border-divider bg-default-50/70 p-4">
