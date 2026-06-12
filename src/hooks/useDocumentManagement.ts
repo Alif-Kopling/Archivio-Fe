@@ -25,7 +25,7 @@ interface UseDocumentManagementOptions {
 
 export function useDocumentManagement({
   endpoint,
-  initialSortBy = "createdAt",
+  initialSortBy = "documentDate",
 }: UseDocumentManagementOptions) {
   const [files, setFiles] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
