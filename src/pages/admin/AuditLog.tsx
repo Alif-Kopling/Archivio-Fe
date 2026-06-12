@@ -52,7 +52,13 @@ export default function AuditLogPage() {
   const [clearOpen, setClearOpen] = useState(false);
   const [clearing, setClearing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [actionFilter, setActionFilter] = useState("all");
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchQuery), 300);
+    return () => clearTimeout(t);
+  }, [searchQuery]);
   const limit = 20;
 
   const fetchLogs = useCallback(async () => {
@@ -83,8 +89,8 @@ export default function AuditLogPage() {
       result = result.filter((e) => e.action === actionFilter);
     }
 
-    if (searchQuery.trim()) {
-      const q = searchQuery.trim().toLowerCase();
+    if (debouncedSearch.trim()) {
+      const q = debouncedSearch.trim().toLowerCase();
       result = result.filter(
         (e) =>
           e.userName.toLowerCase().includes(q) ||
@@ -94,7 +100,7 @@ export default function AuditLogPage() {
     }
 
     return result;
-  }, [entries, actionFilter, searchQuery]);
+  }, [entries, actionFilter, debouncedSearch]);
 
   const stats = useMemo(() => {
     const now = new Date();
