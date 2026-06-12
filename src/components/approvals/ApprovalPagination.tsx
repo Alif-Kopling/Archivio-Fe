@@ -43,19 +43,25 @@ export const ApprovalPagination: FC<ApprovalPaginationProps> = ({
           Previous
         </Button>
         <div className="flex items-center gap-1">
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-            <button
-              key={p}
-              className={`w-6 h-6 rounded-lg text-[10px] font-bold transition-all duration-150 ${
-                p === currentPage
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-default-400 hover:bg-default-100"
-              }`}
-              onClick={() => onPageChange(p)}
-            >
-              {p}
-            </button>
-          ))}
+          {(() => {
+            const start = Math.max(1, Math.min(currentPage - 1, totalPages - 2));
+            const end = Math.min(totalPages, start + 2);
+            const pages = [];
+            for (let i = start; i <= end; i++) pages.push(i);
+            return pages.map((p) => (
+              <button
+                key={p}
+                className={`w-6 h-6 rounded-lg text-[10px] font-bold transition-all duration-150 ${
+                  p === currentPage
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-default-400 hover:bg-default-100"
+                }`}
+                onClick={() => onPageChange(p)}
+              >
+                {p}
+              </button>
+            ));
+          })()}
         </div>
         <Button
           isDisabled={currentPage >= totalPages}
