@@ -207,17 +207,17 @@ export const DocumentRow: FC<DocumentRowProps> = ({
         </div>
       </div>
 
-      {/* Hover Actions */}
+      {/* Hover Actions - overlay instead of pushing */}
       <AnimatePresence>
         {isHovered && !isSelectionMode && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden"
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 4 }}
+            className="absolute bottom-0 left-0 right-0 z-10"
           >
             <div className="h-px bg-divider mx-3" />
-            <div className="flex items-center gap-1 px-3 py-2">
+            <div className="flex items-center gap-1 px-3 py-2 bg-content1/90 backdrop-blur-sm rounded-b-xl">
               {onView && (
                 <Button
                   size="sm"
