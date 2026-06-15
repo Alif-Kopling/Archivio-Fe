@@ -30,7 +30,7 @@ export const StorageSettings: FC<StorageSettingsProps> = ({
 
       <div className="grid grid-cols-1 gap-6">
         <TextField name="max_file_size" type="number">
-          <Label className="block text-xs font-bold uppercase tracking-wider mb-2 text-default-600 ml-1">
+          <Label className="block text-xs font-bold uppercase tracking-wider mb-2 text-default-600 ml-1">m    
             Max File Size (MB)
           </Label>
           <Input
