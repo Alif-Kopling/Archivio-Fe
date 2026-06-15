@@ -3,7 +3,8 @@ export interface Document {
   title: string;
   sender?: string | null;
   documentDate?: string | null;
-  filePath: string;
+  filePath: string | null;
+  fileId?: string | null;
   type: string;
   status: string;
   createdAt: string;

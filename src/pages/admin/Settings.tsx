@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "next-themes";
 import { useSearchParams } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { Alert, AlertDialog, Button, Card } from "@heroui/react";
 import {
   Building2,
@@ -35,6 +36,33 @@ import {
   type SettingCategory,
 } from "@/components/settings";
 import alarmDanger from "@/assets/alarm-danger-danger.mp3";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.06, delayChildren: 0.05 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 300, damping: 28 },
+  },
+};
+
+const contentVariants = {
+  initial: { opacity: 0, y: 10 },
+  animate: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 300, damping: 28 },
+  },
+  exit: { opacity: 0, y: -8, transition: { duration: 0.12 } },
+};
 
 const categories: SettingCategory[] = [
   {
@@ -395,38 +423,72 @@ export default function Settings() {
   };
 
   return (
-    <div className="h-screen flex flex-col p-6">
-      <SettingsHeader
-        hasChanges={hasChanges}
-        loading={loading}
-        onReset={fetchSettings}
-        onSaveAll={handleSaveAll}
-      />
-
-      <div className="flex-1 flex gap-6 min-h-0">
-        <CategorySidebar
-          activeCategory={activeCategory}
-          categories={categories}
-          onCategoryChange={setActiveCategory}
-        />
-
-        <div className="flex-1 overflow-y-auto">
-          <Card className="p-8">
-            <div className="mb-6">
-              <h2 className="text-xl font-bold text-foreground">
-                {categories.find((c) => c.id === activeCategory)?.label}
-              </h2>
-              <p className="text-foreground text-sm mt-1">
-                {categories.find((c) => c.id === activeCategory)?.description}
-              </p>
-            </div>
-            {renderContent()}
-          </Card>
-        </div>
+    <div className="relative h-screen flex flex-col p-6">
+      {/* Ambient Background */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-float" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-warning/5 rounded-full blur-3xl animate-float" style={{ animationDelay: "2s" }} />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/[0.03] rounded-full blur-3xl animate-float" style={{ animationDelay: "4s" }} />
       </div>
 
+      <motion.div
+        className="flex flex-col flex-1 min-h-0"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.div variants={itemVariants}>
+          <SettingsHeader
+            hasChanges={hasChanges}
+            loading={loading}
+            onReset={fetchSettings}
+            onSaveAll={handleSaveAll}
+          />
+        </motion.div>
+
+        <div className="flex-1 flex gap-6 min-h-0">
+          <motion.div variants={itemVariants} className="h-fit">
+            <CategorySidebar
+              activeCategory={activeCategory}
+              categories={categories}
+              onCategoryChange={setActiveCategory}
+            />
+          </motion.div>
+
+          <motion.div variants={itemVariants} className="flex-1 overflow-y-auto">
+            <Card className="p-8">
+              <div className="mb-6">
+                <h2 className="text-xl font-bold text-foreground">
+                  {categories.find((c) => c.id === activeCategory)?.label}
+                </h2>
+                <p className="text-foreground text-sm mt-1">
+                  {categories.find((c) => c.id === activeCategory)?.description}
+                </p>
+              </div>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeCategory}
+                  variants={contentVariants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                >
+                  {renderContent()}
+                </motion.div>
+              </AnimatePresence>
+            </Card>
+          </motion.div>
+        </div>
+      </motion.div>
+
       {message.text && (
-        <div className="fixed bottom-6 right-6 z-50 w-full max-w-sm">
+        <motion.div
+          className="fixed bottom-6 right-6 z-50 w-full max-w-sm"
+          initial={{ opacity: 0, y: 20, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 20, scale: 0.95 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        >
           <Alert status={message.type === "error" ? "danger" : "success"}>
             <Alert.Indicator>
               {message.type === "error" ? (
@@ -439,7 +501,7 @@ export default function Settings() {
               <Alert.Title>{message.text}</Alert.Title>
             </Alert.Content>
           </Alert>
-        </div>
+        </motion.div>
       )}
 
       <AlertDialog isOpen={trashDialogOpen} onOpenChange={setTrashDialogOpen}>

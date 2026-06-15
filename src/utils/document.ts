@@ -69,6 +69,10 @@ export function getDownloadFileName(file: Document): string {
   return file.title || "document.pdf";
 }
 
+export function hasFile(file: Document): boolean {
+  return !!(file.fileId || file.filePath);
+}
+
 export function getApprovalProgress(
   approverIds?: string | null,
   approvedByIds?: string | null,

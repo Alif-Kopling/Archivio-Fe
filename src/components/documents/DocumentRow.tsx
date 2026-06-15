@@ -60,7 +60,8 @@ export const DocumentRow: FC<DocumentRowProps> = ({
   const { isFinal, isRejected, label, color } = getStatusInfo(
     file.status, file.approverIds, file.approvedByIds, type,
   );
-  const ext = getFileExt(file.filePath);
+  const hasFile = !!(file.fileId || file.filePath);
+  const ext = hasFile ? getFileExt(file.filePath!) : "NO FILE";
   const { icon: FileIcon, color: fileColor, bg: fileBg } = getFileIcon(file.filePath);
   const StatusIcon = getStatusIcon(file.status);
   const { approvedCount, totalCount } = getApprovalProgress(file.approverIds, file.approvedByIds);
@@ -211,9 +212,9 @@ export const DocumentRow: FC<DocumentRowProps> = ({
             <Button
               size="sm"
               variant="ghost"
-              className={`h-7 text-[10px] font-semibold gap-1 rounded-lg ${isFinal ? "text-default-500 hover:text-primary" : "text-default-200 opacity-50 cursor-not-allowed"}`}
-              isDisabled={!isFinal}
-              onPress={() => isFinal && onView(file)}
+              className={`h-7 text-[10px] font-semibold gap-1 rounded-lg ${isFinal && hasFile ? "text-default-500 hover:text-primary" : "text-default-200 opacity-50 cursor-not-allowed"}`}
+              isDisabled={!isFinal || !hasFile}
+              onPress={() => isFinal && hasFile && onView(file)}
             >
               <Eye size={12} /> Preview
             </Button>
@@ -222,9 +223,9 @@ export const DocumentRow: FC<DocumentRowProps> = ({
             <Button
               size="sm"
               variant="ghost"
-              className={`h-7 text-[10px] font-semibold gap-1 rounded-lg ${isFinal ? "text-default-500 hover:text-success" : "text-default-200 opacity-50 cursor-not-allowed"}`}
-              isDisabled={!isFinal}
-              onPress={() => isFinal && onDownload(file)}
+              className={`h-7 text-[10px] font-semibold gap-1 rounded-lg ${isFinal && hasFile ? "text-default-500 hover:text-success" : "text-default-200 opacity-50 cursor-not-allowed"}`}
+              isDisabled={!isFinal || !hasFile}
+              onPress={() => isFinal && hasFile && onDownload(file)}
             >
               <Download size={12} /> Download
             </Button>
