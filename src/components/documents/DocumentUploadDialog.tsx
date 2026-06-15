@@ -134,7 +134,7 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
     !loading;
 
   const canSubmitBulk =
-    bulkFiles.length > 0 && bulkFiles.every((f) => f.isValid);
+    bulkFiles.length > 0 && bulkFiles.every((f) => f.isValid) && !loading;
 
   const handlePickFile = () => {
     fileInputRef.current?.click();
@@ -771,7 +771,7 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
           </Tabs>
 
           <div className="flex items-center justify-end gap-2 pt-2">
-            <Button variant="ghost" onClick={onClose}>
+            <Button variant="ghost" onClick={onClose} isDisabled={loading}>
               Cancel
             </Button>
             {uploadMode === "single" ? (
@@ -781,7 +781,7 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                 variant="primary"
                 onClick={onSubmit}
               >
-                {submitLabel}
+                {loading ? "Uploading..." : submitLabel}
               </Button>
             ) : (
               <Button
@@ -790,7 +790,7 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                 variant="primary"
                 onClick={onBulkSubmit}
               >
-                Upload All ({bulkFiles.filter((f) => f.isValid).length})
+                {loading ? "Uploading..." : `Upload All (${bulkFiles.filter((f) => f.isValid).length})`}
               </Button>
             )}
           </div>
