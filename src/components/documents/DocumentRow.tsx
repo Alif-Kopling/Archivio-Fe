@@ -31,7 +31,7 @@ interface DocumentRowProps {
   onSelect?: (id: string | number) => void;
 }
 
-function getFileIcon(filePath: string) {
+function getFileIcon(filePath: string | null) {
   const ext = filePath?.split(".").pop()?.toLowerCase();
   if (ext === "pdf") return { icon: FileText, color: "text-danger", bg: "bg-danger/10" };
   if (["doc", "docx"].includes(ext || "")) return { icon: FileSpreadsheet, color: "text-primary", bg: "bg-primary/10" };

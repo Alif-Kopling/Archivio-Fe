@@ -10,9 +10,9 @@ interface ApprovalPreviewModalProps {
 
 const isPdfFile = (filePath: string): boolean =>
   filePath?.toUpperCase().endsWith(".PDF");
-const isImageFile = (filePath: string): boolean =>
+const isImageFile = (filePath: string | null): boolean =>
   /\.(png|jpe?g)$/i.test(filePath || "");
-const getFileExt = (filePath: string): string =>
+const getFileExt = (filePath: string | null): string =>
   filePath?.split(".").pop()?.toUpperCase() || "FILE";
 
 const getPreviewEndpoint = (doc: any): string => {

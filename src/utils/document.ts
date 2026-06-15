@@ -151,7 +151,7 @@ export function getStatusInfo(
   };
 }
 
-export function getFileExt(filePath: string): string {
+export function getFileExt(filePath: string | null): string {
   return filePath?.split(".").pop()?.toUpperCase() || "FILE";
 }
 
