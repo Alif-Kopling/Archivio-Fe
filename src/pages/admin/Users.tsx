@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Card, Spinner, Table } from "@heroui/react";
 import { Shield, Users, UserCog, UserRound, Search } from "lucide-react";
 import { motion, type Variants } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
 
 import api from "@/lib/axios";
+import { useDebounce } from "@/hooks/useDebounce";
 import {
   AddMemberModal,
   UserSearchHeader,
@@ -37,33 +39,20 @@ const itemVariants: Variants = {
 };
 
 export default function UserManagementPage() {
-  const [users, setUsers] = useState<UserData[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 500);
   const [roleFilter, setRoleFilter] = useState("all");
 
-  const fetchUsers = useCallback(async () => {
-    try {
-      setLoading(true);
+  const { data: users = [], isLoading: loading, refetch } = useQuery<UserData[]>({
+    queryKey: ["users", { search: debouncedSearch }],
+    queryFn: async () => {
       const response = await api.get("/users", {
-        params: { search: searchQuery },
+        params: { search: debouncedSearch },
       });
-
       const fetchedUsers = Array.isArray(response.data) ? response.data : [];
-
-      setUsers(sortUsersByRole(fetchedUsers));
-    } catch (error) {
-      console.error("Failed to fetch users:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [searchQuery]);
-
-  useEffect(() => {
-    const timer = setTimeout(fetchUsers, 500);
-
-    return () => clearTimeout(timer);
-  }, [fetchUsers]);
+      return sortUsersByRole(fetchedUsers);
+    },
+  });
 
   const filteredUsers = useMemo(() => {
     if (roleFilter === "all") return users;
@@ -100,7 +89,7 @@ export default function UserManagementPage() {
         </div>
 
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-          <AddMemberModal onSuccess={fetchUsers} />
+          <AddMemberModal onSuccess={() => refetch()} />
         </motion.div>
       </motion.div>
 
@@ -139,10 +128,7 @@ export default function UserManagementPage() {
               <Table.ScrollContainer>
                 <Table.Content>
                   <Table.Header>
-                    <Table.Column
-                      isRowHeader
-                      className="border-b border-divider bg-transparent text-[10px] font-bold uppercase tracking-wider text-default-500"
-                    >
+                    <Table.Column className="border-b border-divider bg-transparent text-[10px] font-bold uppercase tracking-wider text-default-500">
                       User Profile
                     </Table.Column>
                     <Table.Column className="border-b border-divider bg-transparent text-[10px] font-bold uppercase tracking-wider text-default-500">
@@ -183,9 +169,9 @@ export default function UserManagementPage() {
                       filteredUsers.map((user, idx) => (
                         <UserTableRow
                           key={user.id}
-          user={user}
-          index={idx}
-                          onUserDeleted={fetchUsers}
+                          user={user}
+                          index={idx}
+                          onUserDeleted={() => refetch()}
                         />
                       ))
                     )}

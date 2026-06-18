@@ -20,25 +20,40 @@ import {
   VolumeX,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 
 import loginMusic from "@/assets/login-menu-music.mp3";
 import loginButtonSound from "@/assets/button-login.mp3";
-import api from "@/lib/axios";
+import { useAuth } from "@/hooks/useAuth";
 import DefaultLayout from "@/layouts/default";
+
+const loginSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const { login, loginPending } = useAuth();
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+  });
+
   React.useEffect(() => {
     const audio = new Audio(loginMusic);
-
     audio.loop = true;
     audio.volume = 0.3;
     audioRef.current = audio;
@@ -46,7 +61,6 @@ export default function LoginPage() {
     const playAudio = () => {
       audio
         .play()
-        // eslint-disable-next-line no-console
         .catch((e) => console.log("Background music autoplay blocked:", e));
     };
 
@@ -62,48 +76,30 @@ export default function LoginPage() {
   const toggleMute = () => {
     if (audioRef.current) {
       const newMutedState = !isMuted;
-
       setIsMuted(newMutedState);
       audioRef.current.volume = newMutedState ? 0 : 0.3;
     }
   };
 
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
+  const onSubmit = async (data: LoginFormValues) => {
     // button click sound
     const audio = new Audio(loginButtonSound);
-
     audio.volume = 0.5;
-    // eslint-disable-next-line no-console
     audio.play().catch((e) => console.log("Button sound failed:", e));
 
     setError("");
     setSuccess("");
-    setLoading(true);
 
-    try {
-      const response = await api.post("/auth/login", { email, password });
-
-      const { token, user } = response.data;
-
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("role", user.role.toUpperCase());
-
-      setSuccess(`Welcome back, ${user.name}!`);
-
-      // brief delay so user sees the success message
-      setTimeout(() => {
-        navigate("/welcome");
-      }, 1500);
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Invalid email or password.");
-      // Auto hide error after 5 seconds
-      setTimeout(() => setError(""), 5000);
-    } finally {
-      setLoading(false);
-    }
+    login(data, {
+      onSuccess: (res) => {
+        setSuccess(`Welcome back, ${res.user.name}!`);
+        setTimeout(() => navigate("/welcome"), 1500);
+      },
+      onError: (err: any) => {
+        setError(err.response?.data?.message || "Invalid email or password.");
+        setTimeout(() => setError(""), 5000);
+      },
+    });
   };
 
   return (
@@ -210,25 +206,25 @@ export default function LoginPage() {
               </Card.Title>
             </Card.Header>
             <Card.Content className="px-6 py-4">
-              <Form className="flex flex-col gap-4" onSubmit={onSubmit}>
-                <TextField isRequired name="email" type="email">
+              <Form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+                <TextField isRequired isInvalid={!!errors.email} name="email">
                   <Label className="text-xs font-bold ml-1">Email</Label>
                   <Input
                     className="h-10"
                     placeholder="name@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    {...register("email")}
                   />
+                  {errors.email && <p className="text-[10px] text-danger ml-1 mt-1">{errors.email.message}</p>}
                 </TextField>
 
-                <TextField isRequired name="password" type="password">
+                <TextField isRequired isInvalid={!!errors.password} name="password" type="password">
                   <Label className="text-xs font-bold ml-1">Password</Label>
                   <Input
                     className="h-10"
                     placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    {...register("password")}
                   />
+                  {errors.password && <p className="text-[10px] text-danger ml-1 mt-1">{errors.password.message}</p>}
                 </TextField>
 
                 <Button
@@ -236,7 +232,7 @@ export default function LoginPage() {
                   type="submit"
                   variant="primary"
                 >
-                  {loading ? "Connecting..." : "Sign In Now"}
+                  {loginPending ? "Connecting..." : "Sign In Now"}
                 </Button>
               </Form>
             </Card.Content>

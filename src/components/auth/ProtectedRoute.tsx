@@ -1,25 +1,34 @@
 import { Navigate, Outlet } from "react-router-dom";
+import { Spinner } from "@heroui/react";
 
-import { isAuthenticated, getRole } from "@/lib/auth";
+import { useAuth } from "@/hooks/useAuth";
 
 interface ProtectedRouteProps {
   allowedRoles?: string[];
 }
 
 const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
-  const authenticated = isAuthenticated();
-  const role = getRole();
+  const { user, isLoading, isAuthenticated } = useAuth();
 
-  if (!authenticated) {
+  if (isLoading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || !user) {
     return <Navigate replace to="/login" />;
   }
 
   if (allowedRoles) {
-    const isAllowed = allowedRoles.some((r) => r.toUpperCase() === role);
+    const userRole = user.role.toUpperCase();
+    const isAllowed = allowedRoles.some((r) => r.toUpperCase() === userRole);
 
     if (!isAllowed) {
       return (
-        <Navigate replace to={role === "ADMIN" ? "/admin" : "/dashboard"} />
+        <Navigate replace to={userRole === "ADMIN" ? "/admin" : "/dashboard"} />
       );
     }
   }
