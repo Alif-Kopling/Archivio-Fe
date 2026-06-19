@@ -28,7 +28,6 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { Document } from "@/types/document";
 
-
 interface DocumentListProps {
   files: Document[];
   total: number;
@@ -62,7 +61,11 @@ interface DocumentListProps {
 
 type ViewMode = "grid" | "list";
 
-function getDateGroup(dateStr: string): { key: string; label: string; Icon: any } {
+function getDateGroup(dateStr: string): {
+  key: string;
+  label: string;
+  Icon: any;
+} {
   const now = new Date();
   const date = new Date(dateStr);
   const diffMs = now.getTime() - date.getTime();
@@ -70,20 +73,26 @@ function getDateGroup(dateStr: string): { key: string; label: string; Icon: any 
 
   if (diffDays < 0) return { key: "upcoming", label: "Upcoming", Icon: Clock };
   if (diffDays === 0) return { key: "today", label: "Today", Icon: Clock };
-  if (diffDays <= 7) return { key: "week", label: "This Week", Icon: CalendarDays };
-  if (diffDays <= 30) return { key: "month", label: "This Month", Icon: Calendar };
+  if (diffDays <= 7)
+    return { key: "week", label: "This Week", Icon: CalendarDays };
+  if (diffDays <= 30)
+    return { key: "month", label: "This Month", Icon: Calendar };
+
   return { key: "older", label: "Older", Icon: Archive };
 }
 
 function groupByDate(files: Document[]): Map<string, Document[]> {
   const groups = new Map<string, Document[]>();
+
   files.forEach((f) => {
     const dt = f.documentDate ?? f.createdAt;
     const { key } = getDateGroup(dt);
+
     if (!groups.has(key)) groups.set(key, []);
     groups.get(key)!.push(f);
   });
   const order = ["today", "week", "month", "older", "upcoming"];
+
   return new Map(
     [...groups.entries()].sort(
       (a, b) => order.indexOf(a[0]) - order.indexOf(b[0]),
@@ -164,9 +173,9 @@ export const DocumentList: FC<DocumentListProps> = ({
         </p>
         {searchQuery.trim() && (
           <Button
+            className="text-xs font-semibold"
             size="sm"
             variant="ghost"
-            className="text-xs font-semibold"
             onPress={() => onSearchChange("")}
           >
             Clear Search
@@ -186,10 +195,11 @@ export const DocumentList: FC<DocumentListProps> = ({
           const { label, Icon } = getDateGroup(
             groupFiles[0]?.documentDate ?? groupFiles[0]?.createdAt,
           );
+
           return (
             <div key={groupKey}>
               <div className="flex items-center gap-2 mb-2 px-0.5">
-                <Icon size={13} className="text-default-400" />
+                <Icon className="text-default-400" size={13} />
                 <span className="text-[11px] font-bold text-default-400 uppercase tracking-wider">
                   {label}
                 </span>
@@ -238,10 +248,10 @@ export const DocumentList: FC<DocumentListProps> = ({
       <AnimatePresence>
         {!isSelectionMode && onUploadClick && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
             className="fixed bottom-6 right-6 z-30 sm:hidden"
+            exit={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.8 }}
           >
             <Button
               className="h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-xl shadow-primary/25"
@@ -523,10 +533,10 @@ export const DocumentList: FC<DocumentListProps> = ({
       <AnimatePresence>
         {isSelectionMode && selectedCount > 0 && (
           <motion.div
-            initial={{ y: 80, opacity: 0, scale: 0.95 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
-            exit={{ y: 80, opacity: 0, scale: 0.95 }}
             className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40"
+            exit={{ y: 80, opacity: 0, scale: 0.95 }}
+            initial={{ y: 80, opacity: 0, scale: 0.95 }}
           >
             <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-content1 border border-divider shadow-2xl shadow-black/10 dark:shadow-black/30 backdrop-blur-xl">
               <span className="text-sm font-bold text-foreground whitespace-nowrap">

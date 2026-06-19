@@ -135,9 +135,27 @@ export default function AddMemberModal({ onSuccess }: AddMemberModalProps) {
   };
 
   const fields = [
-    { id: "name" as const, label: "Full Name", icon: User, placeholder: "Enter full name", type: "text" },
-    { id: "email" as const, label: "Email Address", icon: Mail, placeholder: "Enter email address", type: "email" },
-    { id: "password" as const, label: "Password", icon: KeyRound, placeholder: "Set a secure password", type: "password" },
+    {
+      id: "name" as const,
+      label: "Full Name",
+      icon: User,
+      placeholder: "Enter full name",
+      type: "text",
+    },
+    {
+      id: "email" as const,
+      label: "Email Address",
+      icon: Mail,
+      placeholder: "Enter email address",
+      type: "email",
+    },
+    {
+      id: "password" as const,
+      label: "Password",
+      icon: KeyRound,
+      placeholder: "Set a secure password",
+      type: "password",
+    },
   ];
 
   return (
@@ -170,11 +188,11 @@ export default function AddMemberModal({ onSuccess }: AddMemberModalProps) {
               {fields.map(({ id, label, icon: Icon, placeholder, type }, i) => (
                 <motion.div
                   key={id}
-                  custom={i}
-                  variants={fieldVariants}
-                  initial="hidden"
                   animate={isOpen ? "visible" : "hidden"}
                   className="space-y-1.5"
+                  custom={i}
+                  initial="hidden"
+                  variants={fieldVariants}
                 >
                   <Label
                     className="flex items-center gap-1.5 text-xs font-bold text-foreground"
@@ -194,11 +212,11 @@ export default function AddMemberModal({ onSuccess }: AddMemberModalProps) {
               ))}
 
               <motion.div
-                custom={3}
-                variants={fieldVariants}
-                initial="hidden"
                 animate={isOpen ? "visible" : "hidden"}
                 className="space-y-1.5"
+                custom={3}
+                initial="hidden"
+                variants={fieldVariants}
               >
                 <Label
                   className="flex items-center gap-1.5 text-xs font-bold text-foreground"

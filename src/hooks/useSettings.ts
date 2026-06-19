@@ -1,5 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getSettings, getTrashStats, emptyRejectedTrash, updateSetting } from "@/services/setting.service";
+
+import {
+  getSettings,
+  getTrashStats,
+  emptyRejectedTrash,
+  updateSetting,
+} from "@/services/setting.service";
 
 export function useSettings() {
   const queryClient = useQueryClient();
@@ -9,12 +15,16 @@ export function useSettings() {
     queryFn: async () => {
       const { data } = await getSettings();
       const settingsMap: Record<string, any> = {};
+
       data.forEach((s: any) => {
-        const value = s.key.includes("auto_") || s.key.includes("email_")
-          ? s.value === "true"
-          : s.value;
+        const value =
+          s.key.includes("auto_") || s.key.includes("email_")
+            ? s.value === "true"
+            : s.value;
+
         settingsMap[s.key] = value;
       });
+
       return settingsMap;
     },
   });
@@ -23,12 +33,14 @@ export function useSettings() {
     queryKey: ["settings", "trash"],
     queryFn: async () => {
       const { data } = await getTrashStats();
+
       return data;
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ key, value }: { key: string; value: string }) => updateSetting(key, value),
+    mutationFn: ({ key, value }: { key: string; value: string }) =>
+      updateSetting(key, value),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["settings"] });
     },

@@ -114,6 +114,7 @@ export default function ApprovalsPage() {
 
   const filteredDocs = useMemo(() => {
     if (sourceFilter === "all") return pendingDocs;
+
     return pendingDocs.filter((d) => d.sourceType === sourceFilter);
   }, [pendingDocs, sourceFilter]);
 
@@ -226,10 +227,10 @@ export default function ApprovalsPage() {
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
       className="p-6 overflow-y-auto h-full space-y-6"
+      initial={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
     >
       <ApprovalHeader total={approvalTotal} />
 
@@ -242,10 +243,10 @@ export default function ApprovalsPage() {
         ].map(({ label, value, Icon, color, bg }, i) => (
           <motion.div
             key={label}
-            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.06, duration: 0.25 }}
             className="flex items-center gap-3 rounded-xl border border-divider bg-content1 p-3.5 shadow-sm"
+            initial={{ opacity: 0, y: 12 }}
+            transition={{ delay: i * 0.06, duration: 0.25 }}
           >
             <div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center ${color}`}>
               <Icon size={18} />
@@ -260,10 +261,10 @@ export default function ApprovalsPage() {
 
       <ApprovalSearchBar
         searchQuery={approvalSearchInput}
-        onSearchChange={setApprovalSearchInput}
         sourceFilter={sourceFilter}
-        onSourceFilterChange={setSourceFilter}
         stats={sourceStats}
+        onSearchChange={setApprovalSearchInput}
+        onSourceFilterChange={setSourceFilter}
       />
 
       <Card className="bg-content1 border-divider shadow-none">
@@ -324,8 +325,8 @@ export default function ApprovalsPage() {
                         doc={doc}
                         index={idx}
                         onApprove={handleApprove}
-                        onReject={handleReject}
                         onPreview={handlePreview}
+                        onReject={handleReject}
                       />
                     ))
                   )}

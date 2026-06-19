@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -35,7 +34,7 @@ export function useDocumentManagement({
   // --- Local UI State ---
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearch = useDebounce(searchQuery, 500);
-  
+
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState(initialSortBy);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
@@ -52,29 +51,41 @@ export function useDocumentManagement({
     approverIds: [],
   });
   const [bulkFiles, setBulkFiles] = useState<BulkFileItem[]>([]);
-  
+
   const [previewFile, setPreviewFile] = useState<Document | null>(null);
   const [previewUrl, setPreviewUrl] = useState("");
   const [previewLoading, setPreviewLoading] = useState(false);
-  
-  const [selectedIds, setSelectedIds] = useState<Set<number | string>>(new Set());
+
+  const [selectedIds, setSelectedIds] = useState<Set<number | string>>(
+    new Set(),
+  );
 
   // --- Data Fetching (TanStack Query) ---
   const queryKey = useMemo(
-    () => [endpoint, "list", { debouncedSearch, page, sortBy, sortOrder, statusFilter }],
-    [endpoint, debouncedSearch, page, sortBy, sortOrder, statusFilter]
+    () => [
+      endpoint,
+      "list",
+      { debouncedSearch, page, sortBy, sortOrder, statusFilter },
+    ],
+    [endpoint, debouncedSearch, page, sortBy, sortOrder, statusFilter],
   );
 
-  const { data, isLoading: queryLoading, isFetching: searchLoading, refetch } = useQuery({
+  const {
+    data,
+    isLoading: queryLoading,
+    isFetching: searchLoading,
+    refetch,
+  } = useQuery({
     queryKey,
-    queryFn: () => documentService.fetchDocuments(endpoint, {
-      search: debouncedSearch,
-      page,
-      limit,
-      sortBy,
-      sortOrder,
-      status: statusFilter,
-    }),
+    queryFn: () =>
+      documentService.fetchDocuments(endpoint, {
+        search: debouncedSearch,
+        page,
+        limit,
+        sortBy,
+        sortOrder,
+        status: statusFilter,
+      }),
     placeholderData: (previousData) => previousData,
   });
 
@@ -83,18 +94,20 @@ export function useDocumentManagement({
   const totalPages = data?.totalPages ?? 1;
   const stats: DocumentStats = resolveStats(
     data?.stats ?? { total: 0, pending: 0, verified: 0 },
-    files
+    files,
   );
 
   // --- Mutations ---
   const uploadMutation = useMutation({
-    mutationFn: (formData: FormData) => documentService.uploadDocument(endpoint, formData),
+    mutationFn: (formData: FormData) =>
+      documentService.uploadDocument(endpoint, formData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [endpoint] });
       setUploadOpen(false);
       notify({
         title: "Document Uploaded",
-        description: "Your document has been submitted and is pending administrator approval.",
+        description:
+          "Your document has been submitted and is pending administrator approval.",
         status: "success",
       });
     },
@@ -108,14 +121,16 @@ export function useDocumentManagement({
   });
 
   const bulkUploadMutation = useMutation({
-    mutationFn: (formData: FormData) => documentService.bulkUploadDocuments(endpoint, formData),
+    mutationFn: (formData: FormData) =>
+      documentService.bulkUploadDocuments(endpoint, formData),
     onSuccess: (res, variables, context) => {
       queryClient.invalidateQueries({ queryKey: [endpoint] });
       setBulkFiles([]);
       setUploadOpen(false);
       notify({
         title: "Bulk Upload Success",
-        description: "Documents have been submitted and are pending administrator approval.",
+        description:
+          "Documents have been submitted and are pending administrator approval.",
         status: "success",
       });
     },
@@ -129,7 +144,8 @@ export function useDocumentManagement({
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string | number) => documentService.deleteDocument(endpoint, id),
+    mutationFn: (id: string | number) =>
+      documentService.deleteDocument(endpoint, id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [endpoint] });
       notify({
@@ -153,8 +169,10 @@ export function useDocumentManagement({
   const toggleSelection = useCallback((id: number | string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
+
       if (next.has(id)) next.delete(id);
       else next.add(id);
+
       return next;
     });
   }, []);
@@ -206,16 +224,21 @@ export function useDocumentManagement({
         description: "Please choose a file first.",
         status: "warning",
       });
+
       return;
     }
 
     const formData = new FormData();
+
     formData.append("file", uploadForm.file);
     formData.append("title", uploadForm.title.trim());
     formData.append("documentDate", uploadForm.documentDate);
     formData.append("sender", uploadForm.sender.trim());
     formData.append("status", "draft");
-    formData.append("approverIds", JSON.stringify(uploadForm.approverIds || []));
+    formData.append(
+      "approverIds",
+      JSON.stringify(uploadForm.approverIds || []),
+    );
 
     uploadMutation.mutate(formData);
   };
@@ -226,9 +249,13 @@ export function useDocumentManagement({
 
   const handleDownload = async (file: Document) => {
     try {
-      const response = await documentService.downloadDocument(endpoint, file.id);
+      const response = await documentService.downloadDocument(
+        endpoint,
+        file.id,
+      );
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
+
       link.href = url;
       link.setAttribute("download", getDownloadFileName(file));
       document.body.appendChild(link);
@@ -254,13 +281,19 @@ export function useDocumentManagement({
     try {
       setPreviewFile(file);
       setPreviewLoading(true);
-      const response = await documentService.downloadDocument(endpoint, file.id);
-      const contentType = String(response.headers?.["content-type"] || "application/octet-stream");
+      const response = await documentService.downloadDocument(
+        endpoint,
+        file.id,
+      );
+      const contentType = String(
+        response.headers?.["content-type"] || "application/octet-stream",
+      );
       const blob = new Blob([response.data], { type: contentType });
       const url = window.URL.createObjectURL(blob);
 
       setPreviewUrl((current) => {
         if (current) window.URL.revokeObjectURL(current);
+
         return url;
       });
     } catch (error) {
@@ -283,6 +316,7 @@ export function useDocumentManagement({
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       const title = stripFileExtension(file.name);
+
       newItems.push({
         id: `${Date.now()}-${i}`,
         file,
@@ -300,7 +334,10 @@ export function useDocumentManagement({
       current.map((item) => {
         if (item.id !== id) return item;
         const updated = { ...item, [field]: value };
-        updated.isValid = Boolean(updated.sender.trim()) && Boolean(updated.documentDate);
+
+        updated.isValid =
+          Boolean(updated.sender.trim()) && Boolean(updated.documentDate);
+
         return updated;
       }),
     );
@@ -312,26 +349,33 @@ export function useDocumentManagement({
 
   const handleBulkSubmit = async () => {
     const formData = new FormData();
+
     bulkFiles.forEach((item, index) => {
       formData.append("files", item.file);
       formData.append(`title_${index}`, item.title);
       formData.append(`sender_${index}`, item.sender);
       formData.append(`documentDate_${index}`, item.documentDate);
     });
-    formData.append("approverIds", JSON.stringify(uploadForm.approverIds || []));
+    formData.append(
+      "approverIds",
+      JSON.stringify(uploadForm.approverIds || []),
+    );
 
     bulkUploadMutation.mutate(formData);
   };
 
   const handleBulkDelete = async () => {
     if (selectedIds.size === 0) return;
-    
+
     // For bulk delete, we might want a specialized endpoint if available,
     // but here we follow the original logic of individual deletes.
     try {
       const idsToDelete = Array.from(selectedIds);
-      await Promise.all(idsToDelete.map(id => documentService.deleteDocument(endpoint, id)));
-      
+
+      await Promise.all(
+        idsToDelete.map((id) => documentService.deleteDocument(endpoint, id)),
+      );
+
       queryClient.invalidateQueries({ queryKey: [endpoint] });
       notify({
         title: "Bulk Delete Success",
@@ -350,7 +394,8 @@ export function useDocumentManagement({
 
   return {
     files,
-    loading: queryLoading || uploadMutation.isPending || bulkUploadMutation.isPending,
+    loading:
+      queryLoading || uploadMutation.isPending || bulkUploadMutation.isPending,
     searchLoading,
     previewFile,
     previewUrl,

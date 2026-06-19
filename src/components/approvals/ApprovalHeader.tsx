@@ -4,8 +4,20 @@ import { FC, useMemo } from "react";
 export const ApprovalHeader: FC<{ total: number }> = ({ total }) => {
   const stats = useMemo(
     () => [
-      { label: "Pending", value: total, Icon: Clock, color: "text-warning", bg: "bg-warning/10" },
-      { label: "Urgent", value: Math.max(0, total - 3), Icon: AlertTriangle, color: "text-danger", bg: "bg-danger/10" },
+      {
+        label: "Pending",
+        value: total,
+        Icon: Clock,
+        color: "text-warning",
+        bg: "bg-warning/10",
+      },
+      {
+        label: "Urgent",
+        value: Math.max(0, total - 3),
+        Icon: AlertTriangle,
+        color: "text-danger",
+        bg: "bg-danger/10",
+      },
     ],
     [total],
   );
@@ -17,7 +29,9 @@ export const ApprovalHeader: FC<{ total: number }> = ({ total }) => {
           <ClipboardCheck size={28} />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Approval System</h1>
+          <h1 className="text-2xl font-bold text-foreground">
+            Approval System
+          </h1>
           <p className="text-default-500 text-sm">
             Review and verify incoming documents for the archive.
           </p>
@@ -30,7 +44,9 @@ export const ApprovalHeader: FC<{ total: number }> = ({ total }) => {
             className={`flex items-center gap-2 px-3 py-1.5 rounded-xl ${bg} ${color}`}
           >
             <Icon size={14} />
-            <span className="text-[11px] font-bold">{value} {label}</span>
+            <span className="text-[11px] font-bold">
+              {value} {label}
+            </span>
           </div>
         ))}
       </div>

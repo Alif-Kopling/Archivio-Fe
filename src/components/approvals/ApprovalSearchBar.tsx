@@ -18,11 +18,19 @@ const sourceChips = [
 ];
 
 export const ApprovalSearchBar: FC<ApprovalSearchBarProps> = memo(
-  ({ searchQuery, onSearchChange, sourceFilter, onSourceFilterChange, stats }) => {
+  ({
+    searchQuery,
+    onSearchChange,
+    sourceFilter,
+    onSourceFilterChange,
+    stats,
+  }) => {
     const chipCount = (id: string) => {
-      if (id === "all") return stats.incoming + stats.outgoing + stats.certificate;
+      if (id === "all")
+        return stats.incoming + stats.outgoing + stats.certificate;
       if (id === "incoming") return stats.incoming;
       if (id === "outgoing") return stats.outgoing;
+
       return stats.certificate;
     };
 
@@ -30,7 +38,9 @@ export const ApprovalSearchBar: FC<ApprovalSearchBarProps> = memo(
       <div className="flex flex-col gap-3 mb-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h4 className="text-lg font-bold text-foreground">Pending Documents</h4>
+            <h4 className="text-lg font-bold text-foreground">
+              Pending Documents
+            </h4>
             <p className="text-sm text-default-500">
               Review documents waiting in the queue.
             </p>
@@ -67,7 +77,9 @@ export const ApprovalSearchBar: FC<ApprovalSearchBarProps> = memo(
             >
               {sourceFilter === id && <Icon size={10} />}
               {label}
-              <span className={`${sourceFilter === id ? "text-primary-foreground/70" : "text-default-400"}`}>
+              <span
+                className={`${sourceFilter === id ? "text-primary-foreground/70" : "text-default-400"}`}
+              >
                 {chipCount(id)}
               </span>
             </Chip>

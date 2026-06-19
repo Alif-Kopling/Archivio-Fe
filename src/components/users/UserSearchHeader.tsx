@@ -25,6 +25,7 @@ export default function UserSearchHeader({
   const chipCount = (id: string) => {
     if (id === "all") return stats.total;
     if (id === "admin") return stats.admins;
+
     return stats.staff;
   };
 
@@ -60,7 +61,9 @@ export default function UserSearchHeader({
             >
               {roleFilter === id && <Icon size={10} />}
               {label}
-              <span className={`${roleFilter === id ? "text-primary-foreground/70" : "text-default-400"}`}>
+              <span
+                className={`${roleFilter === id ? "text-primary-foreground/70" : "text-default-400"}`}
+              >
                 {chipCount(id)}
               </span>
             </Chip>

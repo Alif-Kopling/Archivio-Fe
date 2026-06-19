@@ -60,13 +60,48 @@ const contentVariants = {
 };
 
 const categories: SettingCategory[] = [
-  { id: "general", label: "General", icon: <Building2 size={20} />, description: "Agency information and identity" },
-  { id: "documents", label: "Documents", icon: <FileText size={20} />, description: "Document and archive settings" },
-  { id: "storage", label: "Storage", icon: <HardDrive size={20} />, description: "Upload and file storage settings" },
-  { id: "notifications", label: "Notifications", icon: <Bell size={20} />, description: "Email and system notifications" },
-  { id: "security", label: "Security", icon: <Shield size={20} />, description: "System access and sessions" },
-  { id: "trash", label: "Trash", icon: <Trash2 size={20} />, description: "Rejected document cleanup" },
-  { id: "display", label: "Display", icon: <Palette size={20} />, description: "Language and themes" },
+  {
+    id: "general",
+    label: "General",
+    icon: <Building2 size={20} />,
+    description: "Agency information and identity",
+  },
+  {
+    id: "documents",
+    label: "Documents",
+    icon: <FileText size={20} />,
+    description: "Document and archive settings",
+  },
+  {
+    id: "storage",
+    label: "Storage",
+    icon: <HardDrive size={20} />,
+    description: "Upload and file storage settings",
+  },
+  {
+    id: "notifications",
+    label: "Notifications",
+    icon: <Bell size={20} />,
+    description: "Email and system notifications",
+  },
+  {
+    id: "security",
+    label: "Security",
+    icon: <Shield size={20} />,
+    description: "System access and sessions",
+  },
+  {
+    id: "trash",
+    label: "Trash",
+    icon: <Trash2 size={20} />,
+    description: "Rejected document cleanup",
+  },
+  {
+    id: "display",
+    label: "Display",
+    icon: <Palette size={20} />,
+    description: "Language and themes",
+  },
 ];
 
 export default function Settings() {
@@ -83,13 +118,15 @@ export default function Settings() {
     trashStats,
     updateSetting,
     emptyTrash,
-    isTrashing
+    isTrashing,
   } = useSettings();
 
   const [localSettings, setLocalSettings] = useState<any>(null);
   const [message, setMessage] = useState({ type: "", text: "" });
   const [hasChanges, setHasChanges] = useState(false);
-  const [activeCategory, setActiveCategory] = useState(searchParams.get("tab") || "general");
+  const [activeCategory, setActiveCategory] = useState(
+    searchParams.get("tab") || "general",
+  );
   const [savingCategory, setSavingCategory] = useState("");
   const [trashDialogOpen, setTrashDialogOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -104,6 +141,7 @@ export default function Settings() {
 
   useEffect(() => {
     const tab = searchParams.get("tab");
+
     if (tab && categories.some((c) => c.id === tab)) {
       setActiveCategory(tab);
     }
@@ -112,10 +150,13 @@ export default function Settings() {
   useEffect(() => {
     if (!trashDialogOpen) return;
 
-    const AudioContextCtor = window.AudioContext ?? (window as any).webkitAudioContext;
+    const AudioContextCtor =
+      window.AudioContext ?? (window as any).webkitAudioContext;
+
     if (!AudioContextCtor) return;
 
     const ctx = audioContextRef.current ?? new AudioContextCtor();
+
     audioContextRef.current = ctx;
 
     const startLoop = async () => {
@@ -123,15 +164,22 @@ export default function Settings() {
       if (!bufferRef.current) {
         try {
           const res = await fetch(alarmDanger);
-          bufferRef.current = await ctx.decodeAudioData(await res.arrayBuffer());
-        } catch { return; }
+
+          bufferRef.current = await ctx.decodeAudioData(
+            await res.arrayBuffer(),
+          );
+        } catch {
+          return;
+        }
       }
 
       const gain = ctx.createGain();
+
       gain.connect(ctx.destination);
       gain.gain.setValueAtTime(0.5, ctx.currentTime);
 
       const source = ctx.createBufferSource();
+
       source.buffer = bufferRef.current;
       source.loop = true;
       source.loopStart = 0;
@@ -147,8 +195,10 @@ export default function Settings() {
     return () => {
       const { current: gain } = gainRef;
       const { current: source } = sourceRef;
+
       if (gain && source) {
         const now = ctx.currentTime;
+
         gain.gain.cancelScheduledValues(now);
         gain.gain.setValueAtTime(gain.gain.value, now);
         gain.gain.linearRampToValueAtTime(0, now + 0.3);
@@ -170,6 +220,7 @@ export default function Settings() {
     setMessage({ type: "", text: "" });
     try {
       const value = localSettings[key];
+
       await updateSetting({ key, value: String(value) });
 
       if (key === "default_theme") setTheme(value);
@@ -216,8 +267,12 @@ export default function Settings() {
     try {
       const response = await emptyTrash();
       const deleted = Number(response.data?.deleted || 0);
+
       setTrashDialogOpen(false);
-      setMessage({ type: "success", text: `Removed ${deleted} rejected documents.` });
+      setMessage({
+        type: "success",
+        text: `Removed ${deleted} rejected documents.`,
+      });
       setTimeout(() => setMessage({ type: "", text: "" }), 3000);
     } catch (error: any) {
       setMessage({ type: "error", text: "Failed to empty rejected trash" });
@@ -225,7 +280,12 @@ export default function Settings() {
   };
 
   const renderContent = () => {
-    if (!localSettings) return <div className="flex justify-center p-12"><Spinner /></div>;
+    if (!localSettings)
+      return (
+        <div className="flex justify-center p-12">
+          <Spinner />
+        </div>
+      );
 
     switch (activeCategory) {
       case "general":
@@ -322,10 +382,18 @@ export default function Settings() {
     <div className="relative h-screen flex flex-col p-6">
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-float" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-warning/5 rounded-full blur-3xl animate-float" style={{ animationDelay: "2s" }} />
+        <div
+          className="absolute -bottom-40 -left-40 w-80 h-80 bg-warning/5 rounded-full blur-3xl animate-float"
+          style={{ animationDelay: "2s" }}
+        />
       </div>
 
-      <motion.div className="flex flex-col flex-1 min-h-0" variants={containerVariants} initial="hidden" animate="visible">
+      <motion.div
+        animate="visible"
+        className="flex flex-col flex-1 min-h-0"
+        initial="hidden"
+        variants={containerVariants}
+      >
         <motion.div variants={itemVariants}>
           <SettingsHeader
             hasChanges={hasChanges}
@@ -336,18 +404,35 @@ export default function Settings() {
         </motion.div>
 
         <div className="flex-1 flex gap-6 min-h-0">
-          <motion.div variants={itemVariants} className="h-fit">
-            <CategorySidebar activeCategory={activeCategory} categories={categories} onCategoryChange={setActiveCategory} />
+          <motion.div className="h-fit" variants={itemVariants}>
+            <CategorySidebar
+              activeCategory={activeCategory}
+              categories={categories}
+              onCategoryChange={setActiveCategory}
+            />
           </motion.div>
 
-          <motion.div variants={itemVariants} className="flex-1 overflow-y-auto">
+          <motion.div
+            className="flex-1 overflow-y-auto"
+            variants={itemVariants}
+          >
             <Card className="p-8">
               <div className="mb-6">
-                <h2 className="text-xl font-bold text-foreground">{categories.find((c) => c.id === activeCategory)?.label}</h2>
-                <p className="text-foreground text-sm mt-1">{categories.find((c) => c.id === activeCategory)?.description}</p>
+                <h2 className="text-xl font-bold text-foreground">
+                  {categories.find((c) => c.id === activeCategory)?.label}
+                </h2>
+                <p className="text-foreground text-sm mt-1">
+                  {categories.find((c) => c.id === activeCategory)?.description}
+                </p>
               </div>
               <AnimatePresence mode="wait">
-                <motion.div key={activeCategory} variants={contentVariants} initial="initial" animate="animate" exit="exit">
+                <motion.div
+                  key={activeCategory}
+                  animate="animate"
+                  exit="exit"
+                  initial="initial"
+                  variants={contentVariants}
+                >
                   {renderContent()}
                 </motion.div>
               </AnimatePresence>
@@ -357,10 +442,23 @@ export default function Settings() {
       </motion.div>
 
       {message.text && (
-        <motion.div className="fixed bottom-6 right-6 z-50 w-full max-w-sm" initial={{ opacity: 0, y: 20, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20, scale: 0.95 }}>
+        <motion.div
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          className="fixed bottom-6 right-6 z-50 w-full max-w-sm"
+          exit={{ opacity: 0, y: 20, scale: 0.95 }}
+          initial={{ opacity: 0, y: 20, scale: 0.95 }}
+        >
           <Alert status={message.type === "error" ? "danger" : "success"}>
-            <Alert.Indicator>{message.type === "error" ? <AlertCircle size={20} /> : <CheckCircle2 size={20} />}</Alert.Indicator>
-            <Alert.Content><Alert.Title>{message.text}</Alert.Title></Alert.Content>
+            <Alert.Indicator>
+              {message.type === "error" ? (
+                <AlertCircle size={20} />
+              ) : (
+                <CheckCircle2 size={20} />
+              )}
+            </Alert.Indicator>
+            <Alert.Content>
+              <Alert.Title>{message.text}</Alert.Title>
+            </Alert.Content>
           </Alert>
         </motion.div>
       )}
@@ -371,17 +469,34 @@ export default function Settings() {
             <AlertDialog.Dialog className="sm:max-w-[420px]">
               <AlertDialog.CloseTrigger />
               <AlertDialog.Header>
-                <AlertDialog.Icon status="danger"><AlertCircle className="size-6" /></AlertDialog.Icon>
+                <AlertDialog.Icon status="danger">
+                  <AlertCircle className="size-6" />
+                </AlertDialog.Icon>
                 <AlertDialog.Heading>Empty rejected trash?</AlertDialog.Heading>
               </AlertDialog.Header>
               <AlertDialog.Body>
                 <p className="text-sm text-default-500">
-                  You are about to permanently delete <strong className="text-foreground">{trashStats?.rejected || 0}</strong> rejected documents. Their files will also be removed from storage.
+                  You are about to permanently delete{" "}
+                  <strong className="text-foreground">
+                    {trashStats?.rejected || 0}
+                  </strong>{" "}
+                  rejected documents. Their files will also be removed from
+                  storage.
                 </p>
               </AlertDialog.Body>
               <AlertDialog.Footer>
-                <Button variant="ghost" onPress={() => setTrashDialogOpen(false)}>Cancel</Button>
-                <Button className="font-semibold bg-danger text-white shadow-lg shadow-danger/20" isDisabled={isTrashing} variant="danger" onPress={handleEmptyRejectedTrash}>
+                <Button
+                  variant="ghost"
+                  onPress={() => setTrashDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="font-semibold bg-danger text-white shadow-lg shadow-danger/20"
+                  isDisabled={isTrashing}
+                  variant="danger"
+                  onPress={handleEmptyRejectedTrash}
+                >
                   {isTrashing ? "Deleting..." : "Delete All"}
                 </Button>
               </AlertDialog.Footer>

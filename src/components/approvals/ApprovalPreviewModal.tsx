@@ -1,5 +1,6 @@
 import { FC, useEffect, useState, useRef } from "react";
 import { Button, Spinner } from "@heroui/react";
+
 import api from "@/lib/axios";
 
 interface ApprovalPreviewModalProps {
@@ -50,14 +51,17 @@ export const ApprovalPreviewModal: FC<ApprovalPreviewModalProps> = ({
         const response = await api.get(endpoint, { responseType: "blob" });
         const blob = response.data;
         const url = URL.createObjectURL(blob);
+
         objectUrlRef.current = url;
         setPreviewUrl(url);
 
         const fileSize = (blob.size / 1024).toFixed(1);
         const ext = getFileExt(doc.filePath);
+
         setPageInfo(`${ext} · ${fileSize} KB`);
       } catch (err: any) {
         const msg = err?.response?.data?.error;
+
         setError(msg || "Failed to load preview");
       } finally {
         setLoading(false);
@@ -112,9 +116,9 @@ export const ApprovalPreviewModal: FC<ApprovalPreviewModalProps> = ({
           ) : previewUrl && isPdfFile(doc.filePath) ? (
             <div className="relative">
               <embed
+                className="h-full min-h-[60vh] w-full rounded-lg bg-white"
                 src={previewUrl}
                 type="application/pdf"
-                className="h-full min-h-[60vh] w-full rounded-lg bg-white"
               />
               <div className="pointer-events-none absolute bottom-4 right-4 select-none rotate-[-15deg] text-lg font-bold text-red-500/30">
                 PREVIEW ONLY

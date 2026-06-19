@@ -188,7 +188,10 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
   const handleDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (dropZoneRef.current && !dropZoneRef.current.contains(e.relatedTarget as Node)) {
+    if (
+      dropZoneRef.current &&
+      !dropZoneRef.current.contains(e.relatedTarget as Node)
+    ) {
       setIsDragging(false);
     }
   }, []);
@@ -199,6 +202,7 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
       e.stopPropagation();
       setIsDragging(false);
       const file = e.dataTransfer.files?.[0] ?? null;
+
       if (file) {
         onFieldChange("title", stripFileExtension(file.name));
         onFileChange(file);
@@ -222,7 +226,10 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
   const handleBulkDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (bulkDropZoneRef.current && !bulkDropZoneRef.current.contains(e.relatedTarget as Node)) {
+    if (
+      bulkDropZoneRef.current &&
+      !bulkDropZoneRef.current.contains(e.relatedTarget as Node)
+    ) {
       setIsBulkDragging(false);
     }
   }, []);
@@ -461,10 +468,7 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                           initial={{ opacity: 0, scale: 0.9 }}
                         >
                           <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                            <FileUp
-                              className="text-primary"
-                              size={24}
-                            />
+                            <FileUp className="text-primary" size={24} />
                           </div>
                           <p className="text-sm font-bold text-primary">
                             Drop file here
@@ -479,10 +483,7 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                           initial={{ opacity: 0, scale: 0.9 }}
                         >
                           <div className="w-12 h-12 rounded-full bg-success/10 flex items-center justify-center">
-                            <FileText
-                              className="text-success"
-                              size={24}
-                            />
+                            <FileText className="text-success" size={24} />
                           </div>
                           <p className="text-sm font-semibold text-foreground truncate max-w-[260px]">
                             {form.file.name}
@@ -492,9 +493,9 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                           </p>
                           <div className="flex items-center gap-2 mt-1">
                             <Button
+                              className="h-7 text-[10px] font-semibold text-default-500"
                               size="sm"
                               variant="ghost"
-                              className="h-7 text-[10px] font-semibold text-default-500"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 onFileChange(null);
@@ -514,10 +515,7 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                           initial={{ opacity: 0, scale: 0.9 }}
                         >
                           <div className="w-12 h-12 rounded-full bg-default-100 flex items-center justify-center">
-                            <Upload
-                              className="text-default-400"
-                              size={22}
-                            />
+                            <Upload className="text-default-400" size={22} />
                           </div>
                           <p className="text-sm font-semibold text-foreground">
                             Drop file here or click to browse
@@ -771,7 +769,7 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
           </Tabs>
 
           <div className="flex items-center justify-end gap-2 pt-2">
-            <Button variant="ghost" onClick={onClose} isDisabled={loading}>
+            <Button isDisabled={loading} variant="ghost" onClick={onClose}>
               Cancel
             </Button>
             {uploadMode === "single" ? (
@@ -790,7 +788,9 @@ export const DocumentUploadDialog: FC<DocumentUploadDialogProps> = ({
                 variant="primary"
                 onClick={onBulkSubmit}
               >
-                {loading ? "Uploading..." : `Upload All (${bulkFiles.filter((f) => f.isValid).length})`}
+                {loading
+                  ? "Uploading..."
+                  : `Upload All (${bulkFiles.filter((f) => f.isValid).length})`}
               </Button>
             )}
           </div>

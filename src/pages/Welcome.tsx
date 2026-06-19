@@ -24,10 +24,12 @@ export default function WelcomePage() {
   useEffect(() => {
     if (countdown <= 0) {
       redirectToDashboard();
+
       return;
     }
 
     const timer = setTimeout(() => setCountdown((prev) => prev - 1), 1000);
+
     return () => clearTimeout(timer);
   }, [countdown, redirectToDashboard]);
 
@@ -53,8 +55,8 @@ export default function WelcomePage() {
         >
           <Button
             className="font-bold shadow-lg shadow-primary/20"
-            variant="primary"
             size="lg"
+            variant="primary"
             onPress={redirectToDashboard}
           >
             <LogIn size={16} />

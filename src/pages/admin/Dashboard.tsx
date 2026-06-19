@@ -29,7 +29,11 @@ const container = {
 
 const fadeUp = {
   hidden: { opacity: 0, y: 16 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" as const } },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: "easeOut" as const },
+  },
 } as const;
 
 const exportCSV = (trends: TrendItem[], stats: DashboardStats) => {
@@ -56,7 +60,7 @@ Month,Surat Masuk,Surat Keluar,Sertifikat,Total`;
 };
 
 const ActiveStaff: FC<{ data: MonitoringData["activeStaff"] }> = ({ data }) => (
-  <motion.div variants={fadeUp} className="h-full">
+  <motion.div className="h-full" variants={fadeUp}>
     <Card className="border-divider shadow-sm h-full flex flex-col overflow-hidden">
       <Card.Content className="p-3 flex flex-col h-full">
         <div className="flex items-center gap-2 mb-3 shrink-0">
@@ -69,10 +73,10 @@ const ActiveStaff: FC<{ data: MonitoringData["activeStaff"] }> = ({ data }) => (
           {data.slice(0, 4).map((item, idx) => (
             <motion.div
               key={idx}
-              initial={{ opacity: 0, x: -8 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3, delay: 0.15 + idx * 0.08 }}
               className="flex items-center justify-between group"
+              initial={{ opacity: 0, x: -8 }}
+              transition={{ duration: 0.3, delay: 0.15 + idx * 0.08 }}
             >
               <div className="flex items-center gap-2">
                 <div className="relative shrink-0">
@@ -100,7 +104,7 @@ const ActiveStaff: FC<{ data: MonitoringData["activeStaff"] }> = ({ data }) => (
 );
 
 const Leaderboard: FC<{ data: MonitoringData["leaderboard"] }> = ({ data }) => (
-  <motion.div variants={fadeUp} className="h-full">
+  <motion.div className="h-full" variants={fadeUp}>
     <Card className="border-divider shadow-sm h-full flex flex-col overflow-hidden">
       <Card.Content className="p-3 flex flex-col h-full">
         <div className="flex items-center gap-2 mb-3 shrink-0">
@@ -113,10 +117,10 @@ const Leaderboard: FC<{ data: MonitoringData["leaderboard"] }> = ({ data }) => (
           {data.slice(0, 4).map((item, idx) => (
             <motion.div
               key={idx}
-              initial={{ opacity: 0, x: 8 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3, delay: 0.15 + idx * 0.08 }}
               className="flex items-center justify-between group"
+              initial={{ opacity: 0, x: 8 }}
+              transition={{ duration: 0.3, delay: 0.15 + idx * 0.08 }}
             >
               <div className="flex items-center gap-2">
                 <motion.span
@@ -131,11 +135,7 @@ const Leaderboard: FC<{ data: MonitoringData["leaderboard"] }> = ({ data }) => (
                   }`}
                   whileHover={{ scale: 1.2 }}
                 >
-                  {idx === 0 ? (
-                    <Trophy size={10} />
-                  ) : (
-                    `#${idx + 1}`
-                  )}
+                  {idx === 0 ? <Trophy size={10} /> : `#${idx + 1}`}
                 </motion.span>
                 <p className="text-xs font-medium truncate max-w-[100px]">
                   {item.user?.name}
@@ -168,7 +168,9 @@ const HealthBadge: FC = () => (
               Operational
               <span className="inline-flex gap-1 items-center">
                 <span className="w-1.5 h-1.5 rounded-full bg-success animate-breathing" />
-                <span className="text-[9px] font-medium text-success">Live</span>
+                <span className="text-[9px] font-medium text-success">
+                  Live
+                </span>
               </span>
             </h5>
           </div>
@@ -189,15 +191,15 @@ const HealthBadge: FC = () => (
 const DashboardSkeleton: FC = () => (
   <motion.div
     className="flex flex-col gap-4"
-    initial={{ opacity: 1 }}
     exit={{ opacity: 0, transition: { duration: 0.3 } }}
+    initial={{ opacity: 1 }}
   >
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {Array.from({ length: 4 }).map((_, i) => (
         <motion.div
           key={i}
-          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 12 }}
           transition={{ delay: i * 0.06 }}
         >
           <Card className="h-[100px] relative overflow-hidden">
@@ -297,24 +299,27 @@ export default function AdminDashboard() {
           <DashboardSkeleton />
         ) : (
           <motion.div
-            className="flex-1 flex flex-col gap-3 min-h-0"
-            variants={container}
-            initial="hidden"
             animate="show"
+            className="flex-1 flex flex-col gap-3 min-h-0"
+            initial="hidden"
+            variants={container}
           >
-            <motion.div variants={fadeUp} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 shrink-0">
+            <motion.div
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 shrink-0"
+              variants={fadeUp}
+            >
               <StatsGrid stats={stats} />
             </motion.div>
 
             <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-3">
               <div className="lg:col-span-3 flex flex-col gap-3 min-h-0">
-                <motion.div variants={fadeUp} className="flex-[2] min-h-0">
+                <motion.div className="flex-[2] min-h-0" variants={fadeUp}>
                   <DistributionChart stats={stats} />
                 </motion.div>
                 <HealthBadge />
               </div>
 
-              <motion.div variants={fadeUp} className="lg:col-span-6 min-h-0">
+              <motion.div className="lg:col-span-6 min-h-0" variants={fadeUp}>
                 <TrendsChart data={trends} />
               </motion.div>
 
@@ -324,7 +329,10 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <motion.div variants={fadeUp} className="flex flex-col gap-2 shrink-0">
+            <motion.div
+              className="flex flex-col gap-2 shrink-0"
+              variants={fadeUp}
+            >
               <div className="flex items-center gap-2 shrink-0">
                 <div className="h-px flex-1 bg-divider" />
                 <h4 className="font-bold text-[9px] uppercase text-default-400 tracking-[0.2em] shrink-0 text-center px-2">

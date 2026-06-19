@@ -26,9 +26,11 @@ function useCountUp(end: number, duration = 700, enabled = true) {
       if (!start) start = ts;
       const p = Math.min((ts - start) / duration, 1);
       const eased = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
+
       setCount(Math.floor(eased * end));
       if (p < 1) requestAnimationFrame(raf);
     };
+
     requestAnimationFrame(raf);
   }, [end, duration, enabled]);
 
@@ -44,16 +46,19 @@ interface StatItem {
   isUp: boolean;
 }
 
-const StatCardItem: FC<{ item: StatItem; index: number }> = ({ item, index }) => {
+const StatCardItem: FC<{ item: StatItem; index: number }> = ({
+  item,
+  index,
+}) => {
   const { label, value, Icon, color, trend, isUp } = item;
   const count = useCountUp(value);
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.1, ease: "easeOut" }}
       className="h-full"
+      initial={{ opacity: 0, y: 20 }}
+      transition={{ duration: 0.4, delay: index * 0.1, ease: "easeOut" }}
     >
       <Card className="border-none shadow-sm relative overflow-hidden group h-full hover:shadow-lg transition-all duration-500">
         <div
@@ -89,7 +94,9 @@ const StatCardItem: FC<{ item: StatItem; index: number }> = ({ item, index }) =>
               </motion.h3>
               <Chip
                 className="h-4 text-[9px] px-1 font-bold"
-                color={trend === "Stable" ? "default" : isUp ? "success" : "danger"}
+                color={
+                  trend === "Stable" ? "default" : isUp ? "success" : "danger"
+                }
                 size="sm"
                 variant="soft"
               >
@@ -149,7 +156,7 @@ const StatsGrid: FC<{ stats: DashboardStats }> = memo(({ stats }) => {
   return (
     <>
       {items.map((item, i) => (
-        <StatCardItem key={item.label} item={item} index={i} />
+        <StatCardItem key={item.label} index={i} item={item} />
       ))}
     </>
   );

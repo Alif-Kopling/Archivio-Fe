@@ -33,10 +33,10 @@ export const ApprovalPagination: FC<ApprovalPaginationProps> = ({
     {totalPages > 1 ? (
       <div className="flex items-center gap-2">
         <Button
+          className="h-8 text-xs font-semibold"
           isDisabled={currentPage <= 1}
           size="sm"
           variant="ghost"
-          className="h-8 text-xs font-semibold"
           onPress={() => onPageChange(currentPage - 1)}
         >
           <ChevronLeft size={14} />
@@ -44,10 +44,15 @@ export const ApprovalPagination: FC<ApprovalPaginationProps> = ({
         </Button>
         <div className="flex items-center gap-1">
           {(() => {
-            const start = Math.max(1, Math.min(currentPage - 1, totalPages - 2));
+            const start = Math.max(
+              1,
+              Math.min(currentPage - 1, totalPages - 2),
+            );
             const end = Math.min(totalPages, start + 2);
             const pages = [];
+
             for (let i = start; i <= end; i++) pages.push(i);
+
             return pages.map((p) => (
               <button
                 key={p}
@@ -64,10 +69,10 @@ export const ApprovalPagination: FC<ApprovalPaginationProps> = ({
           })()}
         </div>
         <Button
+          className="h-8 text-xs font-semibold"
           isDisabled={currentPage >= totalPages}
           size="sm"
           variant="ghost"
-          className="h-8 text-xs font-semibold"
           onPress={() => onPageChange(currentPage + 1)}
         >
           Next

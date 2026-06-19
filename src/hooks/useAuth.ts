@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+
 import api from "@/lib/axios";
 import { decodeJWT, getToken } from "@/lib/auth";
 
@@ -14,15 +15,22 @@ export function useAuth() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const { data: user, isLoading, isError } = useQuery<User | null>({
+  const {
+    data: user,
+    isLoading,
+    isError,
+  } = useQuery<User | null>({
     queryKey: ["auth", "me"],
     queryFn: async () => {
       const token = getToken();
+
       if (!token) return null;
 
       const decoded = decodeJWT(token);
+
       if (!decoded || (decoded.exp && decoded.exp * 1000 < Date.now())) {
         localStorage.clear();
+
         return null;
       }
 
@@ -37,6 +45,7 @@ export function useAuth() {
       // }
 
       const userFromStorage = localStorage.getItem("user");
+
       return userFromStorage ? JSON.parse(userFromStorage) : decoded;
     },
     staleTime: 1000 * 60 * 10, // 10 minutes
@@ -45,14 +54,16 @@ export function useAuth() {
   const loginMutation = useMutation({
     mutationFn: async (credentials: any) => {
       const response = await api.post("/auth/login", credentials);
+
       return response.data;
     },
     onSuccess: (data) => {
       const { token, user } = data;
+
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("role", user.role.toUpperCase());
-      
+
       queryClient.setQueryData(["auth", "me"], user);
       navigate("/welcome");
     },

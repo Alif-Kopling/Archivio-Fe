@@ -29,9 +29,20 @@ const CHART_COLORS = {
 const formatMonth = (m: string) => {
   const [, mm] = m.split("-");
   const months = [
-    "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
-    "Jul", "Agu", "Sep", "Okt", "Nov", "Des",
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "Mei",
+    "Jun",
+    "Jul",
+    "Agu",
+    "Sep",
+    "Okt",
+    "Nov",
+    "Des",
   ];
+
   return months[parseInt(mm, 10) - 1] || m;
 };
 
@@ -46,8 +57,8 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 4, scale: 0.96 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
+      initial={{ opacity: 0, y: 4, scale: 0.96 }}
       transition={{ duration: 0.15 }}
     >
       <Card className="min-w-[140px] shadow-lg border-divider rounded-xl backdrop-blur-md bg-content1/95">
@@ -57,19 +68,30 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           {items.map(({ key, label: lbl, color }) => {
             const p = payload.find((d: any) => d.dataKey === key);
             const val = p?.value ?? 0;
+
             return (
-              <div key={key} className="flex items-center justify-between gap-4">
+              <div
+                key={key}
+                className="flex items-center justify-between gap-4"
+              >
                 <div className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
+                  <span
+                    className="w-2 h-2 rounded-full shrink-0"
+                    style={{ background: color }}
+                  />
                   <span className="text-[10px] text-default-500">{lbl}</span>
                 </div>
-                <span className="text-[10px] font-bold text-foreground tabular-nums">{val}</span>
+                <span className="text-[10px] font-bold text-foreground tabular-nums">
+                  {val}
+                </span>
               </div>
             );
           })}
           <div className="h-px bg-divider mt-1.5 mb-1" />
           <div className="flex items-center justify-between gap-4">
-            <span className="text-[10px] font-semibold text-default-500">Total</span>
+            <span className="text-[10px] font-semibold text-default-500">
+              Total
+            </span>
             <span className="text-[10px] font-bold text-foreground tabular-nums">
               {payload.reduce((s: number, d: any) => s + (d.value ?? 0), 0)}
             </span>
@@ -83,7 +105,14 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 const GradientDefs = () => (
   <defs>
     {(["masuk", "keluar", "sertifikat"] as const).map((key) => (
-      <linearGradient key={key} id={`gradient-${key}`} x1="0" y1="0" x2="0" y2="1">
+      <linearGradient
+        key={key}
+        id={`gradient-${key}`}
+        x1="0"
+        x2="0"
+        y1="0"
+        y2="1"
+      >
         <stop offset="0%" stopColor={CHART_COLORS[key]} stopOpacity={0.35} />
         <stop offset="100%" stopColor={CHART_COLORS[key]} stopOpacity={0.02} />
       </linearGradient>
@@ -167,26 +196,29 @@ const TrendsChart: FC<{ data: TrendItem[] }> = ({ data }) => {
               {(["masuk", "keluar", "sertifikat"] as const).map((key) => (
                 <Area
                   key={key}
-                  type="monotone"
-                  dataKey={key}
-                  stroke={CHART_COLORS[key]}
-                  fill={`url(#gradient-${key})`}
-                  strokeWidth={2}
-                  dot={false}
                   activeDot={{
                     r: 4,
                     fill: CHART_COLORS[key],
                     stroke: "hsl(var(--heroui-background))",
                     strokeWidth: 2,
                   }}
-                  isAnimationActive={true}
                   animationBegin={200}
                   animationDuration={1200}
                   animationEasing="ease-out"
+                  dataKey={key}
+                  dot={false}
+                  fill={`url(#gradient-${key})`}
+                  isAnimationActive={true}
                   name={
-                    key === "masuk" ? "Surat Masuk" :
-                    key === "keluar" ? "Surat Keluar" : "Sertifikat"
+                    key === "masuk"
+                      ? "Surat Masuk"
+                      : key === "keluar"
+                        ? "Surat Keluar"
+                        : "Sertifikat"
                   }
+                  stroke={CHART_COLORS[key]}
+                  strokeWidth={2}
+                  type="monotone"
                 />
               ))}
             </AreaChart>
@@ -194,21 +226,43 @@ const TrendsChart: FC<{ data: TrendItem[] }> = ({ data }) => {
         </div>
 
         <div className="flex gap-3 mt-2 pt-2 border-t border-divider shrink-0">
-          {([
-            { label: "Masuk", key: "masuk" as const, color: CHART_COLORS.masuk },
-            { label: "Keluar", key: "keluar" as const, color: CHART_COLORS.keluar },
-            { label: "Sertifikat", key: "sertifikat" as const, color: CHART_COLORS.sertifikat },
-          ] as const).map(({ label, key, color }) => {
+          {(
+            [
+              {
+                label: "Masuk",
+                key: "masuk" as const,
+                color: CHART_COLORS.masuk,
+              },
+              {
+                label: "Keluar",
+                key: "keluar" as const,
+                color: CHART_COLORS.keluar,
+              },
+              {
+                label: "Sertifikat",
+                key: "sertifikat" as const,
+                color: CHART_COLORS.sertifikat,
+              },
+            ] as const
+          ).map(({ label, key, color }) => {
             const total = data.reduce((s, d) => s + d[key], 0);
+
             return (
               <motion.div
                 key={key}
                 className="flex items-center gap-1.5"
                 whileHover={{ scale: 1.05 }}
               >
-                <span className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
-                <span className="text-[9px] font-semibold text-default-500">{label}</span>
-                <span className="text-[9px] font-bold text-foreground tabular-nums">{total}</span>
+                <span
+                  className="w-2 h-2 rounded-full shrink-0"
+                  style={{ background: color }}
+                />
+                <span className="text-[9px] font-semibold text-default-500">
+                  {label}
+                </span>
+                <span className="text-[9px] font-bold text-foreground tabular-nums">
+                  {total}
+                </span>
               </motion.div>
             );
           })}

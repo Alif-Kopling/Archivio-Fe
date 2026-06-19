@@ -12,7 +12,8 @@ interface StatCardProps {
 export const StatCard = ({ label, count, Icon, color }: StatCardProps) => {
   // Helper untuk mendapatkan class bg yang sesuai
   const getBgClass = (textClass: string) => {
-    if (textClass.includes('amber')) return 'bg-amber-500';
+    if (textClass.includes("amber")) return "bg-amber-500";
+
     return textClass.replace("text-", "bg-");
   };
 

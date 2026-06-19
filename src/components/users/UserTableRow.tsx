@@ -25,8 +25,10 @@ function isAdminRole(role: string): boolean {
 
 function getStatusSeed(id: number): "active" | "away" | "offline" {
   const mod = id % 7;
+
   if (mod < 3) return "active";
   if (mod < 5) return "away";
+
   return "offline";
 }
 
@@ -71,7 +73,9 @@ export default function UserTableRow({
             <span
               className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-content1 ${dot}`}
             >
-              <span className={`absolute inset-0 rounded-full animate-ping ${pulse}`} />
+              <span
+                className={`absolute inset-0 rounded-full animate-ping ${pulse}`}
+              />
             </span>
           </div>
           <div className="flex flex-col">
@@ -89,7 +93,9 @@ export default function UserTableRow({
       <Table.Cell className="px-4 py-3 align-middle">
         <Chip
           className={`h-6 border-none px-3 text-[10px] font-bold backdrop-blur-md gap-1 ${
-            isAdmin ? "bg-warning/10 text-warning" : "bg-default-100 dark:bg-default-50 text-default-500"
+            isAdmin
+              ? "bg-warning/10 text-warning"
+              : "bg-default-100 dark:bg-default-50 text-default-500"
           }`}
           size="sm"
           variant="soft"

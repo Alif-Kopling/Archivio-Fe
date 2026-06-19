@@ -28,16 +28,56 @@ const actionMeta: Record<
   string,
   { label: string; color: string; icon: any; bar: string }
 > = {
-  create:         { label: "Upload",       color: "success", icon: FileUp,      bar: "bg-success" },
-  approve:        { label: "Approve",      color: "primary", icon: CheckCircle, bar: "bg-primary" },
-  reject:         { label: "Reject",       color: "danger",  icon: XCircle,     bar: "bg-danger" },
-  "bulk-approve": { label: "Bulk Approve", color: "primary", icon: CheckCircle, bar: "bg-primary" },
-  "bulk-reject":  { label: "Bulk Reject",  color: "danger",  icon: Ban,         bar: "bg-danger" },
-  delete:         { label: "Delete",       color: "danger",  icon: Trash2,      bar: "bg-danger" },
-  download:       { label: "Download",     color: "warning", icon: Download,    bar: "bg-warning" },
-  withdraw:       { label: "Withdraw",     color: "warning", icon: RotateCcw,   bar: "bg-warning" },
-  "send-email":   { label: "Send Email",   color: "secondary", icon: Send,      bar: "bg-secondary" },
-  "empty-trash":  { label: "Empty Trash",  color: "danger",  icon: AlertTriangle, bar: "bg-danger" },
+  create: {
+    label: "Upload",
+    color: "success",
+    icon: FileUp,
+    bar: "bg-success",
+  },
+  approve: {
+    label: "Approve",
+    color: "primary",
+    icon: CheckCircle,
+    bar: "bg-primary",
+  },
+  reject: { label: "Reject", color: "danger", icon: XCircle, bar: "bg-danger" },
+  "bulk-approve": {
+    label: "Bulk Approve",
+    color: "primary",
+    icon: CheckCircle,
+    bar: "bg-primary",
+  },
+  "bulk-reject": {
+    label: "Bulk Reject",
+    color: "danger",
+    icon: Ban,
+    bar: "bg-danger",
+  },
+  delete: { label: "Delete", color: "danger", icon: Trash2, bar: "bg-danger" },
+  download: {
+    label: "Download",
+    color: "warning",
+    icon: Download,
+    bar: "bg-warning",
+  },
+  withdraw: {
+    label: "Withdraw",
+    color: "warning",
+    icon: RotateCcw,
+    bar: "bg-warning",
+  },
+  "send-email": {
+    label: "Send Email",
+    color: "secondary",
+    icon: Send,
+    bar: "bg-secondary",
+  },
+  "empty-trash": {
+    label: "Empty Trash",
+    color: "danger",
+    icon: AlertTriangle,
+    bar: "bg-danger",
+  },
 };
 
 function getMeta(action: string) {
@@ -72,14 +112,24 @@ export const AuditTimelineRow: FC<AuditTimelineRowProps> = ({
       {/* Timeline bar */}
       <Table.Cell className="pl-4 pr-2 py-3 w-12">
         <div className="flex items-center gap-2">
-          <div className={`w-0.5 h-8 rounded-full ${bar} opacity-40 group-hover:opacity-70 transition-opacity`} />
-          <div className={`w-7 h-7 rounded-lg ${color === "success" ? "bg-success/10 text-success" :
-            color === "danger" ? "bg-danger/10 text-danger" :
-            color === "warning" ? "bg-warning/10 text-warning" :
-            color === "primary" ? "bg-primary/10 text-primary" :
-            color === "secondary" ? "bg-secondary/10 text-secondary" :
-            "bg-default-100 text-default-500"
-          } flex items-center justify-center`}>
+          <div
+            className={`w-0.5 h-8 rounded-full ${bar} opacity-40 group-hover:opacity-70 transition-opacity`}
+          />
+          <div
+            className={`w-7 h-7 rounded-lg ${
+              color === "success"
+                ? "bg-success/10 text-success"
+                : color === "danger"
+                  ? "bg-danger/10 text-danger"
+                  : color === "warning"
+                    ? "bg-warning/10 text-warning"
+                    : color === "primary"
+                      ? "bg-primary/10 text-primary"
+                      : color === "secondary"
+                        ? "bg-secondary/10 text-secondary"
+                        : "bg-default-100 text-default-500"
+            } flex items-center justify-center`}
+          >
             <Icon size={13} />
           </div>
         </div>
@@ -88,12 +138,17 @@ export const AuditTimelineRow: FC<AuditTimelineRowProps> = ({
       <Table.Cell className="py-3">
         <Chip
           className={`font-bold border-none h-6 px-2.5 text-[10px] ${
-            color === "success" ? "bg-success/15 text-success" :
-            color === "danger" ? "bg-danger/15 text-danger" :
-            color === "warning" ? "bg-warning/15 text-warning" :
-            color === "primary" ? "bg-primary/15 text-primary" :
-            color === "secondary" ? "bg-secondary/15 text-secondary" :
-            "bg-default-100 text-default-500"
+            color === "success"
+              ? "bg-success/15 text-success"
+              : color === "danger"
+                ? "bg-danger/15 text-danger"
+                : color === "warning"
+                  ? "bg-warning/15 text-warning"
+                  : color === "primary"
+                    ? "bg-primary/15 text-primary"
+                    : color === "secondary"
+                      ? "bg-secondary/15 text-secondary"
+                      : "bg-default-100 text-default-500"
           }`}
           size="sm"
           variant="soft"

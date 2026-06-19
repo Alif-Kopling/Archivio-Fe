@@ -21,9 +21,10 @@ export const BulkActionModal: FC<BulkActionModalProps> = ({
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
       <Modal.Backdrop
-        className={isApprove
-          ? "bg-gradient-to-t from-primary/20 to-black/40"
-          : "bg-gradient-to-t from-danger/20 to-black/40"
+        className={
+          isApprove
+            ? "bg-gradient-to-t from-primary/20 to-black/40"
+            : "bg-gradient-to-t from-danger/20 to-black/40"
         }
         variant="blur"
       >
@@ -33,8 +34,8 @@ export const BulkActionModal: FC<BulkActionModalProps> = ({
               <>
                 <Modal.Header>
                   <motion.div
-                    initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
+                    initial={{ scale: 0 }}
                     transition={{ type: "spring", stiffness: 300 }}
                   >
                     <Modal.Icon>
@@ -55,7 +56,10 @@ export const BulkActionModal: FC<BulkActionModalProps> = ({
                 </Modal.Header>
                 <Modal.Body>
                   <div className="flex items-start gap-3 p-3 rounded-xl bg-default-50 dark:bg-default-100/5">
-                    <Zap size={18} className={`mt-0.5 ${isApprove ? "text-primary" : "text-danger"}`} />
+                    <Zap
+                      className={`mt-0.5 ${isApprove ? "text-primary" : "text-danger"}`}
+                      size={18}
+                    />
                     <div>
                       <p className="font-medium text-sm">
                         Batch command:{" "}
@@ -64,17 +68,23 @@ export const BulkActionModal: FC<BulkActionModalProps> = ({
                         </code>
                       </p>
                       <p className="text-default-500 text-xs mt-1">
-                        Apply {isApprove ? "authorization" : "rejection"} to
-                        all selected documents.
+                        Apply {isApprove ? "authorization" : "rejection"} to all
+                        selected documents.
                       </p>
                     </div>
                   </div>
                 </Modal.Body>
                 <Modal.Footer>
-                  <Button variant="tertiary" onPress={() => onOpenChange(false)}>
+                  <Button
+                    variant="tertiary"
+                    onPress={() => onOpenChange(false)}
+                  >
                     Cancel
                   </Button>
-                  <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                  <motion.div
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                  >
                     <Button
                       variant={isApprove ? "primary" : "danger"}
                       onPress={onConfirm}

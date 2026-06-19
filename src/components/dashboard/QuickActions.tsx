@@ -41,9 +41,13 @@ export const QuickActions: FC = () => {
       {actions.map(({ label, icon: Icon, href, color, bg }, idx) => (
         <motion.div
           key={label}
-          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, delay: 0.35 + idx * 0.08, ease: "easeOut" }}
+          initial={{ opacity: 0, y: 12 }}
+          transition={{
+            duration: 0.35,
+            delay: 0.35 + idx * 0.08,
+            ease: "easeOut",
+          }}
         >
           <Link className="block" to={href}>
             <Card className="border-none shadow-sm cursor-pointer group relative overflow-hidden hover:shadow-lg transition-all duration-500">
@@ -53,8 +57,8 @@ export const QuickActions: FC = () => {
               <Card.Content className="p-2.5 flex items-center gap-3 relative z-10">
                 <motion.div
                   className={`p-2 rounded-xl ${bg} ${color} shadow-sm shrink-0`}
-                  whileHover={{ rotate: [0, -10, 10, 0], scale: 1.15 }}
                   transition={{ duration: 0.4 }}
+                  whileHover={{ rotate: [0, -10, 10, 0], scale: 1.15 }}
                 >
                   <Icon size={18} />
                 </motion.div>

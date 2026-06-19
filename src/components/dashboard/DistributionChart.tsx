@@ -71,15 +71,24 @@ const DistributionChart: FC<{ stats: DashboardStats }> = memo(({ stats }) => {
             {rows.map((r, idx) => (
               <motion.div
                 key={r.label}
-                initial={{ opacity: 0, x: -12 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.35, delay: 0.1 + idx * 0.12, ease: "easeOut" }}
                 className="group/row"
+                initial={{ opacity: 0, x: -12 }}
+                transition={{
+                  duration: 0.35,
+                  delay: 0.1 + idx * 0.12,
+                  ease: "easeOut",
+                }}
               >
                 <div className="grid grid-cols-[1fr_44px_48px] gap-x-2 items-center px-2 py-1.5 rounded-lg hover:bg-default-100/50 transition-colors">
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className={`w-2 h-2 rounded-full shrink-0 ${r.dot} group-hover/row:animate-pulse`} />
-                    <r.Icon size={11} className="text-default-400 group-hover/row:hidden shrink-0" />
+                    <span
+                      className={`w-2 h-2 rounded-full shrink-0 ${r.dot} group-hover/row:animate-pulse`}
+                    />
+                    <r.Icon
+                      className="text-default-400 group-hover/row:hidden shrink-0"
+                      size={11}
+                    />
                     <span className="text-xs font-semibold text-foreground truncate">
                       {r.label}
                     </span>
@@ -96,7 +105,11 @@ const DistributionChart: FC<{ stats: DashboardStats }> = memo(({ stats }) => {
                     animate={{ width: `${r.pct}%` }}
                     className={`h-full rounded-full ${r.color} relative`}
                     initial={{ width: 0 }}
-                    transition={{ duration: 0.8, delay: 0.2 + idx * 0.12, ease: "easeOut" }}
+                    transition={{
+                      duration: 0.8,
+                      delay: 0.2 + idx * 0.12,
+                      ease: "easeOut",
+                    }}
                   >
                     <div className="absolute inset-0 rounded-full shimmer-overlay" />
                   </motion.div>

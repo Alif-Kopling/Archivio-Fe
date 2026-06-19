@@ -57,7 +57,9 @@ export const ApprovalRow: FC<ApprovalRowProps> = memo(
                   <div className="w-16 h-1 rounded-full bg-default-100 overflow-hidden">
                     <div
                       className="h-full rounded-full bg-warning transition-all duration-500"
-                      style={{ width: `${(approvedCount / totalCount) * 100}%` }}
+                      style={{
+                        width: `${(approvedCount / totalCount) * 100}%`,
+                      }}
                     />
                   </div>
                   <span className="text-[9px] font-medium text-default-400 flex items-center gap-0.5">
@@ -93,9 +95,9 @@ export const ApprovalRow: FC<ApprovalRowProps> = memo(
         </Table.Cell>
         <Table.Cell>
           <motion.div
+            animate={{ opacity: 1 }}
             className="flex gap-2 justify-center opacity-60 group-hover:opacity-100 transition-opacity"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
             transition={{ delay: index * 0.03 + 0.1 }}
           >
             <Tooltip>

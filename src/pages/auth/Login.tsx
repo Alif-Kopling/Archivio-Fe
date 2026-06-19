@@ -54,6 +54,7 @@ export default function LoginPage() {
 
   React.useEffect(() => {
     const audio = new Audio(loginMusic);
+
     audio.loop = true;
     audio.volume = 0.3;
     audioRef.current = audio;
@@ -76,6 +77,7 @@ export default function LoginPage() {
   const toggleMute = () => {
     if (audioRef.current) {
       const newMutedState = !isMuted;
+
       setIsMuted(newMutedState);
       audioRef.current.volume = newMutedState ? 0 : 0.3;
     }
@@ -84,6 +86,7 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginFormValues) => {
     // button click sound
     const audio = new Audio(loginButtonSound);
+
     audio.volume = 0.5;
     audio.play().catch((e) => console.log("Button sound failed:", e));
 
@@ -206,7 +209,10 @@ export default function LoginPage() {
               </Card.Title>
             </Card.Header>
             <Card.Content className="px-6 py-4">
-              <Form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+              <Form
+                className="flex flex-col gap-4"
+                onSubmit={handleSubmit(onSubmit)}
+              >
                 <TextField isRequired isInvalid={!!errors.email} name="email">
                   <Label className="text-xs font-bold ml-1">Email</Label>
                   <Input
@@ -214,17 +220,30 @@ export default function LoginPage() {
                     placeholder="name@email.com"
                     {...register("email")}
                   />
-                  {errors.email && <p className="text-[10px] text-danger ml-1 mt-1">{errors.email.message}</p>}
+                  {errors.email && (
+                    <p className="text-[10px] text-danger ml-1 mt-1">
+                      {errors.email.message}
+                    </p>
+                  )}
                 </TextField>
 
-                <TextField isRequired isInvalid={!!errors.password} name="password" type="password">
+                <TextField
+                  isRequired
+                  isInvalid={!!errors.password}
+                  name="password"
+                  type="password"
+                >
                   <Label className="text-xs font-bold ml-1">Password</Label>
                   <Input
                     className="h-10"
                     placeholder="••••••••"
                     {...register("password")}
                   />
-                  {errors.password && <p className="text-[10px] text-danger ml-1 mt-1">{errors.password.message}</p>}
+                  {errors.password && (
+                    <p className="text-[10px] text-danger ml-1 mt-1">
+                      {errors.password.message}
+                    </p>
+                  )}
                 </TextField>
 
                 <Button

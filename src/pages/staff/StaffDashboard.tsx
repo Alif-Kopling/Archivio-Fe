@@ -1,9 +1,5 @@
 import { FC, memo, useEffect, useMemo, useState, useCallback } from "react";
-import {
-  Card,
-  Chip,
-  Button,
-} from "@heroui/react";
+import { Card, Chip, Button } from "@heroui/react";
 import {
   Files,
   Hourglass,
@@ -13,7 +9,6 @@ import {
   Bell,
   Activity,
 } from "lucide-react";
-
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
@@ -68,9 +63,24 @@ const Header: FC = () => (
 const StatsGrid: FC<{ stats: Stats }> = memo(({ stats }) => {
   const items = useMemo<StatItem[]>(
     () => [
-      { label: "Total Docs",  value: stats.total,   Icon: Files,      color: "text-primary" },
-      { label: "Pending",     value: stats.pending,  Icon: Hourglass,  color: "text-warning" },
-      { label: "Verified",    value: stats.verified, Icon: ShieldCheck,color: "text-success" },
+      {
+        label: "Total Docs",
+        value: stats.total,
+        Icon: Files,
+        color: "text-primary",
+      },
+      {
+        label: "Pending",
+        value: stats.pending,
+        Icon: Hourglass,
+        color: "text-warning",
+      },
+      {
+        label: "Verified",
+        value: stats.verified,
+        Icon: ShieldCheck,
+        color: "text-success",
+      },
     ],
     [stats],
   );
@@ -78,14 +88,23 @@ const StatsGrid: FC<{ stats: Stats }> = memo(({ stats }) => {
   return (
     <>
       {items.map(({ label, value, Icon, color }) => (
-        <Card key={label} className="border-none shadow-sm relative overflow-hidden group">
-          <div className={`absolute inset-0 opacity-[0.05] ${color.replace("text-", "bg-")} group-hover:opacity-[0.1] transition-opacity`} />
+        <Card
+          key={label}
+          className="border-none shadow-sm relative overflow-hidden group"
+        >
+          <div
+            className={`absolute inset-0 opacity-[0.05] ${color.replace("text-", "bg-")} group-hover:opacity-[0.1] transition-opacity`}
+          />
           <Card.Content className="px-4 py-4 flex items-center gap-3 relative z-10">
-            <div className={`p-2 rounded-lg ${color.replace("text-", "bg-")}/10 ${color} shrink-0`}>
+            <div
+              className={`p-2 rounded-lg ${color.replace("text-", "bg-")}/10 ${color} shrink-0`}
+            >
               <Icon size={18} />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-[10px] font-bold text-default-400 uppercase tracking-tighter truncate">{label}</p>
+              <p className="text-[10px] font-bold text-default-400 uppercase tracking-tighter truncate">
+                {label}
+              </p>
               <div className="flex items-center gap-2 mt-0.5">
                 <motion.h3
                   key={value}
@@ -103,9 +122,13 @@ const StatsGrid: FC<{ stats: Stats }> = memo(({ stats }) => {
     </>
   );
 });
+
 StatsGrid.displayName = "StatsGrid";
 
-const statusColorMap: Record<string, "warning" | "success" | "danger" | "accent" | "default"> = {
+const statusColorMap: Record<
+  string,
+  "warning" | "success" | "danger" | "accent" | "default"
+> = {
   pending: "warning",
   draft: "default",
   verified: "success",
@@ -118,7 +141,7 @@ const PendingList: FC<{ data: DocumentItem[] }> = ({ data }) => {
     return (
       <Card className="border-divider shadow-sm h-full">
         <Card.Content className="flex flex-col items-center justify-center h-full gap-2">
-          <ClipboardCheck size={24} className="text-default-300" />
+          <ClipboardCheck className="text-default-300" size={24} />
           <p className="text-sm text-default-400">No pending documents</p>
         </Card.Content>
       </Card>
@@ -171,10 +194,29 @@ const PendingList: FC<{ data: DocumentItem[] }> = ({ data }) => {
 const DistributionCard: FC<{ stats: Stats }> = memo(({ stats }) => {
   const rows = useMemo(() => {
     const total = stats.total || 1;
+
     return [
-      { label: "Pending", count: stats.pending, pct: (stats.pending / total) * 100, color: "bg-warning", dot: "bg-warning" },
-      { label: "Verified", count: stats.verified, pct: (stats.verified / total) * 100, color: "bg-success", dot: "bg-success" },
-      { label: "Total", count: stats.total, pct: 100, color: "bg-primary", dot: "bg-primary" },
+      {
+        label: "Pending",
+        count: stats.pending,
+        pct: (stats.pending / total) * 100,
+        color: "bg-warning",
+        dot: "bg-warning",
+      },
+      {
+        label: "Verified",
+        count: stats.verified,
+        pct: (stats.verified / total) * 100,
+        color: "bg-success",
+        dot: "bg-success",
+      },
+      {
+        label: "Total",
+        count: stats.total,
+        pct: 100,
+        color: "bg-primary",
+        dot: "bg-primary",
+      },
     ];
   }, [stats]);
 
@@ -188,7 +230,9 @@ const DistributionCard: FC<{ stats: Stats }> = memo(({ stats }) => {
               <div className="flex items-center justify-between px-1 mb-1">
                 <div className="flex items-center gap-1.5">
                   <span className={`w-2 h-2 rounded-full ${r.dot}`} />
-                  <span className="text-[10px] font-semibold text-foreground">{r.label}</span>
+                  <span className="text-[10px] font-semibold text-foreground">
+                    {r.label}
+                  </span>
                 </div>
                 <span className="text-[10px] font-bold text-default-500 tabular-nums">
                   {r.count} ({r.pct.toFixed(0)}%)
@@ -209,6 +253,7 @@ const DistributionCard: FC<{ stats: Stats }> = memo(({ stats }) => {
     </Card>
   );
 });
+
 DistributionCard.displayName = "DistributionCard";
 
 const QuickActionCard: FC<{
@@ -220,9 +265,13 @@ const QuickActionCard: FC<{
 }> = ({ label, icon: Icon, href, color, bg }) => (
   <Link to={href}>
     <Card className="border-divider shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer group hover:-translate-y-0.5 relative overflow-hidden aspect-square">
-      <div className={`absolute inset-0 opacity-[0.03] ${bg} group-hover:opacity-[0.08] transition-opacity`} />
+      <div
+        className={`absolute inset-0 opacity-[0.03] ${bg} group-hover:opacity-[0.08] transition-opacity`}
+      />
       <Card.Content className="p-3 flex flex-col items-center justify-center gap-2 relative z-10 h-full">
-        <div className={`p-3 rounded-xl ${bg} ${color} group-hover:scale-110 transition-all duration-300 shadow-sm shrink-0`}>
+        <div
+          className={`p-3 rounded-xl ${bg} ${color} group-hover:scale-110 transition-all duration-300 shadow-sm shrink-0`}
+        >
           <Icon size={28} />
         </div>
         <span className="text-[10px] font-bold text-default-600 group-hover:text-foreground transition-colors uppercase tracking-tight truncate text-center">
@@ -248,7 +297,11 @@ const DashboardSkeleton: FC = () => (
 );
 
 export default function StaffDashboard() {
-  const [stats,   setStats]   = useState<Stats>({ total: 0, pending: 0, verified: 0 });
+  const [stats, setStats] = useState<Stats>({
+    total: 0,
+    pending: 0,
+    verified: 0,
+  });
   const [pending, setPending] = useState<DocumentItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -256,11 +309,11 @@ export default function StaffDashboard() {
     try {
       setLoading(true);
       const response = await api.get("/dashboard");
-      const payload  = response.data ?? {};
+      const payload = response.data ?? {};
 
       setStats({
-        total:    Number(payload.stats?.total   || 0),
-        pending:  Number(payload.stats?.pending  || 0),
+        total: Number(payload.stats?.total || 0),
+        pending: Number(payload.stats?.pending || 0),
         verified: Number(payload.stats?.verified || 0),
       });
       setPending(payload.data || []);
@@ -271,13 +324,17 @@ export default function StaffDashboard() {
     }
   }, []);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   return (
     <div className="h-full w-full flex flex-col gap-3 p-3 overflow-hidden max-w-[1600px] mx-auto">
       <Header />
 
-      {loading ? <DashboardSkeleton /> : (
+      {loading ? (
+        <DashboardSkeleton />
+      ) : (
         <div className="flex-1 flex flex-col gap-3 min-h-0">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 shrink-0">
             <StatsGrid stats={stats} />

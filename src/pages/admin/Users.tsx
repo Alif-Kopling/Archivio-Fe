@@ -35,7 +35,11 @@ const containerVariants: Variants = {
 
 const itemVariants: Variants = {
   hidden: { opacity: 0, y: 12 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.25, ease: "easeOut" } },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.25, ease: "easeOut" },
+  },
 };
 
 export default function UserManagementPage() {
@@ -43,19 +47,25 @@ export default function UserManagementPage() {
   const debouncedSearch = useDebounce(searchQuery, 500);
   const [roleFilter, setRoleFilter] = useState("all");
 
-  const { data: users = [], isLoading: loading, refetch } = useQuery<UserData[]>({
+  const {
+    data: users = [],
+    isLoading: loading,
+    refetch,
+  } = useQuery<UserData[]>({
     queryKey: ["users", { search: debouncedSearch }],
     queryFn: async () => {
       const response = await api.get("/users", {
         params: { search: debouncedSearch },
       });
       const fetchedUsers = Array.isArray(response.data) ? response.data : [];
+
       return sortUsersByRole(fetchedUsers);
     },
   });
 
   const filteredUsers = useMemo(() => {
     if (roleFilter === "all") return users;
+
     return users.filter((u) => u.role.toLowerCase() === roleFilter);
   }, [users, roleFilter]);
 
@@ -63,25 +73,31 @@ export default function UserManagementPage() {
     const total = users.length;
     const admins = users.filter((u) => u.role.toLowerCase() === "admin").length;
     const staff = total - admins;
+
     return { total, admins, staff };
   }, [users]);
 
   return (
     <motion.div
-      variants={containerVariants}
-      initial="hidden"
       animate="visible"
       className="flex w-full flex-col gap-6"
+      initial="hidden"
+      variants={containerVariants}
     >
       {/* Page Header */}
-      <motion.div variants={itemVariants} className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+      <motion.div
+        className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center"
+        variants={itemVariants}
+      >
         <div className="flex items-center gap-3">
           <div className="relative p-2.5 rounded-xl bg-primary/10 text-primary overflow-hidden">
             <Shield size={22} />
             <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">User Management</h1>
+            <h1 className="text-2xl font-bold text-foreground">
+              User Management
+            </h1>
             <p className="text-sm text-default-500">
               Monitor and manage system access for all registered members.
             </p>
@@ -94,14 +110,40 @@ export default function UserManagementPage() {
       </motion.div>
 
       {/* Role Distribution Summary */}
-      <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <motion.div
+        className="grid grid-cols-1 sm:grid-cols-3 gap-3"
+        variants={itemVariants}
+      >
         {[
-          { label: "Total Members", value: stats.total, Icon: Users, color: "text-primary", bg: "bg-primary/10" },
-          { label: "Administrators", value: stats.admins, Icon: UserCog, color: "text-warning", bg: "bg-warning/10" },
-          { label: "Staff Members", value: stats.staff, Icon: UserRound, color: "text-default-500", bg: "bg-default-100" },
+          {
+            label: "Total Members",
+            value: stats.total,
+            Icon: Users,
+            color: "text-primary",
+            bg: "bg-primary/10",
+          },
+          {
+            label: "Administrators",
+            value: stats.admins,
+            Icon: UserCog,
+            color: "text-warning",
+            bg: "bg-warning/10",
+          },
+          {
+            label: "Staff Members",
+            value: stats.staff,
+            Icon: UserRound,
+            color: "text-default-500",
+            bg: "bg-default-100",
+          },
         ].map(({ label, value, Icon, color, bg }) => (
-          <div key={label} className="flex items-center gap-3 rounded-xl border border-divider bg-content1 p-3.5 shadow-sm">
-            <div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center ${color}`}>
+          <div
+            key={label}
+            className="flex items-center gap-3 rounded-xl border border-divider bg-content1 p-3.5 shadow-sm"
+          >
+            <div
+              className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center ${color}`}
+            >
               <Icon size={18} />
             </div>
             <div>
@@ -118,13 +160,16 @@ export default function UserManagementPage() {
           <UserSearchHeader
             roleFilter={roleFilter}
             searchQuery={searchQuery}
+            stats={stats}
             onRoleFilterChange={setRoleFilter}
             onSearchChange={setSearchQuery}
-            stats={stats}
           />
 
           <Card.Content className="p-0">
-            <Table aria-label="User management table" className="bg-transparent">
+            <Table
+              aria-label="User management table"
+              className="bg-transparent"
+            >
               <Table.ScrollContainer>
                 <Table.Content>
                   <Table.Header>
@@ -158,7 +203,7 @@ export default function UserManagementPage() {
                           colSpan={4}
                         >
                           <div className="flex flex-col items-center gap-2">
-                            <Search size={24} className="text-default-300" />
+                            <Search className="text-default-300" size={24} />
                             {searchQuery.trim()
                               ? `"${searchQuery.trim()}" not found`
                               : "No matching user records identified."}
@@ -169,8 +214,8 @@ export default function UserManagementPage() {
                       filteredUsers.map((user, idx) => (
                         <UserTableRow
                           key={user.id}
-                          user={user}
                           index={idx}
+                          user={user}
                           onUserDeleted={() => refetch()}
                         />
                       ))

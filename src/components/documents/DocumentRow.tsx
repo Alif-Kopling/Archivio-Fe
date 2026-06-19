@@ -17,7 +17,12 @@ import { Button, Chip, AlertDialog, Checkbox } from "@heroui/react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { Document } from "@/types/document";
-import { getStatusInfo, getFileExt, formatDate, getApprovalProgress } from "@/utils/document";
+import {
+  getStatusInfo,
+  getFileExt,
+  formatDate,
+  getApprovalProgress,
+} from "@/utils/document";
 
 interface DocumentRowProps {
   file: Document;
@@ -33,16 +38,28 @@ interface DocumentRowProps {
 
 function getFileIcon(filePath: string | null) {
   const ext = filePath?.split(".").pop()?.toLowerCase();
-  if (ext === "pdf") return { icon: FileText, color: "text-danger", bg: "bg-danger/10" };
-  if (["doc", "docx"].includes(ext || "")) return { icon: FileSpreadsheet, color: "text-primary", bg: "bg-primary/10" };
-  if (["jpg", "jpeg", "png", "gif", "webp"].includes(ext || "")) return { icon: Image, color: "text-success", bg: "bg-success/10" };
+
+  if (ext === "pdf")
+    return { icon: FileText, color: "text-danger", bg: "bg-danger/10" };
+  if (["doc", "docx"].includes(ext || ""))
+    return {
+      icon: FileSpreadsheet,
+      color: "text-primary",
+      bg: "bg-primary/10",
+    };
+  if (["jpg", "jpeg", "png", "gif", "webp"].includes(ext || ""))
+    return { icon: Image, color: "text-success", bg: "bg-success/10" };
+
   return { icon: File, color: "text-default-500", bg: "bg-default-100" };
 }
 
 function getStatusIcon(status: string) {
   const s = status?.toLowerCase();
-  if (["final", "approved", "approve", "publish", "published"].includes(s)) return CheckCircle;
+
+  if (["final", "approved", "approve", "publish", "published"].includes(s))
+    return CheckCircle;
   if (s === "rejected") return XCircle;
+
   return Clock;
 }
 
@@ -58,13 +75,23 @@ export const DocumentRow: FC<DocumentRowProps> = ({
   onSelect,
 }) => {
   const { isFinal, isRejected, label, color } = getStatusInfo(
-    file.status, file.approverIds, file.approvedByIds, type,
+    file.status,
+    file.approverIds,
+    file.approvedByIds,
+    type,
   );
   const hasFile = !!(file.fileId || file.filePath);
   const ext = hasFile ? getFileExt(file.filePath!) : "NO FILE";
-  const { icon: FileIcon, color: fileColor, bg: fileBg } = getFileIcon(file.filePath);
+  const {
+    icon: FileIcon,
+    color: fileColor,
+    bg: fileBg,
+  } = getFileIcon(file.filePath);
   const StatusIcon = getStatusIcon(file.status);
-  const { approvedCount, totalCount } = getApprovalProgress(file.approverIds, file.approvedByIds);
+  const { approvedCount, totalCount } = getApprovalProgress(
+    file.approverIds,
+    file.approvedByIds,
+  );
 
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -95,6 +122,7 @@ export const DocumentRow: FC<DocumentRowProps> = ({
   const handleClick = useCallback(() => {
     if (preventClickRef.current) {
       preventClickRef.current = false;
+
       return;
     }
     if (isSelectionMode) onSelect?.(file.id);
@@ -122,23 +150,23 @@ export const DocumentRow: FC<DocumentRowProps> = ({
         ${isLongPressing ? "scale-[0.98]" : ""}
         ${borderColor} border-l-[3px]
       `}
+      onClick={handleClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={handleClick}
-      onPointerDown={handlePointerDown}
-      onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
+      onPointerDown={handlePointerDown}
       onPointerLeave={handlePointerUp}
+      onPointerUp={handlePointerUp}
     >
       {/* Main Content */}
       <div className="p-3 flex items-start gap-3 flex-1">
         <AnimatePresence>
           {isSelectionMode && (
             <motion.div
-              initial={{ opacity: 0, scale: 0.5, width: 0 }}
               animate={{ opacity: 1, scale: 1, width: "auto" }}
-              exit={{ opacity: 0, scale: 0.5, width: 0 }}
               className="flex items-center shrink-0 pt-1 overflow-hidden"
+              exit={{ opacity: 0, scale: 0.5, width: 0 }}
+              initial={{ opacity: 0, scale: 0.5, width: 0 }}
             >
               <Checkbox isReadOnly isSelected={isSelected}>
                 <Checkbox.Control>
@@ -149,14 +177,18 @@ export const DocumentRow: FC<DocumentRowProps> = ({
           )}
         </AnimatePresence>
 
-        <div className={`w-10 h-10 shrink-0 rounded-xl ${fileBg} flex items-center justify-center shadow-sm`}>
-          <FileIcon size={18} className={fileColor} />
+        <div
+          className={`w-10 h-10 shrink-0 rounded-xl ${fileBg} flex items-center justify-center shadow-sm`}
+        >
+          <FileIcon className={fileColor} size={18} />
         </div>
 
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0 flex-1">
-              <p className={`text-sm font-semibold truncate ${isSelected ? "text-primary" : "text-foreground"}`}>
+              <p
+                className={`text-sm font-semibold truncate ${isSelected ? "text-primary" : "text-foreground"}`}
+              >
                 {file.title}
               </p>
               <div className="flex items-center gap-2 mt-0.5 flex-wrap">
@@ -180,7 +212,7 @@ export const DocumentRow: FC<DocumentRowProps> = ({
               size="sm"
               variant="soft"
             >
-              <StatusIcon size={10} className={statusColor} />
+              <StatusIcon className={statusColor} size={10} />
               {label}
             </Chip>
           </div>
@@ -189,9 +221,9 @@ export const DocumentRow: FC<DocumentRowProps> = ({
             <div className="flex items-center gap-2 mt-2">
               <div className="flex-1 h-1 rounded-full bg-default-100 overflow-hidden max-w-[120px]">
                 <motion.div
-                  initial={{ width: 0 }}
                   animate={{ width: `${(approvedCount / totalCount) * 100}%` }}
                   className="h-full rounded-full bg-warning"
+                  initial={{ width: 0 }}
                   transition={{ duration: 0.5, ease: "easeOut" }}
                 />
               </div>
@@ -205,15 +237,17 @@ export const DocumentRow: FC<DocumentRowProps> = ({
       </div>
 
       {/* Hover Actions - always reserved, fade in on hover */}
-      <div className={`transition-all duration-200 ${isHovered && !isSelectionMode ? "opacity-100 max-h-10" : "opacity-0 max-h-0"} overflow-hidden`}>
+      <div
+        className={`transition-all duration-200 ${isHovered && !isSelectionMode ? "opacity-100 max-h-10" : "opacity-0 max-h-0"} overflow-hidden`}
+      >
         <div className="h-px bg-divider mx-3" />
         <div className="flex items-center gap-1 px-3 py-2">
           {onView && (
             <Button
-              size="sm"
-              variant="ghost"
               className={`h-7 text-[10px] font-semibold gap-1 rounded-lg ${isFinal && hasFile ? "text-default-500 hover:text-primary" : "text-default-200 opacity-50 cursor-not-allowed"}`}
               isDisabled={!isFinal || !hasFile}
+              size="sm"
+              variant="ghost"
               onPress={() => isFinal && hasFile && onView(file)}
             >
               <Eye size={12} /> Preview
@@ -221,10 +255,10 @@ export const DocumentRow: FC<DocumentRowProps> = ({
           )}
           {onDownload && (
             <Button
-              size="sm"
-              variant="ghost"
               className={`h-7 text-[10px] font-semibold gap-1 rounded-lg ${isFinal && hasFile ? "text-default-500 hover:text-success" : "text-default-200 opacity-50 cursor-not-allowed"}`}
               isDisabled={!isFinal || !hasFile}
+              size="sm"
+              variant="ghost"
               onPress={() => isFinal && hasFile && onDownload(file)}
             >
               <Download size={12} /> Download
@@ -232,10 +266,10 @@ export const DocumentRow: FC<DocumentRowProps> = ({
           )}
           {onSendEmail && (
             <Button
-              size="sm"
-              variant="ghost"
               className={`h-7 text-[10px] font-semibold gap-1 rounded-lg ${isFinal ? "text-default-500 hover:text-violet-500" : "text-default-200 opacity-50 cursor-not-allowed"}`}
               isDisabled={!isFinal}
+              size="sm"
+              variant="ghost"
               onPress={() => isFinal && onSendEmail(file)}
             >
               <Mail size={12} /> Email
@@ -243,9 +277,9 @@ export const DocumentRow: FC<DocumentRowProps> = ({
           )}
           <div className="flex-1" />
           <Button
+            className="h-7 text-[10px] font-semibold gap-1 rounded-lg text-default-400 hover:text-danger"
             size="sm"
             variant="ghost"
-            className="h-7 text-[10px] font-semibold gap-1 rounded-lg text-default-400 hover:text-danger"
             onPress={() => setDeleteOpen(true)}
           >
             <Trash2 size={12} /> Delete
@@ -270,8 +304,14 @@ export const DocumentRow: FC<DocumentRowProps> = ({
                 </p>
               </AlertDialog.Body>
               <AlertDialog.Footer>
-                <Button slot="close" variant="tertiary">Cancel</Button>
-                <Button className="bg-danger text-white" slot="close" onClick={() => onDelete(file.id)}>
+                <Button slot="close" variant="tertiary">
+                  Cancel
+                </Button>
+                <Button
+                  className="bg-danger text-white"
+                  slot="close"
+                  onClick={() => onDelete(file.id)}
+                >
                   Confirm
                 </Button>
               </AlertDialog.Footer>

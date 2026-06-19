@@ -1,5 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { AlertDialog, Button, Card, Chip, SearchField, Spinner, Table } from "@heroui/react";
+import {
+  AlertDialog,
+  Button,
+  Card,
+  Chip,
+  SearchField,
+  Spinner,
+  Table,
+} from "@heroui/react";
 import {
   History,
   Trash2,
@@ -38,9 +46,27 @@ const actionFilters = [
 ];
 
 const summaryCards = [
-  { label: "Today", key: "today", Icon: Clock, color: "text-primary", bg: "bg-primary/10" },
-  { label: "This Week", key: "week", Icon: CalendarDays, color: "text-warning", bg: "bg-warning/10" },
-  { label: "Total", key: "total", Icon: Activity, color: "text-success", bg: "bg-success/10" },
+  {
+    label: "Today",
+    key: "today",
+    Icon: Clock,
+    color: "text-primary",
+    bg: "bg-primary/10",
+  },
+  {
+    label: "This Week",
+    key: "week",
+    Icon: CalendarDays,
+    color: "text-warning",
+    bg: "bg-warning/10",
+  },
+  {
+    label: "Total",
+    key: "total",
+    Icon: Activity,
+    color: "text-success",
+    bg: "bg-success/10",
+  },
 ];
 
 export default function AuditLogPage() {
@@ -57,6 +83,7 @@ export default function AuditLogPage() {
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(searchQuery), 300);
+
     return () => clearTimeout(t);
   }, [searchQuery]);
   const limit = 20;
@@ -91,6 +118,7 @@ export default function AuditLogPage() {
 
     if (debouncedSearch.trim()) {
       const q = debouncedSearch.trim().toLowerCase();
+
       result = result.filter(
         (e) =>
           e.userName.toLowerCase().includes(q) ||
@@ -104,12 +132,21 @@ export default function AuditLogPage() {
 
   const stats = useMemo(() => {
     const now = new Date();
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const todayStart = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+    );
     const weekStart = new Date(todayStart);
+
     weekStart.setDate(weekStart.getDate() - weekStart.getDay());
 
-    const today = entries.filter((e) => new Date(e.createdAt) >= todayStart).length;
-    const week = entries.filter((e) => new Date(e.createdAt) >= weekStart).length;
+    const today = entries.filter(
+      (e) => new Date(e.createdAt) >= todayStart,
+    ).length;
+    const week = entries.filter(
+      (e) => new Date(e.createdAt) >= weekStart,
+    ).length;
 
     return { today, week, total };
   }, [entries, total]);
@@ -132,10 +169,10 @@ export default function AuditLogPage() {
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
       className="flex w-full flex-col gap-6"
+      initial={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
     >
       {/* Header */}
       <div className="flex items-start justify-between gap-4 flex-col sm:flex-row">
@@ -155,10 +192,10 @@ export default function AuditLogPage() {
         <AlertDialog isOpen={clearOpen} onOpenChange={setClearOpen}>
           <AlertDialog.Trigger>
             <Button
+              className="font-semibold"
               isDisabled={entries.length === 0}
               size="sm"
               variant="danger"
-              className="font-semibold"
             >
               <Trash2 size={16} />
               Clear All
@@ -170,7 +207,9 @@ export default function AuditLogPage() {
                 <AlertDialog.CloseTrigger />
                 <AlertDialog.Header>
                   <AlertDialog.Icon status="danger" />
-                  <AlertDialog.Heading>Clear all audit logs?</AlertDialog.Heading>
+                  <AlertDialog.Heading>
+                    Clear all audit logs?
+                  </AlertDialog.Heading>
                 </AlertDialog.Header>
                 <AlertDialog.Body>
                   <p className="text-sm text-default-500">
@@ -187,9 +226,9 @@ export default function AuditLogPage() {
                     Cancel
                   </Button>
                   <Button
+                    className="font-semibold"
                     isPending={clearing}
                     variant="danger"
-                    className="font-semibold"
                     onPress={handleClearAll}
                   >
                     {clearing ? "Deleting..." : "Delete All"}
@@ -203,26 +242,32 @@ export default function AuditLogPage() {
 
       {/* Summary Stats */}
       <motion.div
-        initial={{ y: 12, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.05 }}
         className="grid grid-cols-1 sm:grid-cols-3 gap-3"
+        initial={{ y: 12, opacity: 0 }}
+        transition={{ delay: 0.05 }}
       >
         {summaryCards.map(({ label, Icon, color, bg }, i) => (
           <motion.div
             key={label}
-            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.08 + i * 0.04 }}
             className="flex items-center gap-3 rounded-xl border border-divider bg-content1 p-3.5 shadow-sm"
+            initial={{ opacity: 0, y: 10 }}
+            transition={{ delay: 0.08 + i * 0.04 }}
           >
-            <div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center ${color}`}>
+            <div
+              className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center ${color}`}
+            >
               <Icon size={18} />
             </div>
             <div>
               <p className="text-xs text-default-400 font-medium">{label}</p>
               <p className="text-lg font-bold text-foreground">
-                {label === "Today" ? stats.today : label === "This Week" ? stats.week : stats.total}
+                {label === "Today"
+                  ? stats.today
+                  : label === "This Week"
+                    ? stats.week
+                    : stats.total}
               </p>
             </div>
           </motion.div>
@@ -231,10 +276,10 @@ export default function AuditLogPage() {
 
       {/* Search + Filters */}
       <motion.div
-        initial={{ y: 12, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.12 }}
         className="flex flex-col gap-3"
+        initial={{ y: 12, opacity: 0 }}
+        transition={{ delay: 0.12 }}
       >
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <SearchField
@@ -264,7 +309,10 @@ export default function AuditLogPage() {
               }`}
               size="sm"
               variant={actionFilter === id ? "primary" : "soft"}
-              onClick={() => { setActionFilter(id); setPage(1); }}
+              onClick={() => {
+                setActionFilter(id);
+                setPage(1);
+              }}
             >
               {actionFilter === id && <Icon size={10} />}
               {label}
@@ -319,7 +367,7 @@ export default function AuditLogPage() {
                         colSpan={6}
                       >
                         <div className="flex flex-col items-center gap-2">
-                          <Search size={24} className="text-default-300" />
+                          <Search className="text-default-300" size={24} />
                           Log activity records not found.
                         </div>
                       </Table.Cell>
@@ -347,10 +395,10 @@ export default function AuditLogPage() {
             </span>
             <div className="flex items-center gap-2">
               <Button
+                className="h-8 text-xs font-semibold"
                 isDisabled={page <= 1}
                 size="sm"
                 variant="ghost"
-                className="h-8 text-xs font-semibold"
                 onPress={() => setPage((p) => Math.max(1, p - 1))}
               >
                 <ChevronLeft size={14} />
@@ -359,6 +407,7 @@ export default function AuditLogPage() {
               <div className="flex items-center gap-1">
                 {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
                   let p: number;
+
                   if (totalPages <= 7) {
                     p = i + 1;
                   } else if (page <= 4) {
@@ -368,6 +417,7 @@ export default function AuditLogPage() {
                   } else {
                     p = page - 3 + i;
                   }
+
                   return (
                     <button
                       key={p}
@@ -384,10 +434,10 @@ export default function AuditLogPage() {
                 })}
               </div>
               <Button
+                className="h-8 text-xs font-semibold"
                 isDisabled={page >= totalPages}
                 size="sm"
                 variant="ghost"
-                className="h-8 text-xs font-semibold"
                 onPress={() => setPage((p) => p + 1)}
               >
                 Next
